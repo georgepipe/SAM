@@ -37,6 +37,6 @@ ehthumbs.db
 Thumbs.db
 
 
-./vendor
-./node_modules
-./bin
+vendor/
+node_modules/
+bin/
