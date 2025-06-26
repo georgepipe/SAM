@@ -16,11 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
         $pdf = $parser->parseFile($_FILES['pdf']['tmp_name']);
         $text = $pdf->getText();
         // echo '<PRE>';
-        // print_r($_FILES['pdf']);
+        //  print_r($_FILES['pdf']);
         // die('stap');
-        $upload_file = fopen($_FILES['pdf']['tmp_name'], 'w');
-        if($upload_file === null) {
-            echo 'file uploaded';
+        $targetFile = 'advice_notes/'.basename($_FILES['pdf']['tmp_name']);
+        echo 'advice_notes/'.$_FILES['pdf']['name'].'<BR>';
+        $upload_file = move_uploaded_file($_FILES['pdf']['tmp_name'], $targetFile);
+        if($upload_file) {
+            echo 'File uploaded<BR>';
+            //fread($upload_file,1);
+            echo '<BR>';
         } else {
             die('error!');
         };
@@ -46,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             $serialString === '' ? $serialString = $serial : '';
             //remove any model name from start if present
             preg_match('/(.*?)\/\d.+ -/',$serialString, $hasPrefix);
-            print_r($hasPrefix);
+            // print_r($hasPrefix);
             if(isset($hasPrefix[1])) {
                 $serialString = substr($serialString, strlen($hasPrefix[1])+1);
             }
