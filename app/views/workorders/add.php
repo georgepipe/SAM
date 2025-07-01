@@ -19,8 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
         //  print_r($_FILES['pdf']);
         // die('stap');
         $targetFile = 'advice_notes/'.basename($_FILES['pdf']['tmp_name']);
-        echo 'advice_notes/'.$_FILES['pdf']['name'].'<BR>';
+        //echo 'advice_notes/'.$_FILES['pdf']['name'].'<BR>';
         $upload_file = move_uploaded_file($_FILES['pdf']['tmp_name'], $targetFile);
+        //echo move_uploaded_file('Here','There');
+        echo 'upload file: '.$upload_file.'<BR>';
+        print_r($upload_file);
         if($upload_file) {
             echo 'File uploaded<BR>';
             //fread($upload_file,1);

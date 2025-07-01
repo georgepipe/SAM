@@ -16,9 +16,11 @@
         - refactor serial regex (sometimes misses old serials)<BR>
         - PID management (stop duplicate PIDs)<BR>
         - Fix edit page: does not populate form correctly on load<br>
+        - Add search bar to filter results
        <BR> 
        <strong>Transport Page:</strong><BR>
         - Calculate total weight for delivery<BR>  
+        - Add search bar to filter results
        <BR>
        <strong>Invertory Page:</strong><BR>
        - Everything<BR> 
