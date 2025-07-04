@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             'waveguide' => extractData('/s,\s(.*?)\swaveguide,/',$text),
             'transport' => (extractData('/(Deliver\sto\sF1)/',$text) ?? extractData('/(To\sstorage)/',$text)) ?? 'TBC',
             'wheels' => (extractData('/WK-4IN\sto\sbe\sfitted/',$text)) ? true : false,
+            'part_no' => extractData('/(F1-\d{3}-\d{3})/'),
             'status' => 'Upcoming'// -- eventually this should set to either 'to be built' or 'waiting for parts' depending on stock levels
         ]; 
         empty($pdfdata['serials']) ? $pdfdata['serials'] = extractData('/(\d{5}\s-\s\d{5})/', $text): '';
@@ -108,6 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
 
     }
 }
+
+$data->data->part_no = $pdfdata['part_no'];
+
 ?>
 
 <div class="">
