@@ -72,7 +72,7 @@
   
   <div class="container">
     <div class="section">
-      <div class="value"><span class="label">WKO:</span> <?php echo $data->workorder->wko; ?> <span class="label">     AVN:</span> <?php echo $data->workorder->avn; ?></div>
+      <div class="value"><span class="label">WKO:</span><?php echo $data->workorder->wko; ?> <span class="label">     AVN:<a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($data->workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"></span> <?php echo $data->workorder->avn; ?></a></div>
       <div class="value"><span class="label">Quantity Required:</span> <?php echo $data->workorder->quantity_required; ?></div>
       <div class="value"><span class="label">Unit Price:</span> <?php echo $data->workorder->model->build_price; ?></div>
       <div class="value"><span class="label">Serial(s):</span> <?php echo $data->workorder->serials; ?></div>

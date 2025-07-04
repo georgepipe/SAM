@@ -92,7 +92,8 @@ class Workorders extends Controller {
                 'wko_status' => trim($_POST['wko_status']),
                 'wko_delivery' => trim($_POST['wko_delivery']),
                 'wko_notes' => trim($_POST['wko_notes']),
-                'pid' => ''
+                'pid' => '',
+                'avn_file' => $_POST['avn_file']
             );
             //$pid = $this->woModel->getPidFromOptions($data);
           
@@ -111,6 +112,8 @@ class Workorders extends Controller {
                 'data' => $data,
                 'errors' => $errors
             );
+
+            $fileName = 'AVN_'.str_pad($data->data->avn, 5 ,'0', STR_PAD_LEFT).'.pdf';
         //validate post data//
             
          //search for WKO and check to see if it slready exists in the db
@@ -216,7 +219,7 @@ class Workorders extends Controller {
             } : '';
             $pid = $this->woModel->getPidFromOptions($data->data); 
             $data->data->pid = $pid;
-            if(empty($pid)&&empty($data->data->fixings)) {
+            if(empty($pid)&&empty($data->data->fixings)) { //set default fixings for new pids
                 $colourname = $this->woModel->getFinishfromId($data->data->cab_finish_id);
                 $colourname = $colourname->name;
                 preg_match('/(Polyurea)/',$colourname,$matches);
@@ -258,14 +261,15 @@ class Workorders extends Controller {
                     $data->data->model = $this->moModel->getModelFromMid($data->data->cab_model_id);
                     $this->poModel->addPidFromOptions($data->data);
                     $pid = $this->woModel->getPidFromOptions($data->data);
-                    print_r($data->data);
                     $data->data->pid = $pid;
                     empty($pid) ? throwErr(999,'PID ERROR: Seek guidance from the almighty flying spaghetti monster'): '';
                 }
             //save to db
                 if ($this->woModel->addOrder($data->data)){
-                // if (1===1){
                     // $this->seModel->addSerials($data->data->work_order_id, $data->data->cab_model_id, $data->data->serials);
+                    $pdfLoc = TEMPDIR.$fileName;
+                    $pdfDest = AVNDIR.$fileName;
+                    $file = rename($pdfLoc, $pdfDest);
                     flash('post_message', 'Workorder sucessfully added');
                     redirect('workorders/index');
                 } else {

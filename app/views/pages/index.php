@@ -26,5 +26,6 @@
        - Everything<BR> 
     </p>
     <BR>
+    <?php  echo exec('whoami'); ?>
 </div>
 <?php require APPROOT . '/views/inc/footer.php'; ?>

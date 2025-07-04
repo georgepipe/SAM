@@ -12,31 +12,28 @@ $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
     if($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
-        $parser = new Parser();
-        $pdf = $parser->parseFile($_FILES['pdf']['tmp_name']);
-        $text = $pdf->getText();
-        // echo '<PRE>';
-        //  print_r($_FILES['pdf']);
-        // die('stap');
-        $targetFile = 'advice_notes/'.basename($_FILES['pdf']['tmp_name']);
-        //echo 'advice_notes/'.$_FILES['pdf']['name'].'<BR>';
-        $upload_file = move_uploaded_file($_FILES['pdf']['tmp_name'], $targetFile);
-        //echo move_uploaded_file('Here','There');
-        echo 'upload file: '.$upload_file.'<BR>';
-        print_r($upload_file);
-        if($upload_file) {
-            echo 'File uploaded<BR>';
-            //fread($upload_file,1);
-            echo '<BR>';
-        } else {
-            die('error!');
-        };
-        unset($_FILES['pdf']); 
 
         function extractData($pattern, $text) {
             preg_match($pattern, $text, $matches);
             return isset($matches[1]) ? trim($matches[1]) : null;
         }
+        $parser = new Parser();
+        $pdf = $parser->parseFile($_FILES['pdf']['tmp_name']);
+        $text = $pdf->getText();
+        $avn = extractData('/AVN_(\d{5})/', $_FILES['pdf']['name']);
+        //$targetFile = '/Applications/XAMPP/xamppfiles/htdocs/SAM/public/advice_notes/'.basename($_FILES['pdf']['name']);
+        $targetFile = TEMPDIR.basename('AVN_'.$avn.'.pdf');
+        $upload_file = move_uploaded_file($_FILES['pdf']['tmp_name'], $targetFile);
+        print_r($upload_file);
+        if($upload_file) {
+            echo 'File uploaded to temp dir';
+        } else {
+            echo $targetFile;
+            die('error!');
+        };
+        //unset($_FILES['pdf']); 
+
+       
 
         function cleanSerials($serial) {
             $serialString = $serial;
