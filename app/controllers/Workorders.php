@@ -72,7 +72,6 @@ class Workorders extends Controller {
 
  
     public function add() {
-       
         if($_SERVER['REQUEST_METHOD'] == 'POST' && !isset(($_FILES['pdf']))) {
          //sanitise POST array
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
@@ -93,9 +92,12 @@ class Workorders extends Controller {
                 'wko_delivery' => trim($_POST['wko_delivery']),
                 'wko_notes' => trim($_POST['wko_notes']),
                 'pid' => '',
+                'part_no' => trim($_POST['part_no']),
                 'avn_file' => $_POST['avn_file']
             );
-            //$pid = $this->woModel->getPidFromOptions($data);
+
+            $explodedGrille = explode(' ',$data->grille_finish_id);
+            $data->grille_finish_id = $explodedGrille[0];
           
             $errors = (object) array (
                 'err_wko' => '',
@@ -129,14 +131,11 @@ class Workorders extends Controller {
             if($this->woModel->getWorkorderByAvn($data->data->avn) ) {
                 $data->errors->err_avn = 'A work order already exists with this AVN';
             } 
-            
             if(!is_numeric($data->data->cab_finish_id) && !empty($data->data->cab_finish_id)) {
                 $sh = preg_match('/(SH)/',$data->data->cab_model_id);
                 $data->data->cab_finish_id = $this->woModel->getFidFromName($data->data->cab_finish_id, !empty($sh));
-                // print_r($data->data);
-                // die('oh no');
             }
-
+        
             if(empty($data->data->cab_model_id)) {
                 $data->errors->err_cab_model = 'Please select the cabinet model';
             } elseif (!is_numeric($data->data->cab_model_id)) {
@@ -151,7 +150,6 @@ class Workorders extends Controller {
                 $sh = preg_match('/(SH)/',$data->data->cab_model_id);
                 $data->data->waveguide_finish_id = $this->woModel->getFidFromName($data->data->waveguide_finish_id, isset($sh) ? true : false);
             }
-            
             if(empty($data->data->grille_finish_id)) {
                 $data->errors->err_grille_colour = match ($data->data->cab_model_id) {
                     //this needs refactoring - current static setup is not growth friendly
@@ -160,11 +158,14 @@ class Workorders extends Controller {
                     '19' => $data->grille_finish_id = 17,
                     default => '',
                 };
-            }
+            };
+
+
             if (!is_numeric($data->data->grille_finish_id) && !empty($data->data->grille_finish_id)) {
+
                 $data->data->grille_finish_id = $this->woModel->getFidFromName($data->data->grille_finish_id, 0); 
+
             }
-            
         //connectors!
             if(empty($data->data->connectors)) {
                 //check if we need to ask for clarification otherwise use default connectors
@@ -251,7 +252,7 @@ class Workorders extends Controller {
                 }
             };
 
-            if (empty($errorsZZ)) {
+            if (empty($errors)) {
         //validated
                 //$pid = $this->woModel->getPidFromOptions($data->data);
                 // echo '<PRE>';

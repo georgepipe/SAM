@@ -21,17 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
         $pdf = $parser->parseFile($_FILES['pdf']['tmp_name']);
         $text = $pdf->getText();
         $avn = extractData('/AVN_(\d{5})/', $_FILES['pdf']['name']);
-        //$targetFile = '/Applications/XAMPP/xamppfiles/htdocs/SAM/public/advice_notes/'.basename($_FILES['pdf']['name']);
         $targetFile = TEMPDIR.basename('AVN_'.$avn.'.pdf');
         $upload_file = move_uploaded_file($_FILES['pdf']['tmp_name'], $targetFile);
-        print_r($upload_file);
         if($upload_file) {
-            echo 'File uploaded to temp dir';
         } else {
-            echo $targetFile;
-            die('error!');
+            throwErr(107,'Pdf upload error!');
         };
-        //unset($_FILES['pdf']); 
+        unset($_FILES['pdf']); 
 
        
 
@@ -72,9 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             'waveguide' => extractData('/s,\s(.*?)\swaveguide,/',$text),
             'transport' => (extractData('/(Deliver\sto\sF1)/',$text) ?? extractData('/(To\sstorage)/',$text)) ?? 'TBC',
             'wheels' => (extractData('/WK-4IN\sto\sbe\sfitted/',$text)) ? true : false,
-            'part_no' => extractData('/(F1-\d{3}-\d{3})/'),
+            'part_no' => extractData('/(F1-\d{3}-\d{3})/', $text),
             'status' => 'Upcoming'// -- eventually this should set to either 'to be built' or 'waiting for parts' depending on stock levels
         ]; 
+
+        $pdfdata['colour'] = ucwords(extractData('/s,(.*?)\scabinet/', $text));
+        echo $pdfdata['colour'];
+        die('oh bother');
+
         empty($pdfdata['serials']) ? $pdfdata['serials'] = extractData('/(\d{5}\s-\s\d{5})/', $text): '';
         
         $pdfdata['serials'] = cleanSerials($pdfdata['serials']);
@@ -110,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
     }
 }
 
-$data->data->part_no = $pdfdata['part_no'];
+// $data->data->part_no = $pdfdata['part_no'];
 
 ?>
 
@@ -267,7 +268,7 @@ $data->data->part_no = $pdfdata['part_no'];
                         value="<?php echo($data->data->wko_notes); ?>"><?php echo($data->data->wko_notes); ?></textarea>
                     <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes;?></span>
                 </div>
-
+                <!-- <input class="hidden" type="text" name="part_no" value="<?php echo $pdfdata['part_no']; ?>"></input> -->
                 <input type="submit" 
                     class="btn" 
                     value="Submit">
@@ -276,6 +277,7 @@ $data->data->part_no = $pdfdata['part_no'];
 </div>
 
 
-<?php echo '<PRE>errs:'; print_r($data->errors); ?>
+<?php echo '<PRE>errs:'; print_r($data->errors);?>
+<?php echo 'pdfData:'; print_r($pdfdata);?>
 
 <?php require APPROOT . '/views/inc/footer.php'; ?>
