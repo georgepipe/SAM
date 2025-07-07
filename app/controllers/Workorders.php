@@ -150,11 +150,11 @@ class Workorders extends Controller {
                 $sh = preg_match('/(SH)/',$data->data->cab_model_id);
                 $data->data->waveguide_finish_id = $this->woModel->getFidFromName($data->data->waveguide_finish_id, isset($sh) ? true : false);
             }
-            if(empty($data->data->grille_finish_id)) {
-                $data->errors->err_grille_colour = match ($data->data->cab_model_id) {
+            if(empty($data->data->grille_finish_id)) { 
                     //this needs refactoring - current static setup is not growth friendly
+                $data->errors->err_grille_colour = match ($data->data->cab_model_id) {
                     '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','20','33','34','35','36','37','38','39' => "Please select a grille colour",
-                    '17' => $data->grille_finish_id = 18,
+                    '17', => $data->grille_finish_id = 18,
                     '19' => $data->grille_finish_id = 17,
                     default => '',
                 };
@@ -370,8 +370,7 @@ class Workorders extends Controller {
                        $errors = 'TRUE';
                    }
                }
-               //die('death');
-               if (empty($errors)) {
+               if (!$errors === TRUE) {
            // if(empty($data['errors']->err_avn) && empty($data['errors']->err_wko) && empty($data['errors']->err_cab_model) && empty($data['errors']->err_cab_colour) && empty($data['errors']->err_quantity_required)) {
              //if validated run the edit method
                     if ($this->woModel->editOrder($data->data)){
@@ -379,11 +378,11 @@ class Workorders extends Controller {
                         redirect('workorders/index');
                     } else {
                         die ('<br> something went wrong');
-                    }
+                    };
             } else {
          //else reload with errors
             $data = (object) [
-                'models' => $this->woModel->getModels(),
+                'models' => $this->moModel->getModels(),
                 'finishes' => $this->woModel->getFinishes(),
                 'data' => $data->data,
                 'errors' => $data->errors

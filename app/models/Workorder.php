@@ -126,6 +126,7 @@ class Workorder {
         }
 
         public function editOrder($data) {
+            die('this is a death');
             $this->db->query('UPDATE work_orders SET 
                 work_order_id = :work_order_id,
                 avn = :avn, 
