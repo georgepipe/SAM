@@ -20,6 +20,7 @@
             try {$results = $this->db->resultSet();} catch (PDOException $e) {
                 PRINT_R($e);
             };
+            
             return $results;
         }
 

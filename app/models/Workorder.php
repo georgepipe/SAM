@@ -59,7 +59,7 @@ class Workorder {
 
 
         public function getFinishes(){
-            $this->db->query('select * from finishes order by name asc');
+            $this->db->query('select * from finishes');
             $results = $this->db->resultSet();
             return $results;
         }
@@ -126,11 +126,10 @@ class Workorder {
         }
 
         public function editOrder($data) {
-            die('this is a death');
             $this->db->query('UPDATE work_orders SET 
                 work_order_id = :work_order_id,
-                avn = :avn, 
                 wko = :wko,
+                avn = :avn, 
                 pid = :pid, 
                 wheels = :wheels,
                 quantity_required = :quantity_required,
@@ -149,7 +148,7 @@ class Workorder {
             $this->db->bind(':wko',  $data->wko);
             $this->db->bind(':avn',  $data->avn);
             $this->db->bind(':pid',  $data->pid);
-            $this->db->bind(':wheels',  $data->wheels);
+            $this->db->bind(':wheels', 'yes please sir!');
             $this->db->bind(':quantity_required',  $data->quantity_required);
             $this->db->bind(':quantity_built',  $data->quantity_built);
             $this->db->bind(':serials',  $data->serials);
@@ -161,8 +160,7 @@ class Workorder {
             // try {$this->db->execute();} catch (PDOException $e) {
             //     print_r($e);
             // }
-
-
+            // die('this will not update!');
             if($this->db->execute()){
                 return true;
             } else { 

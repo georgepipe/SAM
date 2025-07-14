@@ -1,6 +1,7 @@
 <?php require APPROOT . '/views/inc/header.php'; ?>
 
 
+<a class="" href="javascript:history.go(-1)"><?php include APPROOT.'/views/components/icons/backicon.php'; ?>Back</a>
 
 <?php 
 
@@ -72,9 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             'status' => 'Upcoming'// -- eventually this should set to either 'to be built' or 'waiting for parts' depending on stock levels
         ]; 
 
-        $pdfdata['colour'] = ucwords(extractData('/s,(.*?)\scabinet/', $text));
-        echo $pdfdata['colour'];
-        die('oh bother');
+        // $pdfdata['colour'] = ucwords(extractData('/s,(.*?)\scabinet/', $text));
+        // echo $pdfdata['colour'];
+        // die('oh bother');
 
         empty($pdfdata['serials']) ? $pdfdata['serials'] = extractData('/(\d{5}\s-\s\d{5})/', $text): '';
         

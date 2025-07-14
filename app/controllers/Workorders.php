@@ -374,7 +374,7 @@ class Workorders extends Controller {
            // if(empty($data['errors']->err_avn) && empty($data['errors']->err_wko) && empty($data['errors']->err_cab_model) && empty($data['errors']->err_cab_colour) && empty($data['errors']->err_quantity_required)) {
              //if validated run the edit method
                     if ($this->woModel->editOrder($data->data)){
-                        flash('post_message', 'Post Added');
+                        flash('post_message', 'Workorder Updated');
                         redirect('workorders/index');
                     } else {
                         die ('<br> something went wrong');
@@ -400,16 +400,17 @@ class Workorders extends Controller {
                 'finishes' => $this->woModel->getFinishes(),
                 'data' => $this->woModel->getWorkorderById($id),
             ];
-            
-            $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
-            $data->data->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
-            $data->data->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
-            $data->data->waveguide = $this->woModel->getFinishfromId($data->product->waveguide);
+            if (!empty($data->data)) {
+                $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
+                $data->data->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
+                $data->data->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
+                $data->data->waveguide = $this->woModel->getFinishfromId($data->product->waveguide);
+            };
             
 
          //load edit page with workorder data 
             $this->view('workorders/edit', $data);
-            }
+            };
         }
     }
 

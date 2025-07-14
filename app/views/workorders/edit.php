@@ -1,4 +1,7 @@
 <?php require APPROOT . '/views/inc/header.php'; ?>
+
+<a class="" href="javascript:history.go(-1)"><?php include APPROOT.'/views/components/icons/backicon.php'; ?>Back</a>
+
 <div class="row">
     <div class="card card-body bg-light mt-2 text-center">
         <h1 class=" text-lg">NEED TO LOAD INFORMATION INTO FORM PROPERLY!!</h1>
@@ -32,8 +35,9 @@
                     <select 
                         name="cab_model_id" 
                         class= "<?php echo (!empty($data->errors->err_cab_model))? 'is-invalid' : '';?>" 
-                        value="<?php echo $data->product->model_id;?>">
-                        <option value="<?php if(isset($data->product)) {echo $data->product->model_id;} else { echo '';} ?>"><?php if(isset($data->product)) {echo $data->models[$data->product->model_id-1]->name;} else { echo ' - -';} ?></option>
+                        value="<?php echo $data->data->product->model_id;?>">
+                        
+                        <option value="<?php if(isset($data->data->product->model_id)) {echo $data->data->product->model_id;} else { echo '';} ?>"><?php if(isset($data->data->product->model_id)) {echo $data->models[$data->data->product->model_id-1]->name;} else { echo '';} ?></option>
                         <?php foreach($data->models as $model) : ?>
                             <option value="<?php echo $model->name;?>"><?php echo $model->name;?></option>
                          <?php endforeach; ?>
@@ -46,7 +50,7 @@
                         name="cab_finish_id" 
                         class= "<?php echo (!empty($data->errors->err_cab_colour))? 'is-invalid' : '';?> cabColourSel" 
                         value="<?php echo $data->data->cab_finish_id;?>">
-                        <option value="<?php if(isset($data->product->finish_id)) {echo $data->product->finish_id;} else { echo '';} ?>"><?php if(isset($data->product->finish_id)) {echo $data->data->cab_finish->name;} else { echo ' - -';} ?></option>
+                        <option value="<?php if(isset($data->data->product->finish_id)) {echo $data->data->product->finish_id;} else { echo '';} ?>"><?php if(isset($data->data->product->finish_id)) {echo $data->finishes[$data->data->product->finish_id-1]->name;} else { echo '';} ?></option>
                         <?php foreach($data->finishes as $finish) : ?>
                             <?php if($finish->type != 'Metal' & $finish->type != 'Polyurethane') :?>
                                 <option value="<?php echo $finish->id;?>"><?php echo $finish->name;?></option> 
@@ -61,7 +65,7 @@
                         name="grille_finish_id" 
                         class= "<?php echo (!empty($data->errors->err_grille_colour))? 'is-invalid' : '';?> " 
                         value="<?php echo $data->data->grille_finish_id;?>">
-                        <option value="<?php if(isset($data->product->grille_finish_id)) {echo $data->product->grille_finish_id;} else { echo '';} ?>"><?php if(isset($data->product->grille_finish_id)) {echo $data->data->grille_finish->name;} else { echo ' - -';} ?></option>
+                        <option value="<?php if(isset($data->data->product->grille_finish_id)) {echo $data->data->product->grille_finish_id;} else { echo '';} ?>"><?php if(isset($data->data->product->grille_finish_id)) {echo $data->data->grille_finish->name;} else { echo '';} ?></option>
                         <?php foreach($data->finishes as $finish) : ?>
                             <?php if($finish->type != 'Polyurethane' & $finish->type != 'Wood' & $finish->type != 'Weather Resistant') :?>
                                 <option value="<?php echo $finish->id;?>"><?php echo $finish->name;?></option> 
