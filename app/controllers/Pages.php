@@ -18,5 +18,10 @@ class Pages  extends Controller {
         ];
 
         $this->view('/pages/about', $data);
-        }
+    }
+
+    public function _404() {
+        
+        $this->view('pages/404');
+    }
 }

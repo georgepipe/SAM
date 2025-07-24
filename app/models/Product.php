@@ -42,12 +42,15 @@
                 default => $workorder->product->connectors,
             };
             if(!is_null($workorder->grille_finish)) {
-                $grille = match($workorder->grille_finish->type) {
-                    'Standard' => "m'Steel ".$workorder->grille_finish->name." grille, ",
-                    'Weather Resitant' => "s'Steel ".$workorder->grille_finish->name." grille, ",
-                    'Custom Weather Resistant' => "s'Steel ".$workorder->grille_finish->name." grille, ",
-                    default => '',
-                };
+                if(!is_null($workorder->grille_finish->type)) {
+                    $grille = match($workorder->grille_finish->type) {
+                        'Standard' => "m'Steel ".$workorder->grille_finish->name." grille, ",
+                        'Weather Resitant' => "s'Steel ".$workorder->grille_finish->name." grille, ",
+                        'Custom Weather Resistant' => "s'Steel ".$workorder->grille_finish->name." grille, ",
+                        default => '',
+                    };
+                }
+                $grille = $grille ?? 'no grille, ';
             };
         //final string construction
             $pdesc = $name.' '.$scolour.' ('.$workorder->model->type.') '.$workorder->model->drive_units.': '.$workorder->model->amping.' '.

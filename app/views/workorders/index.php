@@ -85,9 +85,9 @@
                         ?>
                         <tr class="text-center items-center border-4 worow <?php if(!empty($trClass)){echo $trClass;} ?>" data-id="<?php echo $workorder->work_order_id; ?>">
                             <?php if($workorder->wko_status !='Completed') :?>
-                                <td class="text-nowrap"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
-                                <td><?php echo $workorder->wko ?></td>
-                                <td><?php echo $workorder->avn ?></td>
+                                <td class="text-nowrap text-sm" style="font-size:0.7rem"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
+                                <td class="text-nowrap"><?php echo $workorder->wko ?></td>
+                                <td><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"></span> <?php echo $workorder->avn; ?></a></td>
                                 <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
                                 <td><?php echo $workorder->quantity_required ?></td>
                                 <td><?php echo $workorder->serials ?></td>

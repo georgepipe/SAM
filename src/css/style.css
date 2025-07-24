@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;    
+@import url('https://fonts.googleapis.com/css2?family=Manrope&family=Press+Start+2P&family=VT323&display=swap');
 
 
 .text-white {
@@ -151,4 +152,5 @@ tr.worow:hover {
     color: aqua;
     background:rgb(142, 102, 252)
 }
+
  /* //elative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 */

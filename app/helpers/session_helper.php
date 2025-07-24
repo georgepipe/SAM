@@ -19,7 +19,7 @@
                 $class = !empty($_SESSION[$name.'_class']) ? $_SESSION[$name. '_class'] : '';//
                 echo '<div class="'.$class.'" id="msg-flash">'.$_SESSION[$name].'</div>';
                 unset($_SESSION[$name]);
-                unset ($_session[$name. '_class']);
+                unset ($_SESSION[$name. '_class']);
             }
         }
     }

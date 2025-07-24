@@ -25,7 +25,14 @@
                     unset($url[0]);
                 } else {
                     if(!empty($url[0])) {
-                        print_r(" !file not found in app/controllers ");
+                        if($url[0]==='advice_notes'){
+                            //404!
+                            header("Location: ".URLROOT."pages/_404");
+                            die('this will redirect to 404 page!');
+                        } else {
+                            print_r(" !file not found in app/controllers ");
+                            print_r($url);
+                        }
                     }
                 }
                 require_once '../app/controllers/'. $this->currentController . '.php';
