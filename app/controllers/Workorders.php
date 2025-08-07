@@ -32,7 +32,7 @@ class Workorders extends Controller {
             $acWkoCount = $this->woModel->getActiveWorkorderCount();
             $coWkoCount = $this->woModel->getCompletedWorkorderCount();
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-            $workorder->model = $this->moModel->getModelFromMid($workorder->product->model_id);
+            $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
             $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
             $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
             $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
@@ -45,7 +45,7 @@ class Workorders extends Controller {
             $acWkoCount = $this->woModel->getActiveWorkorderCount();
             $coWkoCount = $this->woModel->getCompletedWorkorderCount();
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-            $workorder->model = $this->moModel->getModelFromMid($workorder->product->model_id);
+            $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
             $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
             $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
             $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
@@ -259,6 +259,7 @@ class Workorders extends Controller {
                 // print_r($data);
                 // die('');
                 if (empty($pid)) {
+                    echo '<PRE>';
                     $data->data->model = $this->moModel->getModelFromMid($data->data->cab_model_id);
                     $this->poModel->addPidFromOptions($data->data);
                     $pid = $this->woModel->getPidFromOptions($data->data);
@@ -428,7 +429,7 @@ class Workorders extends Controller {
         $debug = [];
         $workorder = $this->woModel->getWorkorderById($id);
         $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-        $workorder->model = $this->moModel->getModelFromMid($workorder->product->model_id);
+        $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
         $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
         $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
         $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
@@ -450,7 +451,7 @@ class Workorders extends Controller {
             redirect('workorders/index');
             throwErr(1234,'Stap right there buddy!');
         } else {
-            $this->seModel->addSerials($work_order_id, $product->model_id, $workorder->serials);
+            $this->seModel->addSerials($work_order_id, $product->cab_model_id, $workorder->serials);
             if ($this->woModel->completeOrder($workorder)) {
                 flash('post_message', 'Work Order marked as completed!');
             } else { die('Something went horribly horribly wrong, please contact the web admin'); }

@@ -35,9 +35,9 @@
                     <select 
                         name="cab_model_id" 
                         class= "<?php echo (!empty($data->errors->err_cab_model))? 'is-invalid' : '';?>" 
-                        value="<?php echo $data->data->product->model_id;?>">
+                        value="<?php echo $data->data->product->cab_model_id;?>">
                         
-                        <option value="<?php if(isset($data->data->product->model_id)) {echo $data->data->product->model_id;} else { echo '';} ?>"><?php if(isset($data->data->product->model_id)) {echo $data->models[$data->data->product->model_id-1]->name;} else { echo '';} ?></option>
+                        <option value="<?php if(isset($data->data->product->cab_model_id)) {echo $data->data->product->cab_model_id;} else { echo '';} ?>"><?php if(isset($data->data->product->cab_model_id)) {echo $data->models[$data->data->product->cab_model_id-1]->name;} else { echo '';} ?></option>
                         <?php foreach($data->models as $model) : ?>
                             <option value="<?php echo $model->name;?>"><?php echo $model->name;?></option>
                          <?php endforeach; ?>

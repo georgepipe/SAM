@@ -24,7 +24,7 @@ class Transport extends Controller {
         $completedtransportnotes = $this->tnModel->getCompletedTransportNotes();
         foreach($avaliableworkorders as $workorder) {
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-            $workorder->model = $this->moModel->getModelFromMid($workorder->product->model_id);
+            $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
             $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
             $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
             $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
@@ -53,7 +53,7 @@ class Transport extends Controller {
         // $models = [];
         foreach($workorders as $workorder) {
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-            $workorder->model = $this->moModel->getModelFromMid($workorder->product->model_id);
+            $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
             $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
             $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
             $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);

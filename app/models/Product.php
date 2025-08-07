@@ -44,9 +44,9 @@
             if(!is_null($workorder->grille_finish)) {
                 if(!is_null($workorder->grille_finish->type)) {
                     $grille = match($workorder->grille_finish->type) {
-                        'Standard' => "m'Steel ".$workorder->grille_finish->name." grille, ",
-                        'Weather Resitant' => "s'Steel ".$workorder->grille_finish->name." grille, ",
-                        'Custom Weather Resistant' => "s'Steel ".$workorder->grille_finish->name." grille, ",
+                        'Standard' => "M/Steel ".$workorder->grille_finish->name." grille, ",
+                        'Weather Resitant' => "S/Steel ".$workorder->grille_finish->name." grille, ",
+                        'Custom Weather Resistant' => "S/Steel ".$workorder->grille_finish->name." grille, ",
                         default => '',
                     };
                 }

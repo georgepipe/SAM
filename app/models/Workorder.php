@@ -270,11 +270,11 @@ class Workorder {
                     switch(empty($data->grille_finish_id)) {
                         case 0:
                             $this->db->query('SELECT pid FROM finished_product WHERE 
-                            model_id = :model_id AND 
+                            cab_model_id = :cab_model_id AND 
                             finish_id = :finish_id AND 
                             grille_finish_id = :grille_finish_id AND 
                             waveguide = :waveguide');
-                            $this->db->bind(':model_id', $data->cab_model_id);
+                            $this->db->bind(':cab_model_id', $data->cab_model_id);
                             $this->db->bind(':finish_id', $data->cab_finish_id);
                             $this->db->bind(':grille_finish_id', $data->grille_finish_id);
                             $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
@@ -283,21 +283,21 @@ class Workorder {
                             switch(empty($data->cab_finish_id)) {
                                 case 0:
                                     $this->db->query('SELECT pid FROM finished_product WHERE 
-                                    model_id = :model_id AND 
+                                    cab_model_id = :cab_model_id AND 
                                     finish_id = :finish_id AND 
                                     grille_finish_id is null AND 
                                     waveguide = :waveguide_finish_id');
-                                    $this->db->bind(':model_id', $data->cab_model_id);
+                                    $this->db->bind(':cab_model_id', $data->cab_model_id);
                                     $this->db->bind(':finish_id', $data->cab_finish_id);
                                     $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
                                     break;
                                 case 1:
                                     $this->db->query('SELECT pid FROM finished_product WHERE 
-                                    model_id = :model_id AND 
+                                    cab_model_id = :cab_model_id AND 
                                     finish_id is null AND 
                                     grille_finish_id is null AND 
                                     waveguide = :waveguide_finish_id');
-                                    $this->db->bind(':model_id', $data->cab_model_id);
+                                    $this->db->bind(':cab_model_id', $data->cab_model_id);
                                     $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
                             }
                             break;
@@ -307,22 +307,22 @@ class Workorder {
                     switch(empty($data->grille_finish_id)) {
                         case 0:
                             $this->db->query('SELECT * FROM finished_product WHERE 
-                                model_id = :model_id and 
+                                cab_model_id = :cab_model_id and 
                                 finish_id = :finish_id AND 
                                 grille_finish_id = :grille_finish_id AND 
                                 waveguide is NULL');
-                            $this->db->bind(':model_id', $data->cab_model_id);
+                            $this->db->bind(':cab_model_id', $data->cab_model_id);
                             $this->db->bind(':finish_id', $data->cab_finish_id);
                             $this->db->bind(':grille_finish_id', $data->grille_finish_id);
 
                         break;
                         case 1:
                             $this->db->query('SELECT pid FROM finished_product WHERE 
-                                model_id = :model_id AND 
+                                cab_model_id = :cab_model_id AND 
                                 finish_id = :finish_id AND 
                                 grille_finish_id is null AND 
                                 waveguide is null');
-                            $this->db->bind(':model_id', $data->cab_model_id);
+                            $this->db->bind(':cab_model_id', $data->cab_model_id);
                             $this->db->bind(':finish_id', $data->cab_finish_id);
                         break;
 

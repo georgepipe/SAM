@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             }
             $serialString === '' ? $serialString = $serial : '';
             //remove any model name from start if present
-            preg_match('/(.*?)\/\d.+ -/',$serialString, $hasPrefix);
+            preg_match('/(.*)\/\d{5}/',$serialString, $hasPrefix);
             // print_r($hasPrefix);
             if(isset($hasPrefix[1])) {
                 $serialString = substr($serialString, strlen($hasPrefix[1])+1);
@@ -62,23 +62,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             'serials' => extractData('/Serial Nos:\s*(.*?)\nCharge and Quantity/s', $text) ?? extractData('/Serial Numbers:(.*?)\sCharge/', $text),
             'quantityRequired' => extractData('/Qty Required:\s*(\d+)/', $text),
             'model' => extractData('/Description:(.*?)\s/',$text) ?? extractData('/(.*?)\s/',$text),
-            'colour' => ucwords(extractData('/s,(.*?)\scabinet/', $text) ?? extractData('/s,(.*?)\swaveguide/', $text)," "),
-            'grille' => ucwords(extractData('/t,(.*?)\sgrille/',$text)," \t\r\n\f\v'"),
+            'colour' => ucwords(extractData('/s, (.*?)\scabinet/', $text) ?? extractData('/s,(.*?)\swaveguide/', $text)," "),
+            'grille' => ucwords(extractData('/t, (.*?)\sgrille/',$text)," \t\r\n\f\v'"),
             'connectors' => extractData('/d,(.*?)\sconnectors/',$text) ?? extractData('/\),(.*?)\sconnectors/',$text),
             'fixings' => ucwords(extractData('/e,\s(.*?)\sfixings,/',$text),"'"),
-            'waveguide' => extractData('/s,\s(.*?)\swaveguide,/',$text),
+            'waveguide' => extractData('/t,\s(.*?)\swaveguide,/',$text),
             'transport' => (extractData('/(Deliver\sto\sF1)/',$text) ?? extractData('/(To\sstorage)/',$text)) ?? 'TBC',
             'wheels' => (extractData('/WK-4IN\sto\sbe\sfitted/',$text)) ? true : false,
             'part_no' => extractData('/(F1-\d{3}-\d{3})/', $text),
             'status' => 'Upcoming'// -- eventually this should set to either 'to be built' or 'waiting for parts' depending on stock levels
         ]; 
 
-        // $pdfdata['colour'] = ucwords(extractData('/s,(.*?)\scabinet/', $text));
-        // echo $pdfdata['colour'];
-        // die('oh bother');
+        $i = 0;
+        $grille = explode(" ",$pdfdata['grille']);
+        $countG = count($grille);
+        for ($i = 0; $i <= $countG; $i++) {
+            ucfirst($grille[$i]) === "S'Steel" ? $grille[$i] = "S/Steel" : '';
+            ucfirst($grille[$i]) === "M'Steel" ? $grille[$i] = "M/Steel" : '';
+            ucfirst($grille[$i]) === 'No' ? $grille = [] : '';
+        }
+        $pdfdata['grille'] = implode(' ',$grille);
 
         empty($pdfdata['serials']) ? $pdfdata['serials'] = extractData('/(\d{5}\s-\s\d{5})/', $text): '';
-        
         $pdfdata['serials'] = cleanSerials($pdfdata['serials']);
 
         $modelCheck = extractData('/(mkII)/',$text);
@@ -96,17 +101,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                 unset($pdfdata['colour']);
             }
         }
-        if($pdfdata['grille']==='No') {
+        if($pdfdata['grille']==='No'|$pdfdata['grille']==='No Throat') {
             $pdfdata['grille'] = '';
         }
         preg_match('/(Throat)/',$pdfdata['grille'],$matches);
         if(isset($matches[0])) {
             $grilleLen = strlen($pdfdata['grille']);
             $pdfdata['grille'] = substr($pdfdata['grille'],0,$grilleLen-7);
-            if($pdfdata['grille'] === "Brushed S'Steel") {$pdfdata['grille'] = "Brushed S/Steel";
-            }
-            if($pdfdata['grille'] === "Black S'Steel") {$pdfdata['grille'] = "Black S/Steel";
-            }
+            // if($pdfdata['grille'] === "Brushed S'Steel") {$pdfdata['grille'] = "Brushed S/Steel";
+            // }
+            // if($pdfdata['grille'] === "Black S'Steel") {$pdfdata['grille'] = "Black S/Steel";
+            // }
         }  
 
     }
@@ -167,8 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                     <select 
                         name="cab_model_id" 
                         class= "<?php echo (!empty($data->errors->err_cab_model))? 'is-invalid' : '';?>" 
-                        value="<?php echo  $data->data->model_id ?? $pdfdata['model'] ;?>">
-                        <option value="<?php if(isset($data->data->model_id)) {echo $data->data->model_id;} else {if(isset($pdfdata['model'])){echo $pdfdata['model'];} else {echo '';};}?>"><?php if(isset($data->data->model_id)) {echo $data->data->model_id;} else {if(isset($pdfdata['model'])){echo $pdfdata['model'];} else {echo '- -';};} ?></option>
+                        value="<?php echo  $data->data->cab_model_id ?? $pdfdata['model'] ;?>">
+                        <option value="<?php if(isset($data->data->cab_model_id)) {echo $data->data->cab_model_id;} else {if(isset($pdfdata['model'])){echo $pdfdata['model'];} else {echo '';};}?>"><?php if(isset($data->data->cab_model_id)) {echo $data->data->cab_model_id;} else {if(isset($pdfdata['model'])){echo $pdfdata['model'];} else {echo '- -';};} ?></option>
                         <?php foreach($data->models as $model) : ?>
                             <option value="<?php echo $model->name;?>"><?php echo $model->name;?></option>
                          <?php endforeach; ?>

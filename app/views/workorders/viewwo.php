@@ -83,7 +83,7 @@
       <div class="value"><span class="label">Updated At:</span> 2024-12-20 11:23:01</div>
     </div>
     <div class="section">
-      <div class="value"><span class="label">Model:</span> <?php echo $data->workorder->model->name; ?></div>
+      <div class="value"><span class="label">Model:</span> <a href="<?php echo URLROOT?>models/viewmodel/<?php echo $data->workorder->product->cab_model_id ?>"><?php echo $data->workorder->model->name; ?></a></div>
       <div class="value"><span class="label">Finish:</span> <?php echo $data->workorder->cab_finish->name; if($data->workorder->cab_finish->ral_code != '') {echo ' ('.$data->workorder->cab_finish->ral_code.')';}; ?></div>
       <?php if($data->workorder->product->grille_finish_id != ''): ?>
         <div class="value"><span class="label">Grille Finish:</span> <?php echo $data->workorder->grille_finish->name; if($data->workorder->grille_finish->ral_code != '') {echo ' ('.$data->workorder->grille_finish->ral_code.')';}; ?></div>
@@ -103,6 +103,6 @@
  
 
 
-<!-- <pre><?php print_r($data);?></pre> -->
+<pre><?php print_r($data);?></pre>
 
 <?php require APPROOT . '/views/inc/footer.php'; ?>

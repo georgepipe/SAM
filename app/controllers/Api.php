@@ -18,7 +18,7 @@
                 $activeWorkorders = $this->woModel->getActiveOrders($page);
                 foreach($activeWorkorders as $workorder) {
                     $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-                    $workorder->model = $this->moModel->getModelFromMid($workorder->product->model_id);
+                    $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
                     $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
                     $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
                     $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
@@ -31,7 +31,7 @@
                 $completedWorkorders = $this->woModel->getCompletedOrders($page);
                 foreach($completedWorkorders as $workorder) {
                     $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-                    $workorder->model = $this->moModel->getModelFromMid($workorder->product->model_id);
+                    $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
                     $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
                     $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
                     $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
