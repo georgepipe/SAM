@@ -11,11 +11,11 @@ class Models extends Controller {
 
     }
 
-    public function viewmodel($modelID) {
+    public function vmodel($modelID) {
 
        $modelInformation = $this->moModel->getModelFromMid($modelID);
 
-       $this->view('models/viewmodel', $modelInformation); 
+       $this->view('models/vmodel', $modelInformation); 
 
 
     } 
