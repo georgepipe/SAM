@@ -93,8 +93,14 @@ class Workorders extends Controller {
                 'wko_notes' => trim($_POST['wko_notes']),
                 'pid' => '',
                 'part_no' => trim($_POST['part_no']),
-                'avn_file' => $_POST['avn_file']
+                'avn_file' => $_POST['avn_file'],
+                'addAnother' => $_POST['addAnother']
             );
+            echo '<PRE>';
+            print_r($_POST);
+            echo '<BR>';
+            print_r($data);
+            die('checkpoint');
 
             $explodedGrille = explode(' ',$data->grille_finish_id);
             $data->grille_finish_id = $explodedGrille[0];
@@ -114,7 +120,6 @@ class Workorders extends Controller {
                 'data' => $data,
                 'errors' => $errors
             );
-
             $fileName = 'AVN_'.str_pad($data->data->avn, 5 ,'0', STR_PAD_LEFT).'.pdf';
         //validate post data//
             
@@ -127,7 +132,7 @@ class Workorders extends Controller {
                 $data->errors->err_avn = 'Please enter advice note reference';
             }
             
-         //search for avn and check to see if it slready exists in the db
+         //search for avn and check to see if it already exists in the db
             if($this->woModel->getWorkorderByAvn($data->data->avn) ) {
                 $data->errors->err_avn = 'A work order already exists with this AVN';
             } 
@@ -178,6 +183,7 @@ class Workorders extends Controller {
                 if(empty( $data->errors->err_connectors)) {
                     $data->data->connectors = match($data->data->cab_model_id) {
                         //this needs refactoring - current static setup is not growth friendly
+                        '7','8','11','12','15','16' => 'NL4 & PHX',
                         '43','45','52' => 'NL8',
                         default => 'NL4',
                     };
@@ -218,6 +224,8 @@ class Workorders extends Controller {
                 38,39,40,41,42,43,44,45,46,47,48,49,50,52,53,54,55,56,57 => 'Please select a waveguide colour',
                 default => ''
             } : '';
+
+
             $pid = $this->woModel->getPidFromOptions($data->data); 
             $data->data->pid = $pid;
             if(empty($pid)&&empty($data->data->fixings)) { //set default fixings for new pids
@@ -273,7 +281,12 @@ class Workorders extends Controller {
                     $pdfDest = AVNDIR.$fileName;
                     $file = rename($pdfLoc, $pdfDest);
                     flash('post_message', 'Workorder sucessfully added');
-                    redirect('workorders/index');
+                    if($data->data->addAnother == TRUE) {
+                        redirect('workorders/add');
+                    } else {
+                        redirect('workorders/index');    
+                    }
+                    
                 } else {
                     die ('something went wrong');
                 }

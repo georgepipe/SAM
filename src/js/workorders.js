@@ -240,7 +240,7 @@ function initWorkOrders () {
 
     }; 
 
-    console.log("sdjkbfmdbf");
+    console.log("Test point Ghost");
     const addWkoBtn = document.querySelector(".addWkoBtn")
     const addWkoDialog = document.querySelector("#addWko")
     if(addWkoBtn) { 

@@ -97,7 +97,8 @@
                                 <td><a href="<?php echo URLROOT; ?>workorders/complete/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
                                 <td><a href="javascript:void(0)" data-qty="<?php echo $workorder->quantity_required?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
                                 <td><a href="<?php echo URLROOT; ?>workorders/edit/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/editicon.php'; ?></a></td>
-                                <td class="dltBtn"><a href="<?php echo URLROOT; ?>workorders/delete/<?php echo $workorder->work_order_id?>" class="delete" data-confirm="Are you sure to delete wko <?php echo $workorder->wko;?> avn <?php echo $workorder->avn;?>?"><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td>
+                                <td class="dltBtn"><a href="javascript:void(0)" class="delete" data-confirm="Are you sure to delete wko <?php echo $workorder->wko;?> avn <?php echo $workorder->avn;?>?"><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td>
+                                <!-- <td class="dltBtn"><a href="<?php echo URLROOT; ?>workorders/delete/<?php echo $workorder->work_order_id?>" class="delete" data-confirm="Are you sure to delete wko <?php echo $workorder->wko;?> avn <?php echo $workorder->avn;?>?"><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td> -->
                                 <?php endif ;?>
                         </tr>
                     <?php endforeach; ?>

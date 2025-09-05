@@ -112,21 +112,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             // }
             // if($pdfdata['grille'] === "Black S'Steel") {$pdfdata['grille'] = "Black S/Steel";
             // }
-        }  
-
+        } 
     }
 }
 
 // $data->data->part_no = $pdfdata['part_no'];
 
 ?>
-
-<div class="">
-    <form action="" method="post" enctype="multipart/form-data">
-        <input style="width:calc(100%/1)" type="file" name="pdf" accept="application/pdf" required>
-        <button type="submit">Upload Advice Note</button>
-    </form>
-</div>
 
 <!-- <?php if ($pdfdata): ?>
     <h3>Advice Note</h3>
@@ -145,9 +137,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
 
 <div class="row fade-in">
     <div class="card card-body bg-light mt-2 text-center">
-        <h2>Add Work Order</h2>
-        <p>Add a WKO from the database using the form below or uplaod an AVN using the form above</p>
+        <h1>Add Work Order</h1>
+        <p>Add/Upload a AVN to the database using the form or button below</p>
         <br>
+
+        <div class=" border-4" style="display: flex; justify-content: center;">
+            <form action="" method="post" enctype="multipart/form-data">
+                <input style="padding-left:250px; color:transparent;" type="file" name="pdf" title=" " accept="application/pdf" required onchange="this.form.submit();">
+                <!-- <button type="submit">Upload Advice Note</button> -->
+            </form>
+        </div>
+
         <form action="<?php echo URLROOT; ?>workorders/add/" method="post">
                 <div class="pt-5 row">
                 <label for="wko">WKO: <sup>*</label>
@@ -275,6 +275,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                     <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes;?></span>
                 </div>
                 <!-- <input class="hidden" type="text" name="part_no" value="<?php echo $pdfdata['part_no']; ?>"></input> -->
+                <div class="pt-3">
+                    <label for="addAnother">Add Another:</label>
+                    <input name="addAnother" 
+                            type="checkbox"
+                            value="1"/>
+                </div>
+
                 <input type="submit" 
                     class="btn" 
                     value="Submit">

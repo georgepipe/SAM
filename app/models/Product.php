@@ -27,6 +27,7 @@
         //name, colour abbreviation, series, drive units, amping, connectors, cabinet colour, grille, fixings, features
             $name = empty($workorder->model->name) ? 'No name' : $workorder->model->name;
 
+
             $scolour = match($workorder->cab_finish->type) {
                 'Standard' => $workorder->cab_finish->name[0],
                 'Weather Resistant' => 'PU-'.$workorder->cab_finish->name[9],
@@ -35,14 +36,20 @@
                 'Wood' => 'UN',
                 default => '',
             };
+            // echo '<pre>';
+            // print_r($workorder);
+            // die('asdsad');
+            $scolour = empty($scolour) ? $workorder->waveguide->name[0] : $scolour;
 
             $xover = empty($workorder->model->x_over) ? '' : '('.$workorder->model->x_over.') ';
             $connectors = match($workorder->model->mid) {
                 39,44,46,48,50,53,55,57 => 'NL4',
                 default => $workorder->product->connectors,
             };
-            if(!is_null($workorder->grille_finish)) {
-                if(!is_null($workorder->grille_finish->type)) {
+
+            $grille = '';
+            if(!is_bool($workorder->grille_finish)) {
+                if(!is_bool($workorder->grille_finish->type)) {
                     $grille = match($workorder->grille_finish->type) {
                         'Standard' => "M/Steel ".$workorder->grille_finish->name." grille, ",
                         'Weather Resitant' => "S/Steel ".$workorder->grille_finish->name." grille, ",
@@ -50,8 +57,8 @@
                         default => '',
                     };
                 }
-                $grille = $grille ?? 'no grille, ';
             };
+            if($grille == '') {$grille = 'no grille, ';}
         //final string construction
             $pdesc = $name.' '.$scolour.' ('.$workorder->model->type.') '.$workorder->model->drive_units.': '.$workorder->model->amping.' '.
                 $xover.$connectors.' connectors, '.$workorder->cab_finish->name.' cabinet, '.$grille.$workorder->product->fixings.' fixings, '.$workorder->model->features;
@@ -60,10 +67,10 @@
        
         public function addPidFromOptions($data) {
             $this->db->query('INSERT INTO finished_product 
-                (model_id, finish_id, grille_finish_id, connectors, waveguide, fixings)
+                (cab_model_id, finish_id, grille_finish_id, connectors, waveguide, fixings)
                      VALUES
-                (:model_id, :finish_id, :grille_finish_id, :connectors, :waveguide, :fixings)');
-            $this->db->bind(':model_id', $data->cab_model_id);
+                (:cab_model_id, :finish_id, :grille_finish_id, :connectors, :waveguide, :fixings)');
+            $this->db->bind(':cab_model_id', $data->cab_model_id);
             $this->db->bind(':finish_id', $data->cab_finish_id);
             if(empty($data->grille_finish_id)) {$data->grille_finish_id = NULL;}
             $this->db->bind(':grille_finish_id', $data->grille_finish_id);
