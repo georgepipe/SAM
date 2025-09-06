@@ -96,11 +96,11 @@ class Workorders extends Controller {
                 'avn_file' => $_POST['avn_file'],
                 'addAnother' => $_POST['addAnother']
             );
-            echo '<PRE>';
-            print_r($_POST);
-            echo '<BR>';
-            print_r($data);
-            die('checkpoint');
+            // echo '<PRE>';
+            // print_r($_POST);
+            // echo '<BR>';
+            // print_r($data);
+            // die('checkpoint');
 
             $explodedGrille = explode(' ',$data->grille_finish_id);
             $data->grille_finish_id = $explodedGrille[0];
@@ -229,25 +229,30 @@ class Workorders extends Controller {
             $pid = $this->woModel->getPidFromOptions($data->data); 
             $data->data->pid = $pid;
             if(empty($pid)&&empty($data->data->fixings)) { //set default fixings for new pids
-                $colourname = $this->woModel->getFinishfromId($data->data->cab_finish_id);
-                $colourname = $colourname->name;
-                preg_match('/(Polyurea)/',$colourname,$matches);
-                if(!empty($matches[0])) {
-                    $fixing = 'S/Steel ';
-                }
-                preg_match('/(Black)/',$colourname,$Bmatches);
-                preg_match('/(White)/',$colourname,$Wmatches);
-                preg_match('/(Violet)/',$colourname,$Vmatches);
-                if(!empty($Bmatches[0])) {
-                    $fixing = 'Black p/Steel';
-                } 
-                if(!empty($Wmatches[0])) {
-                    $fixing = 'Black p/Steel';
-                }
-                if(!empty($Vmatches[0])) {
-                    $fixing = 'BZP Steel';
-                }
-                $data->data->fixings = $fixing;
+                echo '<pre>';
+                print_r($data->data);
+                echo '<BR>';
+                print_r($pid);
+                die('PID?');
+                // $colourname = $this->woModel->getFinishfromId($data->data->cab_finish_id);
+                // $colourname = $colourname->name;
+                // preg_match('/(Polyurea)/',$colourname,$matches);
+                // if(!empty($matches[0])) {
+                //     $fixing = 'S/Steel ';
+                // }
+                // preg_match('/(Black)/',$colourname,$Bmatches);
+                // preg_match('/(White)/',$colourname,$Wmatches);
+                // preg_match('/(Violet)/',$colourname,$Vmatches);
+                // if(!empty($Bmatches[0])) {
+                //     $fixing = 'Black p/Steel';
+                // } 
+                // if(!empty($Wmatches[0])) {
+                //     $fixing = 'Black p/Steel';
+                // }
+                // if(!empty($Vmatches[0])) {
+                //     $fixing = 'BZP Steel';
+                // }
+                // $data->data->fixings = $fixing;
             } 
         //if number of serials doesnt match quantity throw error
             //todo: serial checker
@@ -267,11 +272,11 @@ class Workorders extends Controller {
                 // print_r($data);
                 // die('');
                 if (empty($pid)) {
-                    echo '<PRE>';
-                    $data->data->model = $this->moModel->getModelFromMid($data->data->cab_model_id);
-                    $this->poModel->addPidFromOptions($data->data);
-                    $pid = $this->woModel->getPidFromOptions($data->data);
-                    $data->data->pid = $pid;
+                    // echo '<PRE>';
+                    // $data->data->model = $this->moModel->getModelFromMid($data->data->cab_model_id);
+                    // $this->poModel->addPidFromOptions($data->data);
+                    // $pid = $this->woModel->getPidFromOptions($data->data);
+                    // $data->data->pid = $pid;
                     empty($pid) ? throwErr(999,'PID ERROR: Seek guidance from the almighty flying spaghetti monster'): '';
                 }
             //save to db
@@ -281,7 +286,7 @@ class Workorders extends Controller {
                     $pdfDest = AVNDIR.$fileName;
                     $file = rename($pdfLoc, $pdfDest);
                     flash('post_message', 'Workorder sucessfully added');
-                    if($data->data->addAnother == TRUE) {
+                    if($data->data->addAnother == 1) {
                         redirect('workorders/add');
                     } else {
                         redirect('workorders/index');    

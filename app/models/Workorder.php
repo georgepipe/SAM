@@ -266,9 +266,9 @@ class Workorder {
 
         public function getPidFromOptions($data) {
             switch(empty($data->waveguide_finish_id)) {
-                case 0:
+                case 0: //has waveguide
                     switch(empty($data->grille_finish_id)) {
-                        case 0:
+                        case 0: //has grille
                             $this->db->query('SELECT pid FROM finished_product WHERE 
                             cab_model_id = :cab_model_id AND 
                             finish_id = :finish_id AND 
@@ -279,7 +279,7 @@ class Workorder {
                             $this->db->bind(':grille_finish_id', $data->grille_finish_id);
                             $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
                             break;
-                        case 1:
+                        case 1: //no grille
                             switch(empty($data->cab_finish_id)) {
                                 case 0:
                                     $this->db->query('SELECT pid FROM finished_product WHERE 
@@ -303,9 +303,9 @@ class Workorder {
                             break;
                     }
                     break;
-                case 1:
+                case 1: //no waveguide
                     switch(empty($data->grille_finish_id)) {
-                        case 0:
+                        case 0: //has grille
                             $this->db->query('SELECT * FROM finished_product WHERE 
                                 cab_model_id = :cab_model_id and 
                                 finish_id = :finish_id AND 
@@ -316,7 +316,7 @@ class Workorder {
                             $this->db->bind(':grille_finish_id', $data->grille_finish_id);
 
                         break;
-                        case 1:
+                        case 1: //no grille
                             $this->db->query('SELECT pid FROM finished_product WHERE 
                                 cab_model_id = :cab_model_id AND 
                                 finish_id = :finish_id AND 

@@ -522,7 +522,7 @@ function initWorkOrders() {
     }
   }
   ;
-  console.log("sdjkbfmdbf");
+  console.log("Test point Ghost");
   var addWkoBtn = document.querySelector(".addWkoBtn");
   var addWkoDialog = document.querySelector("#addWko");
   if (addWkoBtn) {

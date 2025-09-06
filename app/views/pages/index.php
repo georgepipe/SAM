@@ -16,17 +16,18 @@
         - refactor serial regex (sometimes misses old serials)<BR>
         - PID management (stop duplicate PIDs)<BR>
         - Fix edit page: does not populate form correctly on load<br>
-        - Add search bar to filter results
-        - Need to add avn pdf handler to show 404 errors rather than redirect to homepage
-       <BR> 
+        - Add search bar to filter results<br>
+        - Need to add avn pdf handler to show 404 errors rather than redirect to homepage<br>
+        - Pop-up function to add serials to AVNs with To Be Confirmed serial range<br>
+        - Fix pagination<br>
+       <BR><BR>
        <strong>Transport Page:</strong><BR>
         - Calculate total weight for delivery<BR>  
         - Add search bar to filter results
-       <BR>
+       <BR><BR>
        <strong>Invertory Page:</strong><BR>
        - Everything<BR> 
     </p>
     <BR>
-    <?php  echo exec('whoami'); ?>
 </div>
 <?php require APPROOT . '/views/inc/footer.php'; ?>

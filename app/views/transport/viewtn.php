@@ -1,6 +1,6 @@
 <?php require APPROOT . '/views/inc/header.php'; ?> <!--  mx-auto -->
 <div class="flex flex-col">
-    <div class="flex mx-8 my-4 ">
+    <div class="backBtn">
         <a class="" href="javascript:history.go(-1)"><?php include APPROOT.'/views/components/icons/backicon.php'; ?>Back</a>
     </div>
 

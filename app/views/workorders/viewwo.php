@@ -1,68 +1,28 @@
 <?php require APPROOT . '/views/inc/header.php'; ?>
-<div>
-<div class="flex m-8 pr-6">
+<div class="backBtn">
     <a class="" href="javascript:history.go(-1)"><?php include APPROOT.'/views/components/icons/backicon.php'; ?>Back</a>
     <BR>
-    <p class=" ml-3 self-center text-center"><?php echo $data->workorder->pdesc; ?></p>
 </div>
-<div class="flex flex-wrap justify-center text-sm">
-    
-</div>
-</div>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #fdfdfc;
-      margin: 2rem;
-      color: #33294A;
-    }
-    .header {
-      display: flex;
-      justify-content: center;
-    }
-    .header div {
-      flex: 1;
-      text-align: center;
-      padding: 1rem;
-      color: white;
-      font-weight: bold;
-    }
-    .work {
-    background:rgb(142, 102, 252);
-      border-top-left-radius: 10px;
-    }
-    .product {
-      border-top-right-radius: 10px;
-    background:rgb(92, 102, 252);
-    }
-    .container {
-      display: flex;
-      justify-content: space-evenly;
-      border: 2px solid #33294A;
-      border-top: none;
-      border-radius: 0 0 10px 10px;
-      overflow: hidden;
-    }
-    .section {
-      padding: 2rem;
-      background: #fffaf5;
-    }
-    .label {
-      font-weight: bold;
-      color: #33294A;
-    }
-    .value {
-      margin-bottom: 0.5rem;
-    }
-    .footer {
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 2px solid #33294A;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
+<p class=" ml-3 self-center text-center"><?php echo $data->workorder->pdesc; ?></p>
+<?php
+
+//model
+$model = $data->workorder->model->name;
+
+//finish
+$ral = $data->workorder->cab_finish->ral_code ?? '';
+$finish = $data->workorder->cab_finish->name ?? '';
+$finish != '' ? $finish = $finish.' ('.$ral.')': '';
+//$data->workorder->cab_finish->name; if($data->workorder->cab_finish->ral_code != '') {echo ' ('.$data->workorder->cab_finish->ral_code.')';}; 
+
+//grille
+$grille = $data->workorder->product->grille_finish_id ?? '';
+
+//waveguide
+$waveguide = $data->workorder->waveguide->name ?? '';
+
+?>
+<body id="table">
 
 
   <div class="header">
@@ -83,13 +43,15 @@
       <div class="value"><span class="label">Updated At:</span> 2024-12-20 11:23:01</div>
     </div>
     <div class="section">
-      <div class="value"><span class="label">Model:</span> <a href="<?php echo URLROOT?>models/viewmodel/<?php echo $data->workorder->product->cab_model_id ?>"><?php echo $data->workorder->model->name; ?></a></div>
-      <div class="value"><span class="label">Finish:</span> <?php echo $data->workorder->cab_finish->name; if($data->workorder->cab_finish->ral_code != '') {echo ' ('.$data->workorder->cab_finish->ral_code.')';}; ?></div>
-      <?php if($data->workorder->product->grille_finish_id != ''): ?>
-        <div class="value"><span class="label">Grille Finish:</span> <?php echo $data->workorder->grille_finish->name; if($data->workorder->grille_finish->ral_code != '') {echo ' ('.$data->workorder->grille_finish->ral_code.')';}; ?></div>
+      <div class="value"><span class="label">Model:</span> <a href="<?php echo URLROOT?>models/viewmodel/<?php echo $data->workorder->product->cab_model_id ?>"><?php echo $model; ?></a></div>
+      <?php if($finish != ''): ?>
+        <div class="value"><span class="label">Cab Finish:</span> <?php echo $finish?></div>
       <?php endif ?>
-      <?php if($data->workorder->waveguide != ''):?>
-        <div class="value"><span class="label">Waveguide Finish:</span> <?php echo $data->workorder->waveguide->name; ?></div>
+      <?php if($grille != ''): ?>
+        <div class="value"><span class="label">Grille Finish:</span> <?php echo $grille ?></div>
+      <?php endif ?>
+      <?php if($waveguide != ''):?>
+        <div class="value"><span class="label">Waveguide Finish:</span> <?php echo $waveguide; ?></div>
       <?php endif ?>
       <div class="value"><span class="label">Connectors:</span> <?php echo $data->workorder->product->connectors; ?></div>
       <div class="value"><span class="label">Fixings:</span> <?php echo $data->workorder->product->fixings; ?></div>

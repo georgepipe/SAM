@@ -21,20 +21,23 @@
 
 
         public function createProductDescription($workorder) {
-            // echo '<PRE>';
-            // print_r($workorder);
-            // die('<BR>fuckin wat?!');
         //name, colour abbreviation, series, drive units, amping, connectors, cabinet colour, grille, fixings, features
             $name = empty($workorder->model->name) ? 'No name' : $workorder->model->name;
 
-
-            $scolour = match($workorder->cab_finish->type) {
-                'Standard' => $workorder->cab_finish->name[0],
-                'Weather Resistant' => 'PU-'.$workorder->cab_finish->name[9],
-                'Custom Weather Resistant' => 'PU-X',
-                'Custom' => 'X',
-                'Wood' => 'UN',
-                default => '',
+            // $sh = preg_match('/(SH)/',$workorder->model->name);
+            if(!is_bool($workorder->cab_finish)){
+                $scolour = match($workorder->cab_finish->type) {
+                    'Standard' => $workorder->cab_finish->name[0],
+                    'Weather Resistant' => 'PU-'.$workorder->cab_finish->name[9],
+                    'Custom Weather Resistant' => 'PU-X',
+                    'Custom' => 'X',
+                    'Wood' => 'UN',
+                    default => '',
+                };
+                $cabFinishName = $workorder->cab_finish->name.' cabinet, ';
+                // die($cabFinishName);
+            } else {
+                $cabFinishName = '';
             };
             // echo '<pre>';
             // print_r($workorder);
@@ -61,7 +64,7 @@
             if($grille == '') {$grille = 'no grille, ';}
         //final string construction
             $pdesc = $name.' '.$scolour.' ('.$workorder->model->type.') '.$workorder->model->drive_units.': '.$workorder->model->amping.' '.
-                $xover.$connectors.' connectors, '.$workorder->cab_finish->name.' cabinet, '.$grille.$workorder->product->fixings.' fixings, '.$workorder->model->features;
+                $xover.$connectors.' connectors, '.$cabFinishName.$grille.$workorder->product->fixings.' fixings, '.$workorder->model->features;
             return $pdesc;
         }
        

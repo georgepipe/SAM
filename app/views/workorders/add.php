@@ -1,8 +1,9 @@
 <?php require APPROOT . '/views/inc/header.php'; ?>
 
-
-<a class="" href="javascript:history.go(-1)"><?php include APPROOT.'/views/components/icons/backicon.php'; ?>Back</a>
-
+<?php if(isset($_SESSION['post_message'])) {echo flash('post_message');} ?>
+<div class="">
+    <a class="" href="javascript:history.go(-1)"><?php include APPROOT.'/views/components/icons/backicon.php'; ?>Back</a>
+</div>
 <?php 
 
 require '../vendor/autoload.php';
@@ -101,6 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                 unset($pdfdata['colour']);
             }
         }
+        if($pdfdata['model']==='F121') {$pdfdata['model']='F121 MkII';}
+
         if($pdfdata['grille']==='No'|$pdfdata['grille']==='No Throat') {
             $pdfdata['grille'] = '';
         }
@@ -119,21 +122,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
 // $data->data->part_no = $pdfdata['part_no'];
 
 ?>
-
-<!-- <?php if ($pdfdata): ?>
-    <h3>Advice Note</h3>
-    <table>
-        <?php foreach ($pdfdata as $key => $value): ?>
-            <tr>
-                <th><?php echo htmlspecialchars($key) ?></th>
-                <td><?php echo htmlspecialchars($value); ?></td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
-<?php
- 
-?>
-<?php endif; ?> -->
 
 <div class="row fade-in">
     <div class="card card-body bg-light mt-2 text-center">
@@ -290,7 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
 </div>
 
 
-<?php echo '<PRE>errs:'; print_r($data->errors);?>
-<?php echo 'pdfData:'; print_r($pdfdata);?>
+<!-- <?php echo '<PRE>errs:'; print_r($data->errors);?>
+<?php echo 'pdfData:'; print_r($pdfdata);?> -->
 
 <?php require APPROOT . '/views/inc/footer.php'; ?>
