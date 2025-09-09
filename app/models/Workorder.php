@@ -104,6 +104,8 @@ class Workorder {
 
 
         public function addOrder($data) {
+            $data->avn ?? null;
+            $data->wko ?? null;
             $this->db->query('INSERT INTO work_orders 
                 (wko, avn, pid, wheels, quantity_required, quantity_built, serials, wko_status, wko_delivery, wko_notes) 
                                 VALUES

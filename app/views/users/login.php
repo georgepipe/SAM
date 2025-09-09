@@ -1,6 +1,6 @@
 <?php require APPROOT . '/views/inc/header.php'; ?>
 <div class="row" data-session="BOOO">
-    <div class="col-md-6 mx-auto">
+    <div class="grid col-md-6 mx-auto justify-center">
         <div class="mt-5 text-center">
             <h1 class="pb-4"> Speaker Assembly Managment System: SAMS</h1>
             <h2 class="p-4">Login</h2>
@@ -19,7 +19,7 @@
                     <input 
                         type="password" 
                         name="password" 
-                        class= " <?php echo (!empty($data['errors']->err_password))? 'is-invalid' : '';?>" 
+                        class= " <?php echo (!empty($data['errors']->err_password)) ? 'is-invalid' : '';?>" 
                         value="">
                     <span class="invalid-feedback"><?php echo $data['errors']->err_password;?></span>
                 </div>

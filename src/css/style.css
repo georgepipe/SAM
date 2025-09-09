@@ -35,8 +35,75 @@
     display: flex;
     justify-content: center;
     width: 3.5rem;
-    padding: 1.5rem;
+    /* padding: 1.5rem; */
     margin: 1rem,2rem;
+}
+.editform {
+    display:grid;
+    justify-content: center;
+}
+
+form {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: auto;
+    grid-template-rows: auto ;
+    max-width: 700px;
+}
+
+.form-group {
+    display: grid;
+}
+
+.form-group > input, select, textarea {
+    text-align: center;
+    border-color: #33294A;
+    border-radius: 0.5rem;
+    border-width: 2px;
+}
+
+.form-group:has(#wko) {
+    grid-column:1/span 2
+}
+.form-group:has(#avn) {
+    grid-column: 3/5;
+}
+.form-group:has(#cab_model_id) {
+    grid-column: 1/span 2;
+}
+.form-group:has(#cab_finish_id) {
+    grid-column: 3/5; 
+}
+.form-group:has(#grille_finish_id) {
+    grid-column: 1/span 2;
+}
+.form-group:has(#waveguide_finish_id) {
+    grid-column: 3/5; 
+}
+.form-group:has(#connectors) {
+    grid-column: 1/span 2;
+}
+.form-group:has(#wheels) {
+    grid-column: 3/5; 
+}
+.form-group:has(#quantity_required) {
+    grid-column: 1/span 2;
+}
+.form-group:has(#serials) {
+    grid-column: 3/5; 
+}
+.form-group:has(#wko_status) {
+    grid-column: 1/span 2;
+}
+.form-group:has(#wko_delivery) {
+    grid-column: 3/5; 
+}
+.form-group:has(#wko_notes) {
+    grid-column:1/span 4
+}
+
+form > .form-group {
+    /* padding-top: 0.5rem; */
 }
 
 .invalid-feedback {

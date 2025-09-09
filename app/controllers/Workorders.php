@@ -128,9 +128,9 @@ class Workorders extends Controller {
             $data->errors->err_wko = 'A work order already exists with this WKO';
             }
             
-            if(empty($data->data->avn)) {
-                $data->errors->err_avn = 'Please enter advice note reference';
-            }
+            // if(empty($data->data->avn)) {
+            //     $data->errors->err_avn = 'Please enter advice note reference';
+            // }
             
          //search for avn and check to see if it already exists in the db
             if($this->woModel->getWorkorderByAvn($data->data->avn) ) {
@@ -299,6 +299,12 @@ class Workorders extends Controller {
             //reload view with errors
             $models = $this->moModel->getModelNames();
             $finishes = $this->woModel->getFinishes();
+            if (!empty($data->data)) {
+                $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
+                $data->data->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
+                $data->data->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
+                $data->data->waveguide = $this->woModel->getFinishfromId($data->product->waveguide);
+            };
             $data = (object) [
                 
                 'finishes' => $finishes,
