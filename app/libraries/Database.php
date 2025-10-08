@@ -78,9 +78,9 @@
      * @return bool or last index
      */
     public function execute(){
-        // echo "\nPDO::errorInfo():\n";
-        // print_r($this->dbhandler->errorInfo());
-        //return $this->stmt->execute();
+        // echo "\nPDO::errorInfo():\n<PRE>";
+        // print_r($this);
+        // return $this->stmt->execute();
 
         $exe = $this->stmt->execute();
         if ($exe) {

@@ -124,8 +124,11 @@ class Workorders extends Controller {
         //validate post data//
             
          //search for WKO and check to see if it slready exists in the db
-            if($this->woModel->getWorkorderByWko($data->data->wko) ) {
-            $data->errors->err_wko = 'A work order already exists with this WKO';
+            
+            if($this->woModel->getWorkorderByWko($data->data->wko)) {
+                if (!$data->data->wko == '') {
+                    $data->errors->err_wko = 'A work order already exists with this WKO';
+                }
             }
             
             // if(empty($data->data->avn)) {
@@ -134,7 +137,9 @@ class Workorders extends Controller {
             
          //search for avn and check to see if it already exists in the db
             if($this->woModel->getWorkorderByAvn($data->data->avn) ) {
-                $data->errors->err_avn = 'A work order already exists with this AVN';
+                if(!$data->data->avn == '') {
+                    $data->errors->err_avn = 'A work order already exists with this AVN';
+                }
             } 
             if(!is_numeric($data->data->cab_finish_id) && !empty($data->data->cab_finish_id)) {
                 $sh = preg_match('/(SH)/',$data->data->cab_model_id);
@@ -190,21 +195,9 @@ class Workorders extends Controller {
                 }
             }
 
-
-
-            if(empty($data->data->quantity_required)) {
-                $data->errors->err_quantity_required = 'Please enter a quantity';
-            } else {
-                $sCount = $this->seModel->countSerials($data->data->serials);
-                // echo $data->data->serials;
-                // echo '<BR>'.$sCount;
-                if($data->data->quantity_required != $sCount && !empty($data->data->serials)) {
-                    $data->errors->err_quantity_required = 'Quantity is '.$data->data->quantity_required.' but '.$sCount.' serial(s) has/have been specified.';
-                }
+            if(preg_match('/([A-z])/',$data->data->serials)) {
+                $data->errors->err_serials = "Serials cannot contain characters";
             }
-
-            // die('<BR>we dyin');
-
             if(empty($data->data->serials)) {
                 $data->data->serials = 'To Be Confirmed';
             } else {
@@ -219,6 +212,18 @@ class Workorders extends Controller {
                 } 
             }
             
+            if(empty($data->data->quantity_required)) {
+                $data->errors->err_quantity_required = 'Please enter a quantity';
+            } else {
+                if(empty($data->errors->err_serials) && !$data->data->serials === 'To Be Confirmed') {
+                    $sCount = $this->seModel->countSerials($data->data->serials);
+                    // echo $data->data->serials;
+                    // echo '<BR>'.$sCount;
+                    if($data->data->quantity_required != $sCount && !empty($data->data->serials)) {
+                        $data->errors->err_quantity_required = 'Quantity is '.$data->data->quantity_required.' but '.$sCount.' serial(s) has/have been specified.';
+                    }
+                }
+            } 
             empty($data->data->waveguide) ? $data->errors->err_waveguide_colour = match ($data->cab_model_id) {
                 //this needs refactoring - current static setup is not growth friendly
                 38,39,40,41,42,43,44,45,46,47,48,49,50,52,53,54,55,56,57 => 'Please select a waveguide colour',
@@ -234,25 +239,6 @@ class Workorders extends Controller {
                 echo '<BR>';
                 print_r($pid);
                 die('PID?');
-                // $colourname = $this->woModel->getFinishfromId($data->data->cab_finish_id);
-                // $colourname = $colourname->name;
-                // preg_match('/(Polyurea)/',$colourname,$matches);
-                // if(!empty($matches[0])) {
-                //     $fixing = 'S/Steel ';
-                // }
-                // preg_match('/(Black)/',$colourname,$Bmatches);
-                // preg_match('/(White)/',$colourname,$Wmatches);
-                // preg_match('/(Violet)/',$colourname,$Vmatches);
-                // if(!empty($Bmatches[0])) {
-                //     $fixing = 'Black p/Steel';
-                // } 
-                // if(!empty($Wmatches[0])) {
-                //     $fixing = 'Black p/Steel';
-                // }
-                // if(!empty($Vmatches[0])) {
-                //     $fixing = 'BZP Steel';
-                // }
-                // $data->data->fixings = $fixing;
             } 
         //if number of serials doesnt match quantity throw error
             //todo: serial checker
@@ -301,8 +287,8 @@ class Workorders extends Controller {
             $finishes = $this->woModel->getFinishes();
             if (!empty($data->data)) {
                 $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
-                $data->data->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
-                $data->data->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
+                // $data->data->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
+                // $data->data->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
                 $data->data->waveguide = $this->woModel->getFinishfromId($data->product->waveguide);
             };
             $data = (object) [
@@ -312,6 +298,9 @@ class Workorders extends Controller {
                 'models' => $models,
                 'data' => $data->data
             ];
+            // echo '<PRE>';
+            // print_r($data);
+            // die('<BR>we dyin');
             $this->view('workorders/add', $data);
             }
 
@@ -366,12 +355,12 @@ class Workorders extends Controller {
                    'errors' => $errors
                );
                 //validate post data//
-               if(empty($data->data->wko)) {
-                   $data->errors->err_wko = 'Please enter work order reference';
-               }
-               if(empty($data->data->avn)) {
-                   $data->errors->err_avn = 'Please enter advice note reference';
-               }
+            //    if(empty($data->data->wko)) {
+            //        $data->errors->err_wko = 'Please enter work order reference';
+            //    }
+            //    if(empty($data->data->avn)) {
+            //        $data->errors->err_avn = 'Please enter advice note reference';
+            //    }
                if(empty($data->data->cab_model_id)) {
                    $data->errors->err_cab_model = 'Please select the cabinet model';
                }
@@ -384,6 +373,7 @@ class Workorders extends Controller {
                if(empty($data->data->serials)) {
                    $data->data->serials = 'To Be Confirmed';
                }
+
                $data->pid = $this->woModel->getPidFromOptions($data->data); 
 
            //if number of serials doesnt match quantity throw error

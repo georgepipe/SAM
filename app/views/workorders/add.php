@@ -14,7 +14,7 @@ $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
     if($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
-
+        $pdf = true;
         function extractData($pattern, $text) {
             preg_match($pattern, $text, $matches);
             return isset($matches[1]) ? trim($matches[1]) : null;
@@ -34,12 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
        
 
         function cleanSerials($serial) {
-            $serialString = $serial;
+            $serialString = str_replace("&","-",$serial);
             preg_match('/([A-z])/',$serialString, $hasChar);
             if ($hasChar) {
                 preg_match('/\/(\d{5}).*?\/(\d{5})/', $serialString, $matches);
+                if($matches){
                 $serialString = ltrim($matches[1],'0').' - '.ltrim($matches[2],'0');
-                ($serialString === ' - ') ? $serialString = '' : '' ;
+                ($serialString === ' - ') ? $serialString = '' : '' ;}
             } else {
                 preg_match('/(\d{5})\s-\s(\d{5})/', $serialString, $matches);
                 $serialString = ltrim($matches[1],'0').' - '.ltrim($matches[2],'0');
@@ -63,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             'serials' => extractData('/Serial Nos:\s*(.*?)\nCharge and Quantity/s', $text) ?? extractData('/Serial Numbers:(.*?)\sCharge/', $text),
             'quantityRequired' => extractData('/Qty Required:\s*(\d+)/', $text),
             'model' => extractData('/Description:(.*?)\s/',$text) ?? extractData('/(.*?)\s/',$text),
+            'model_id' => '',
             'colour' => ucwords(extractData('/s, (.*?)\scabinet/', $text) ?? extractData('/s,(.*?)\swaveguide/', $text)," "),
             'grille' => ucwords(extractData('/t, (.*?)\sgrille/',$text)," \t\r\n\f\v'"),
             'connectors' => extractData('/d,(.*?)\sconnectors/',$text) ?? extractData('/\),(.*?)\sconnectors/',$text),
@@ -71,16 +73,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             'transport' => (extractData('/(Deliver\sto\sF1)/',$text) ?? extractData('/(To\sstorage)/',$text)) ?? 'TBC',
             'wheels' => (extractData('/WK-4IN\sto\sbe\sfitted/',$text)) ? true : false,
             'part_no' => extractData('/(F1-\d{3}-\d{3})/', $text),
-            'status' => 'Upcoming'// -- eventually this should set to either 'to be built' or 'waiting for parts' depending on stock levels
+            'status' => 'To Be Built'// -- eventually this should set to either 'to be built' or 'waiting for parts' depending on stock levels
         ]; 
 
         $i = 0;
         $grille = explode(" ",$pdfdata['grille']);
         $countG = count($grille);
-        for ($i = 0; $i <= $countG; $i++) {
-            ucfirst($grille[$i]) === "S'Steel" ? $grille[$i] = "S/Steel" : '';
-            ucfirst($grille[$i]) === "M'Steel" ? $grille[$i] = "M/Steel" : '';
-            ucfirst($grille[$i]) === 'No' ? $grille = [] : '';
+        if ($countG < 1) {
+            for ($i = 0; $i <= $countG; $i++) {
+                ucfirst($grille[$i]) === "S'Steel" ? $grille[$i] = "S/Steel" : '';
+                ucfirst($grille[$i]) === "M'Steel" ? $grille[$i] = "M/Steel" : '';
+                ucfirst($grille[$i]) === 'No' ? $grille = [] : '';
+            }
         }
         $pdfdata['grille'] = implode(' ',$grille);
 
@@ -116,25 +120,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             // if($pdfdata['grille'] === "Black S'Steel") {$pdfdata['grille'] = "Black S/Steel";
             // }
         } 
+        $names = array_column($data->models,"name");
+        $pdfdata['model_id'] = array_search($pdfdata['model'], $names)+1;
     }
-}
+} else {$pdf = false;}
 
-// $data->data->part_no = $pdfdata['part_no'];
-
+// if (!(is_bool($data->data->cab_model_id))) {
+//     echo '<pre>';
+//         print_r($data->models[$data->data->cab_model_id-1]->name);
+//         echo '<BR>';
+//         // if($data->data->cab_finish_id ==''){ echo 'cab finish id == '.is_empty($data->data->cab_finish_id);}
+//         echo '<BR>';
+//         // print_r($data->finishes[$data->data->waveguide_finish_id-1]->name);
+//     echo '</PRE>';
+// }
+// echo "<PRE>";
+// print_r( $data->data);
+// echo "</PRE>";
 ?>
+
 <section>
     <div class="fade-in addform">
         <div class="grid justify-center text-center mb-8">
-            <h1>Add Work Order</h1>
+            <h1 >Add Work Order</h1>
             <p>Add/Upload a AVN to the database using the form or button below</p>
             <br>
 
-            <div class=" border-4" style="display: flex; justify-content: center;">
-                <form action="" method="post" enctype="multipart/form-data">
+            <div class="border-4" style="display: flex; justify-content: center;">
+                <form id="addForm" action="" onsubmit="" method="post" enctype="multipart/form-data">
                     <input style="padding-left:250px; color:transparent;" type="file" name="pdf" title=" " accept="application/pdf" required onchange="this.form.submit();">
                 </form>
             </div>
-            <form action="<?php echo URLROOT; ?>workorders/add/" method="post">
+            <form class="input-form" action="<?php echo URLROOT; ?>workorders/add/" method="post">
                     <div class="form-group">
                     <label for="wko">WKO: <sup>*</label>
                         <input 
@@ -142,8 +159,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             name="wko" 
                             id="wko"
                             class= "<?php echo (!empty($data->errors->err_wko))? 'is-invalid' : '';?>" 
-                            value="<?php echo $pdfdata['WKO'] ?? $data->data->wko ;?>">
-                        <span class="invalid-feedback"><?php echo $data->errors->err_wko;?></span>
+                            value="<?php echo $pdfdata['WKO'] ?? ($data->data->wko ?? '') ;?>">
+                        <span class="invalid-feedback"><?php echo $data->errors->err_wko ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="avn">AVN: <sup>*</label>
@@ -151,140 +168,164 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             name="avn" 
                             id="avn"
                             class= "<?php echo (!empty($data->errors->err_avn))? 'is-invalid' : '';?>" 
-                            value="<?php echo $pdfdata['AVN'] ?? $data->data->avn;?>">
+                            value="<?php echo $pdfdata['AVN'] ?? ($data->data->avn ?? '');?>">
                         </input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_avn;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_avn ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="cab_model_id">Speaker Model: <sup>*</label>
                         <select 
                             name="cab_model_id" 
                             id="cab_model_id"
-                            class= "<?php echo (!empty($data->errors->err_cab_model))? 'is-invalid' : '';?>" 
-                            value="<?php echo  $data->data->cab_model_id ?? $pdfdata['model'] ;?>">
+                            class= "cabSel <?php echo (!empty($data->errors->err_cab_model))? 'is-invalid' : '';?>" 
+                            value="">
                             <option 
                                 value="
                                     <?php if(isset($data->data->cab_model_id)) {echo $data->data->cab_model_id;} 
                                         else 
-                                            {if(isset($pdfdata['model'])){echo $pdfdata['model'];} 
+                                            {if(isset($pdfdata['model_id'])){echo $pdfdata['model_id'];} 
                                                 else {;};}
                                     ?>">
-                                    <?php if(isset($data->data->cab_model_id)) {echo $data->model[$data->data->cab_model_id-1]->name;} 
+                                    <?php if(isset($data->data->cab_model_id)) {echo $data->models[$data->data->cab_model_id-1]->name;} 
                                         else 
                                             {if(isset($pdfdata['model'])){echo $pdfdata['model'];} 
                                                 else {echo '- -';};} ?>
                             </option>
 
                             <?php foreach($data->models as $model) : ?>
-                                <option value="<?php echo $model->name;?>"><?php echo $model->name;?></option>
+                                <option value="<?php echo $model->mid;?>"><?php echo $model->name;?></option>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_model;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_model ?? '';?></span>
                     </div>
-                    <div class="form-group">
+                    <div class="ccDiv <?php if($pdf){if(!empty($pdfdata['colour']) | !empty($data->data->cab_finish_id)){echo 'form-group';} else {echo 'hidden';}} else {echo 'form-group';} ?>">
                         <label for="cab_finish_id">Speaker Colour: <sup>*</label>
                         <select
                             name="cab_finish_id" 
                             id="cab_finish_id"
                             class= "<?php echo (!empty($data->errors->err_cab_colour))? 'is-invalid' : '';?> cabColourSel" 
-                            value="<?php echo $data->data->cab_finish_id;?>">
-                            <option value="<?php if(isset($data->data->finish_id)) {echo $data->data->finish_id;} else {if(isset($pdfdata['colour'])){echo $pdfdata['colour'];} else {echo '';};}?>"><?php if(isset($data->data->finish_id)) {echo $data->data->cab_finish->name;} else {if(isset($pdfdata['colour'])){echo $pdfdata['colour'];} else {echo '- -';};}?></option>
+                            value="<?php echo $data->data->cab_finish_id ?? '';?>">
+                            <option 
+                                value="
+                                    <?php if(isset($data->data->cab_finish_id)) {echo $data->data->cab_finish_id;} 
+                                        else 
+                                            {if(isset($pdfdata['colour'])){echo $pdfdata['colour'];} 
+                                                else 
+                                                    {echo '';};}?>">
+                                    <?php if(isset($data->data->cab_finish_id)) {echo $data->finishes[$data->data->cab_finish_id-1]->name;} 
+                                        else 
+                                            {if(isset($pdfdata['colour'])){echo $pdfdata['colour'];} 
+                                                else 
+                                                    {echo '- -';};}?>
+                            </option>
                             <?php foreach($data->finishes as $finish) : ?>
                                 <?php if($finish->type != 'Metal' & $finish->type != 'Polyurethane') :?>
                                     <option value="<?php echo $finish->id;?>"><?php echo $finish->name;?></option> 
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_colour;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_colour ?? '';?></span>
                     </div>
-                    <div class="form-group">
+                    <div class="gDiv <?php if(!empty($pdfdata['grille']) | !empty($data->data->grille_finish_id)){echo 'form-group';} else {echo 'hidden';} ?>">
                         <label for="grille_finish_id">Speaker Grille: </label>
                         <select 
                             name="grille_finish_id" 
                             id="grille_finish_id" 
-                            class= "<?php echo (!empty($data->errors->err_grille_colour))? 'is-invalid' : '';?> " 
-                            value="<?php echo $data->data->grille_finish_id;?>">
-                            <option value="<?php if(isset($data->data->grille_finish_id)) {echo $data->data->grille_finish_id;} else {if(isset($pdfdata['grille'])){echo $pdfdata['grille'];} else {echo '';};}?>"><?php if(isset($data->data->grille_finish_id)) {echo $data->data->grille_finish->name;} else {if(isset($pdfdata['grille'])){echo $pdfdata['grille'];} else {echo '- -';};}?></option>
+                            class= "grilleSel <?php echo (!empty($data->errors->err_grille_colour))? 'is-invalid' : '';?> " 
+                            value="<?php echo $data->data->grille_finish_id ?? '';?>">
+                            <option value="<?php 
+                                if(isset($data->data->grille_finish_id)) 
+                                    {echo $data->data->grille_finish_id;} 
+                                else 
+                                    {if(isset($pdfdata['grille']))
+                                        {echo $pdfdata['grille'];} 
+                                            else {echo '';};}?>">
+                                <?php if(!empty($data->data->grille_finish_id)) 
+                                    {echo $data->finishes[$data->data->grille_finish_id-1]->name;} 
+                                        else {if(isset($pdfdata['grille']))
+                                            {echo $pdfdata['grille'];} else {echo '- -';};}?>
+                            </option>
+
                             <?php foreach($data->finishes as $finish) : ?>
                                 <?php if($finish->type != 'Polyurethane' & $finish->type != 'Wood' & $finish->type != 'Weather Resistant') :?>
                                     <option value="<?php echo $finish->id;?>"><?php echo $finish->name;?></option> 
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_grille_colour;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_grille_colour ?? '';?></span>
                     </div>
-                    <div class="waveguideSel <?php echo(empty($data->data->waveguide->name) ? '' :'block'); ?>form-group ">
+                    <div class="wDiv <?php if(!empty($pdfdata['waveguide']) | !empty($data->data->waveguide_finish_id)){echo 'form-group';} else {echo 'hidden';} ?> ">
                         <label for="waveguide_finish_id">Waveguide Colour: </label>
                         <select 
                             name="waveguide_finish_id" 
                             id="waveguide_finish_id" 
-                            class="<?php echo (!empty($data->errors->err_waveguide_colour))? 'is-invalid' : '';?>" 
-                            value="<?php echo $data->data->waveguide_finish_id ;?>">
-                            <option value="<?php echo $data->data->waveguide ?? $pdfdata['waveguide'] ?>"><?php echo ($data->data->waveguide ?? $pdfdata['waveguide']) ?? '- -' ?></option>
+                            class="waveguideSel <?php echo (!empty($data->errors->err_waveguide_colour))? 'is-invalid' : '';?>" 
+                            value="<?php echo $data->data->waveguide_finish_id ?? '';?>">
+                            <option value="<?php echo $data->data->waveguide ?? ($pdfdata['waveguide'] ?? '') ?>"><?php echo ($data->data->waveguide ?? ($pdfdata['waveguide'] ?? '')) ?? '- -' ?></option>
                             <?php foreach($data->finishes as $finish) : ?>
                                 <?php if($finish->type === 'Polyurethane') :?>
                                     <option value="<?php echo $finish->id;?>"><?php echo $finish->name;?></option> 
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_colour;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_colour ?? '';?></span>
                     </div>
-                    <div class="form-group">
+                    <div class="whDiv <?php if(!empty($pdfdata['wheels']) | !empty($data->data->wheels)){echo 'form-group';} else {echo 'hidden';} ?>">
                         <label for="wheels">Wheels:</label>
                         <input name="wheels" 
                                 type="checkbox"
                                 id="wheels"
                                 class= "" 
-                            value="<?php echo $data->data->wheels ?? $pdfdata['wheels'];?>"></input>
+                            value="<?php echo $data->data->wheels ?? ($pdfdata['wheels'] ?? '');?>"></input>
                     </div>
                     <div class="form-group">
                         <label for="quantity_required">Quantity Required: <sup>*</label>
                         <input name="quantity_required" 
                             class= "<?php echo (!empty($data->errors->err_quantity_required))? 'is-invalid' : '';?>" 
                             id="quantity_required"
-                            value="<?php echo $data->data->quantity_required ?? $pdfdata['quantityRequired'];?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity_required;?></span>
+                            value="<?php echo $data->data->quantity_required ?? ($pdfdata['quantityRequired'] ?? '');?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity_required ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="serials">Serials: <sup>*</label>
                         <input name="serials" 
                             class= "<?php echo (!empty($data->errors->err_serials))? 'is-invalid' : '';?>" 
                             id="serials"
-                            value="<?php echo $data->data->serials ?? $pdfdata['serials'];?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_serials;?></span>
+                            value="<?php echo $data->data->serials ?? ($pdfdata['serials'] ?? '');?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_serials ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="wko_status">Status: </label>
                         <select name="wko_status" 
                             class= "<?php echo (!empty($data->errors->err_wko_status))? 'is-invalid' : '';?>" 
                             id="wko_status"
-                            value="<?php echo $data->data->wko_status;?>">
-                            <option value=""><?php if(isset($data->data->wko_status)) {echo $data->data->wko_status;} else { echo ' - -';} ?></option>
+                            value="">
+                            <option value="<?php echo $pdfdata['status'] ?? '';?>"><?php echo $pdfdata['status'] ?? '';?></option>
                             <option value="In Progress">In Progress</option>
                             <option value="On Hold">On Hold</option>
                             <option value="To Be Built">To Be Built</option>
                             <option value="Upcoming">Upcoming</option>
                             <option value="Completed">Completed</option>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_status;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_status ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="wko_delivery">Delivery: </label>
                         <input name="wko_delivery" 
                             class= "<?php echo (!empty($data->errors->err_wko_delivery))? 'is-invalid' : '';?>" 
                             id="wko_delivery"
-                            value="<?php echo $data->data->wko_delivery ?? $pdfdata['transport'];?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_delivery;?></span>
+                            value="<?php echo $data->data->wko_delivery ?? ($pdfdata['transport'] ?? '');?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_delivery ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="wko_notes">Notes: </label>
                         <textarea name="wko_notes" 
                             class= "<?php echo (!empty($data->errors->err_wko_notes))? 'is-invalid' : '';?>" 
                             id="wko_notes"
-                            value="<?php echo($data->data->wko_notes); ?>"><?php echo($data->data->wko_notes); ?></textarea>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes;?></span>
+                            value="<?php echo $data->data->wko_notes ?? ''; ?>"><?php echo $data->data->wko_notes ?? ''; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes ?? '';?></span>
                     </div>
-                    <!-- <input class="hidden" type="text" name="part_no" value="<?php echo $pdfdata['part_no']; ?>"></input> -->
+                    <!-- <input class="hidden" type="text" name="part_no" value="<?php echo $pdfdata['part_no'] ?? ''; ?>"></input> -->
                     <div class="form-group">
                         <label for="addAnother">Add Another:</label>
                         <input name="addAnother" 
@@ -301,11 +342,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
     </div>
 </section>
 
-<?php echo $data->models[0]->name; ?>
+<?php 
+echo '<BR>';
+echo $data->data->waveguide_finish_id ?? '';
 
-<?php echo '<PRE>data->errs:'; print_r($data->errors);?>
-<?php echo 'data->data:'; print_r($data->data);?>
-<?php echo 'pdfData:'; print_r($pdfdata);?>
-<?php echo 'data->models:'; print_r($data->models);?>
+?>
+
+<?php echo '<PRE>data->errs:'; print_r($data->errors ?? '');?>
+<?php echo 'data->data:'; print_r($data->data??'');?>
+<?php echo 'pdfData:'; print_r($pdfdata??'');?>
+<?php echo 'data->models:'; print_r($data->models??'');?>
 
 <?php require APPROOT . '/views/inc/footer.php'; ?>

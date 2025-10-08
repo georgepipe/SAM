@@ -4,10 +4,10 @@
 
 <section>
     <div class="editform">
-        <div class="text-center">
-            <h1>Edit Work Order</h1>
+        <div class="grid justify-center text-center w-lvw">
+            <h1 class="">Edit Work Order</h1>
             <BR>
-            <p>Edit a WKO from the database using the form below</p>
+            <p style="width:600px">Edit a WKO from the database using the form below</p>
             <br>
             <?php if(empty($data->data)) : ?>
                 <h2>No workorder found with that Id</h2>
