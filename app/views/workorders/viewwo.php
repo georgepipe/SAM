@@ -55,7 +55,7 @@ $waveguide = $data->workorder->waveguide->name ?? '';
       <?php endif ?>
       <div class="value"><span class="label">Connectors:</span> <?php echo $data->workorder->product->connectors; ?></div>
       <div class="value"><span class="label">Fixings:</span> <?php echo $data->workorder->product->fixings; ?></div>
-      <?php if($data->workorder->wheels != ''): ?>
+      <?php if($data->workorder->wheels === '1'): ?>
         <div class="value"><span class="label">Wheels Fitted</span></div>
       <?php endif ?>
       <div class="value"><span class="label">Part Number:</span> <?php echo $data->workorder->product->part_number; ?></div>

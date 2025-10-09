@@ -28,8 +28,6 @@ function initAddOrder() {
     ce.addEventListener("change", function (e) {
       var cText = 'text innit';
       var cValue = ce.selectedIndex;
-      console.log(cText);
-      console.log(cValue);
       checkSelectors(cValue, cText);
     });
   }
@@ -38,8 +36,6 @@ function initAddOrder() {
   //!! NOT FUTURE FRIENDLY!!
 
   function checkSelectors(cValue, cText) {
-    console.log('checking grille');
-    console.log(cValue);
     switch (cValue) {
       //grille selector toggle
       case 1:
@@ -119,12 +115,10 @@ function initAddOrder() {
       case 56:
       case 57:
       case 59:
-        console.log('show Waveguide');
         wDiv.classList.remove('hidden');
         wDiv.classList.add('form-group');
         break;
       default:
-        console.log('hide waveguide');
         wDiv.classList.remove('form-group');
         wDiv.classList.add('hidden');
         wDiv.value = "";
@@ -138,12 +132,10 @@ function initAddOrder() {
       case 56: //E7sh
       case 59:
         //E2sh
-        console.log('hide cab colour');
         ccDiv.classList.add('hidden');
         ccDiv.classList.remove('form-group');
         break;
       default:
-        console.log('show cab colour');
         ccDiv.classList.add('form-group');
         ccDiv.classList.remove('hidden');
         ccDiv.value = "";
@@ -161,12 +153,10 @@ function initAddOrder() {
       case 30:
       case 31:
       case 32:
-        console.log('show wheel checkbox');
         whDiv.classList.remove('hidden');
         whDiv.classList.add('form-group');
         break;
       default:
-        console.log('hide wheel checkbox');
         whDiv.classList.remove('form-group');
         whDiv.classList.add('hidden');
         whDiv.value = "";

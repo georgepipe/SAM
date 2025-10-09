@@ -33,7 +33,7 @@ class Workorders extends Controller {
             $coWkoCount = $this->woModel->getCompletedWorkorderCount();
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
             $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
+            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id);
             $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
             $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
             $workorder->pdesc = $this->poModel->createProductDescription($workorder);
@@ -46,7 +46,7 @@ class Workorders extends Controller {
             $coWkoCount = $this->woModel->getCompletedWorkorderCount();
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
             $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
+            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id);
             $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
             $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
             $workorder->pdesc = $this->poModel->createProductDescription($workorder);
@@ -321,17 +321,16 @@ class Workorders extends Controller {
             //sanitise POST array
                $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
                $data = (object) array (
+                'work_order_id' => $id,
                 'wko' => trim($_POST['wko']),
                 'avn' => trim($_POST['avn']),
                 'cab_model_id' => trim($_POST['cab_model_id']),
                 'cab_finish_id' => trim($_POST['cab_finish_id']),
                 'waveguide_finish_id' => trim($_POST['waveguide_finish_id']),
                 'grille_finish_id' => trim($_POST['grille_finish_id']),
-                'fixings' => trim($_POST['fixings']),
                 'connectors' => trim($_POST['connectors']),
                 'wheels' => $_POST['wheels'],
                 'quantity_required' => (int)$_POST['quantity_required'],
-                'quantity_built' => (int)$_POST['quantity_built'],
                 'serials' => trim($_POST['serials']),
                 'wko_status' => trim($_POST['wko_status']),
                 'wko_delivery' => trim($_POST['wko_delivery']),
@@ -364,9 +363,9 @@ class Workorders extends Controller {
                if(empty($data->data->cab_model_id)) {
                    $data->errors->err_cab_model = 'Please select the cabinet model';
                }
-               if(empty($data->data->cab_finish_id)) {
-                   $data->errors->err_cab_colour = 'Please select the cabinet finish';
-               }
+               if(empty($data->data->cab_finish_id) && empty($data->data->waveguide_finish_id)) {
+                $data->errors->err_cab_colour = 'Please select the cabinet finish';
+            } 
                if(empty($data->data->quantity_required)) {
                    $data->errors->err_quantity_required = 'Please enter a quantity';
                }
@@ -374,8 +373,9 @@ class Workorders extends Controller {
                    $data->data->serials = 'To Be Confirmed';
                }
 
-               $data->pid = $this->woModel->getPidFromOptions($data->data); 
-
+               $data->data->pid = $this->woModel->getPidFromOptions($data->data); 
+            //    echo $data->pid;
+            //    die('osahdoihas');
            //if number of serials doesnt match quantity throw error
                //todo
            // check for errors
@@ -396,13 +396,17 @@ class Workorders extends Controller {
                     };
             } else {
          //else reload with errors
-            $data = (object) [
-                'models' => $this->moModel->getModels(),
-                'finishes' => $this->woModel->getFinishes(),
-                'data' => $data->data,
-                'errors' => $data->errors
-                
-            ];
+         $data = (object) [
+            'models' => $this->moModel->getModelNames(),
+            'finishes' => $this->woModel->getFinishes(),
+            'data' => $this->woModel->getWorkorderById($id),
+            'errors' => $data->errors
+        ];
+        if (!empty($data->data)) {
+            $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
+            if(!empty($data->data->product->waveguide)) {
+            $data->data->waveguide = $this->woModel->getFinishfromId($data->data->product->waveguide);}
+        };
             $this->view('workorders/edit', $data);
             }
         }  else { //not a post request
@@ -418,7 +422,7 @@ class Workorders extends Controller {
             if (!empty($data->data)) {
                 $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
                 if(!empty($data->data->product->waveguide)) {
-                $data->data->waveguide = $this->woModel->getFinishfromId($data->product->waveguide);}
+                $data->data->waveguide = $this->woModel->getFinishfromId($data->data->product->waveguide);}
             };
             
 
@@ -443,7 +447,7 @@ class Workorders extends Controller {
         $workorder = $this->woModel->getWorkorderById($id);
         $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
         $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
+        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id);
         $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
         $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
         $workorder->pdesc = $this->poModel->createProductDescription($workorder);

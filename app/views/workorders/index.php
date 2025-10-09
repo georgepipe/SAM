@@ -41,7 +41,9 @@
 
 <?php if(isset($_SESSION['post_message'])) {echo flash('post_message');} ?>
 
-<div class="activeWkos <?php if($url[3] === 'index?p=cw') { echo 'hidden'; } else {echo 'block';} ?>">
+<div class="activeWkos <?php 
+                            // if($url[3] === 'index?p=cw') { echo 'hidden'; } else {echo 'block';}
+                         ?>">
     <div class="border-red-600">
         <h1 class="flex justify-center text-lg"><strong><U>Active Work Orders</U></strong></h1>
         <section class="flex flex-col">
@@ -172,7 +174,9 @@
     </div>
     </div>
 </div>
-<div class="completed <?php if($url[3] != 'index?p=cw') { echo 'hidden'; } else {echo 'block';} ?>">
+<div class="completed <?php
+                        //  if($url[3] != 'index?p=cw') { echo 'hidden'; } else {echo 'block';} 
+                        ?>">
     <div class="border-red-600">
         <h1 class="flex justify-center text-lg"><strong><U>Completed Work Orders</U></strong></h1>
         <section class="flex flex-col">

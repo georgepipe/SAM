@@ -135,7 +135,6 @@ class Workorder {
                 pid = :pid, 
                 wheels = :wheels,
                 quantity_required = :quantity_required,
-                quantity_built = :quantity_built,
                 serials = :serials,
                 wko_status = :wko_status,
                 wko_delivery = :wko_delivery,
@@ -146,22 +145,25 @@ class Workorder {
 
             date_default_timezone_set('Europe/London');
         ////bind values
+        // print_r($data);
+        // die('asdadas');
             $this->db->bind(':work_order_id',  $data->work_order_id);
             $this->db->bind(':wko',  $data->wko);
             $this->db->bind(':avn',  $data->avn);
             $this->db->bind(':pid',  $data->pid);
-            $this->db->bind(':wheels', 'yes please sir!');
+            $this->db->bind(':wheels',  empty($data->wheels) ? 0 : 1);
             $this->db->bind(':quantity_required',  $data->quantity_required);
-            $this->db->bind(':quantity_built',  $data->quantity_built);
             $this->db->bind(':serials',  $data->serials);
             $this->db->bind(':wko_status',  $data->wko_status);
             $this->db->bind(':wko_delivery',  $data->wko_delivery);
             $this->db->bind(':wko_notes',  $data->wko_notes);
             $this->db->bind(':updated_at', date('Y-m-d h:i:s', time()));
          //execute
+
             // try {$this->db->execute();} catch (PDOException $e) {
             //     print_r($e);
             // }
+
             // die('this will not update!');
             if($this->db->execute()){
                 return true;
