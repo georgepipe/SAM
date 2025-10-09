@@ -207,7 +207,8 @@ class Workorders extends Controller {
                     //there are duplicate serials
                     $data->errors->err_serials = 'Duplicate serials detected: ';
                     foreach($duplicates as $duplicate) {
-                        $data->errors->err_serials = $data->errors->err_serials.'work order -> '.$duplicate->work_order_id.' serial ->'.$duplicate->serial_num.' :';
+                        $workorder = $this->woModel->getWorkorderById($duplicate->work_order_id);
+                        $data->errors->err_serials = $data->errors->err_serials.'AVN: '.$workorder->avn.' Serial ->'.$duplicate->serial_num.' :';
                     }
                 } 
             }

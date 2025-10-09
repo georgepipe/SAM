@@ -15,10 +15,8 @@
             - check serials for duplicates (not working)<BR>
             - confirmation before delete<BR>
             - refactor serial regex (sometimes misses old serials)<BR>
-            - PID management (stop duplicate PIDs)<BR>
-            - Fix edit page: does not populate form correctly on load<br>
+            - PID management (stop duplicate PIDs) DONE?<BR>
             - Add search bar to filter results<br>
-            - Need to add avn pdf handler to show 404 errors rather than redirect to homepage<br>
             - Pop-up function to add serials to AVNs with To Be Confirmed serial range<br>
             - Fix pagination<br>
         <BR>
@@ -26,7 +24,7 @@
             - Calculate total weight for delivery<BR>  
             - Add search bar to filter results
         <BR><BR>
-        <strong class="border-b-2">Invertory Page:</strong><BR>
+        <strong class="border-b-2">Inventory Page:</strong><BR>
         - Everything<BR> 
         </p>
         <BR>
