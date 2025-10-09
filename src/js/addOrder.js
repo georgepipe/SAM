@@ -4,7 +4,6 @@ function initAddOrder () {
     const gDiv = document.querySelector(".gDiv");
     const wDiv = document.querySelector(".wDiv");
     const whDiv = document.querySelector(".whDiv");
-    const addForm = document.getElementById("addForm")
 
     console.log('start of innAddOrder JS');
     // if(ce) {
@@ -20,11 +19,6 @@ function initAddOrder () {
             console.log(cValue);
             checkSelectors(cValue, cText);
        
-        })
-    }
-    if (addForm) {
-        addForm.addEventListener("submit" , (e) =>{
-            console.log("Form has been submitted innit!")
         })
     }
 

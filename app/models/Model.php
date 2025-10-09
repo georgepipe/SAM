@@ -29,7 +29,7 @@
             // $results = $this->db->resultSet();  
             $models=[];  
             foreach($workorders as $workorder) {
-                 array_push($models,$workorder->cab_model);
+                 array_push($models,$workorder->cab_model_id);
             };
             return $models;
         }

@@ -417,9 +417,8 @@ class Workorders extends Controller {
             ];
             if (!empty($data->data)) {
                 $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
-                $data->data->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
-                $data->data->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
-                $data->data->waveguide = $this->woModel->getFinishfromId($data->product->waveguide);
+                if(!empty($data->data->product->waveguide)) {
+                $data->data->waveguide = $this->woModel->getFinishfromId($data->product->waveguide);}
             };
             
 

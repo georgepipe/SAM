@@ -3,7 +3,7 @@
 <a class="" href="javascript:history.go(-1)"><?php include APPROOT.'/views/components/icons/backicon.php'; ?>Back</a>
 
 <section>
-    <div class="editform">
+    <div class="fade-in editform">
         <div class="grid justify-center text-center w-lvw">
             <h1 class="">Edit Work Order</h1>
             <BR>
@@ -13,7 +13,7 @@
                 <h2>No workorder found with that Id</h2>
             <?php else : ?>
 
-            <form action="<?php echo URLROOT; ?>workorders/edit/<?php echo $data->data->work_order_id ?>" method="post">
+            <form class="input-form" action="<?php echo URLROOT; ?>workorders/edit/<?php echo $data->data->work_order_id ?>" method="post">
                     <div class="form-group">
                         <label for="wko">WKO: </label>
                         <input 
@@ -22,7 +22,7 @@
                             name="wko" 
                             class= "<?php echo (!empty($data->errors->err_wko))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->wko;?>">
-                        <span class="invalid-feedback"><?php echo $data->errors->err_wko;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_wko ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="avn">AVN: </label>
@@ -32,14 +32,14 @@
                             class= "<?php echo (!empty($data->errors->err_avn))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->avn;?>">
                         </input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_avn;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_avn ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="cab_model_id">Speaker Model: </label>
                         <select 
                             id="cab_model_id"
                             name="cab_model_id" 
-                            class= "<?php echo (!empty($data->errors->err_cab_model))? 'is-invalid' : '';?>" 
+                            class= "cabSel <?php echo (!empty($data->errors->err_cab_model))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->product->cab_model_id;?>">
                             
                             <option value="<?php if(isset($data->data->product->cab_model_id)) {echo $data->data->product->cab_model_id;} else { echo '';} ?>"><?php if(isset($data->data->product->cab_model_id)) {echo $data->models[$data->data->product->cab_model_id-1]->name;} else { echo '';} ?></option>
@@ -47,31 +47,39 @@
                                 <option value="<?php echo $model->name;?>"><?php echo $model->name;?></option>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_model;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_model ?? '';?></span>
                     </div>
-                    <div class="form-group">
+                    <div class="ccDiv form-group">
                         <label for="cab_finish_id">Speaker Colour: </label>
                         <select 
                             id="cab_finish_id"
                             name="cab_finish_id" 
-                            class= "<?php echo (!empty($data->errors->err_cab_colour))? 'is-invalid' : '';?> cabColourSel" 
-                            value="<?php echo $data->data->cab_finish_id;?>">
-                            <option value="<?php if(isset($data->data->product->finish_id)) {echo $data->data->product->finish_id;} else { echo '';} ?>"><?php if(isset($data->data->product->finish_id)) {echo $data->finishes[$data->data->product->finish_id-1]->name;} else { echo '';} ?></option>
+                            class= "<?php echo (!empty($data->errors->err_cab_colour))? 'is-invalid' : '';?>" 
+                            value="<?php echo $data->data->cab_finish_id ?? '';?>">
+                            <option value="
+                                <?php if(isset($data->data->product->cab_finish_id)) 
+                                    {echo $data->data->product->cab_finish_id;} 
+                                        else { echo '';} ?>">
+                                <?php if(isset($data->data->product->cab_finish_id)) 
+                                    {echo $data->finishes[$data->data->product->cab_finish_id-1]->name;} 
+                                        else { echo '';} ?>
+                            </option>
+
                             <?php foreach($data->finishes as $finish) : ?>
                                 <?php if($finish->type != 'Metal' & $finish->type != 'Polyurethane') :?>
                                     <option value="<?php echo $finish->id;?>"><?php echo $finish->name;?></option> 
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_colour;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_colour ?? '';?></span>
                     </div>
-                    <div class="form-group">
+                    <div class="gDiv form-group">
                         <label for="grille_finish_id">Speaker Grille: </label>
                         <select 
                             id="grille_finish_id"
                             name="grille_finish_id" 
-                            class= "<?php echo (!empty($data->errors->err_grille_colour))? 'is-invalid' : '';?> " 
-                            value="<?php echo $data->data->grille_finish_id;?>">
+                            class= "<?php echo (!empty($data->errors->err_grille_colour)) ? 'is-invalid' : '';?> " 
+                            value="<?php echo $data->data->grille_finish_id ?? '';?>">
                             <option value="<?php if(isset($data->data->product->grille_finish_id)) {echo $data->data->product->grille_finish_id;} else { echo '';} ?>"><?php if(isset($data->data->product->grille_finish_id)) {echo $data->finishes[$data->data->product->grille_finish_id-1]->name;} else { echo '';} ?></option>
                             <?php foreach($data->finishes as $finish) : ?>
                                 <?php if($finish->type != 'Polyurethane' & $finish->type != 'Wood' & $finish->type != 'Weather Resistant') :?>
@@ -79,15 +87,15 @@
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_grille_colour;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_grille_colour ?? '';?></span>
                     </div>
-                    <div class="form-group waveguideSel <?php echo(!is_bool($data->data->product->waveguide) ? 'hidden' :'block'); ?>">
+                    <div class="wDiv <?php echo(empty($data->data->product->waveguide) ? 'hidden' :'form-group'); ?>">
                         <label for="waveguide_finish_id">Waveguide Colour: </label>
                         <select 
                             id="waveguide_finish_id"
                             name="waveguide_finish_id" 
                             class= "<?php echo (!empty($data->errors->err_waveguide_colour))? 'is-invalid' : '';?>" 
-                            value="<?php echo $data->data->waveguide_finish_id;?>">
+                            value="<?php echo $data->data->waveguide_finish_id ?? '';?>">
                             <option value="<?php if(isset($data->product->waveguide)) {echo $data->product->waveguide;} else { echo '';} ?>"><?php if(isset($data->product->waveguide)) {echo $data->data->waveguide->name;} else { echo '';} ?></option>
                             <?php foreach($data->finishes as $finish) : ?>
                                 <?php if($finish->type === 'Polyurethane') :?>
@@ -95,17 +103,17 @@
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_colour;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_colour ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="connectors">Connectors: </label>
                         <input name="connectors" 
                             id="connectors"
                             class= "<?php echo (!empty($data->errors->err_connectors))? 'is-invalid' : '';?>" 
-                            value="<?php echo $data->data->product->connectors;?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_connectors;?></span>
+                            value="<?php echo $data->data->product->connectors ?? '';?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_connectors ?? '';?></span>
                     </div>
-                    <div class="form-group">
+                    <div class="whDiv form-group">
                         <label for="wheels">Wheels:</label>
                         <input name="wheels" 
                             id="wheels"
@@ -117,30 +125,23 @@
                         <input name="quantity_required" 
                             id="quantity_required"
                             class= "<?php echo (!empty($data->errors->err_quantity_required))? 'is-invalid' : '';?>" 
-                            value="<?php echo $data->data->quantity_required;?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity_required;?></span>
+                            value="<?php echo $data->data->quantity_required ?? '';?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity_required ?? '';?></span>
                     </div>
-                    <!-- <div class="form-group">
-                        <label for="quantity_built">Quantity Built: </label>
-                        <input name="quantity_built" 
-                        class= "<?php echo (!empty($data->errors->err_quantity_built))? 'is-invalid' : '';?>" 
-                        value="<?php echo $data->data->quantity_built;?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity_built;?></span>
-                    </div> -->
                     <div class="form-group">
                         <label for="serials">Serials: </label>
                         <input name="serials" 
                             id="serials"
                             class= "<?php echo (!empty($data->errors->err_serials))? 'is-invalid' : '';?>" 
-                            value="<?php echo $data->data->serials;?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_serials;?></span>
+                            value="<?php echo $data->data->serials ?? '';?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_serials ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="wko_status">Status: </label>
                         <select name="wko_status" 
                             id="wko_status"
                             class= "<?php echo (!empty($data->errors->err_wko_status))? 'is-invalid' : '';?>" 
-                            value="<?php echo $data->data->wko_status;?>">
+                            value="<?php echo $data->data->wko_status ?? '';?>">
                             <option value=""><?php if(isset($data->data->wko_status)) {echo $data->data->wko_status;} else { echo '';} ?></option>
                             <option value="In Progress">In Progress</option>
                             <option value="On Hold">On Hold</option>
@@ -148,23 +149,23 @@
                             <option value="Upcoming">Upcoming</option>
                             <option value="Completed">Completed</option>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_status;?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_status ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="wko_delivery">Delivery: </label>
                         <input name="wko_delivery" 
                             id="wko_delivery"
                             class= "<?php echo (!empty($data->errors->err_wko_delivery))? 'is-invalid' : '';?>" 
-                            value="<?php echo $data->data->wko_delivery;?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_delivery;?></span>
+                            value="<?php echo $data->data->wko_delivery ?? '';?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_delivery ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="wko_notes">Notes: </label>
                         <textarea name="wko_notes" 
                             id="wko_notes"
                             class= "<?php echo (!empty($data->errors->err_wko_notes))? 'is-invalid' : '';?>" 
-                            value="<?php echo($data->data->wko_notes); ?>"><?php echo($data->data->wko_notes); ?></textarea>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes;?></span>
+                            value="<?php echo($data->data->wko_notes ?? ''); ?>"><?php echo($data->data->wko_notes ?? ''); ?></textarea>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes ?? '';?></span>
                     </div>
 
                     <input type="submit" 

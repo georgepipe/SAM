@@ -15,7 +15,7 @@ class Models extends Controller {
 
        $modelInformation = $this->moModel->getModelFromMid($modelID);
 
-       $this->view('models/vmodel', $modelInformation); 
+       $this->view('models/viewm', $modelInformation); 
 
 
     } 

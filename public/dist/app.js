@@ -18,7 +18,6 @@ function initAddOrder() {
   var gDiv = document.querySelector(".gDiv");
   var wDiv = document.querySelector(".wDiv");
   var whDiv = document.querySelector(".whDiv");
-  var addForm = document.getElementById("addForm");
   console.log('start of innAddOrder JS');
   // if(ce) {
   //     console.log('ce exists, checking state');
@@ -32,11 +31,6 @@ function initAddOrder() {
       console.log(cText);
       console.log(cValue);
       checkSelectors(cValue, cText);
-    });
-  }
-  if (addForm) {
-    addForm.addEventListener("submit", function (e) {
-      console.log("Form has been submitted innit!");
     });
   }
 

@@ -273,11 +273,11 @@ class Workorder {
                         case 0: //has grille
                             $this->db->query('SELECT pid FROM finished_product WHERE 
                             cab_model_id = :cab_model_id AND 
-                            finish_id = :finish_id AND 
+                            cab_finish_id = :cab_finish_id AND 
                             grille_finish_id = :grille_finish_id AND 
                             waveguide = :waveguide');
                             $this->db->bind(':cab_model_id', $data->cab_model_id);
-                            $this->db->bind(':finish_id', $data->cab_finish_id);
+                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
                             $this->db->bind(':grille_finish_id', $data->grille_finish_id);
                             $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
                             break;
@@ -286,17 +286,17 @@ class Workorder {
                                 case 0:
                                     $this->db->query('SELECT pid FROM finished_product WHERE 
                                     cab_model_id = :cab_model_id AND 
-                                    finish_id = :finish_id AND 
+                                    cab_finish_id = :cab_finish_id AND 
                                     grille_finish_id is null AND 
                                     waveguide = :waveguide_finish_id');
                                     $this->db->bind(':cab_model_id', $data->cab_model_id);
-                                    $this->db->bind(':finish_id', $data->cab_finish_id);
+                                    $this->db->bind(':cab_finish_id', $data->cab_finish_id);
                                     $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
                                     break;
                                 case 1:
                                     $this->db->query('SELECT pid FROM finished_product WHERE 
                                     cab_model_id = :cab_model_id AND 
-                                    finish_id is null AND 
+                                    cab_finish_id is null AND 
                                     grille_finish_id is null AND 
                                     waveguide = :waveguide_finish_id');
                                     $this->db->bind(':cab_model_id', $data->cab_model_id);
@@ -310,22 +310,22 @@ class Workorder {
                         case 0: //has grille
                             $this->db->query('SELECT * FROM finished_product WHERE 
                                 cab_model_id = :cab_model_id and 
-                                finish_id = :finish_id AND 
+                                cab_finish_id = :cab_finish_id AND 
                                 grille_finish_id = :grille_finish_id AND 
                                 waveguide is NULL');
                             $this->db->bind(':cab_model_id', $data->cab_model_id);
-                            $this->db->bind(':finish_id', $data->cab_finish_id);
+                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
                             $this->db->bind(':grille_finish_id', $data->grille_finish_id);
 
                         break;
                         case 1: //no grille
                             $this->db->query('SELECT pid FROM finished_product WHERE 
                                 cab_model_id = :cab_model_id AND 
-                                finish_id = :finish_id AND 
+                                cab_finish_id = :cab_finish_id AND 
                                 grille_finish_id is null AND 
                                 waveguide is null');
                             $this->db->bind(':cab_model_id', $data->cab_model_id);
-                            $this->db->bind(':finish_id', $data->cab_finish_id);
+                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
                         break;
 
                     }
