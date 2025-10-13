@@ -12,9 +12,7 @@
     <div class=" ml-8" >
         <h1 class="text-center text-lg"><strong>To Do:</strong></h1>
         <p><strong class="mb-4 border-b-2">Workorders Page:</strong><BR>
-            - check serials for duplicates (not working)<BR>
-            - confirmation before delete<BR>
-            - refactor serial regex (sometimes misses old serials)<BR>
+            - Prompt to add serials to work order before allowing completion <br>
             - PID management (stop duplicate PIDs) DONE?<BR>
             - Add search bar to filter results<br>
             - Pop-up function to add serials to AVNs with To Be Confirmed serial range<br>
@@ -23,6 +21,7 @@
         <strong class="border-b-2">Transport Page:</strong><BR>
             - Calculate total weight for delivery<BR>  
             - Add search bar to filter results
+            - categorise avliable complete wkos into: -to funktion one, -to storage & unassigned<br>
         <BR><BR>
         <strong class="border-b-2">Inventory Page:</strong><BR>
         - Everything<BR> 

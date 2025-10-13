@@ -776,6 +776,10 @@ video {
   width: 100lvw;
 }
 
+.min-w-24 {
+  min-width: 6rem;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -1101,6 +1105,18 @@ video {
   color: aliceblue;
 }
 
+.avnPdf {
+  color: red;
+  font-weight: bolder;
+  -webkit-text-decoration: underline overline #ff3028;
+          text-decoration: underline overline #ff3028;
+  width: 100px;
+}
+
+.avnPdf:hover {
+  color:chartreuse;
+}
+
 .text-gray-300 {
   color: rgb(92, 92, 92);
 }
@@ -1130,6 +1146,14 @@ video {
   width: 3.5rem;
   /* padding: 1.5rem; */
   margin: 1rem,2rem;
+}
+
+.dispContainer {
+  border-color: rgb(220 38 38);
+  border-width: 3px;
+  border-radius: 20px;
+  padding: 5px 10px;
+  margin: 25px 10px;
 }
 
 .addform {
@@ -1224,8 +1248,8 @@ video {
   grid-column:1/span 5
 }
 
-form > .form-group {
-  /* padding-top: 0.5rem; */
+.submitBtn {
+  grid-column: 2/5;
 }
 
 .invalid-feedback {
@@ -1275,6 +1299,10 @@ tr.worow:hover {
 
 .fade-in{
   animation: fadeIn 1s;
+}
+
+.slow-fade-in{
+  animation: fadeIn 1.5s;
 }
 
 @keyframes fadeIn {

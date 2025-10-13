@@ -464,10 +464,11 @@ class Workorders extends Controller {
     public function complete($work_order_id) {
         $workorder = $this->woModel->getWorkorderById($work_order_id);
         $product = $this->poModel->getProductFromPid($workorder->pid);
-        if(!isset($workorder->serials) | $workorder->serials === 'To Be Confirmed') {
-            flash('post_message', 'You must add serials to this workorder before it can be completed!');
-            redirect('workorders/index');
+        if($workorder->serials === 'To Be Confirmed') {
+
             throwErr(1234,'Stap right there buddy!');
+            flash('post_message', 'You must add serials to this workorder before it can be completed!',);
+            redirect('workorders/index');
         } else {
             $this->seModel->addSerials($work_order_id, $product->cab_model_id, $workorder->serials);
             if ($this->woModel->completeOrder($workorder)) {

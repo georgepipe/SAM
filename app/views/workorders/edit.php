@@ -12,7 +12,9 @@
             <?php if(empty($data->data)) : ?>
                 <h2>No workorder found with that Id</h2>
             <?php else : ?>
-
+            <div class="avnPdfDiv">
+                <a class="avnPdf" href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($data->data->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');">Original AVN</a>
+            </div>
             <form class="input-form" action="<?php echo URLROOT; ?>workorders/edit/<?php echo $data->data->work_order_id ?>" method="post">
                     <div class="form-group">
                         <label for="wko">WKO: </label>
@@ -167,18 +169,18 @@
                             value="<?php echo($data->data->wko_notes ?? ''); ?>"><?php echo($data->data->wko_notes ?? ''); ?></textarea>
                         <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes ?? '';?></span>
                     </div>
-
+                    <div class="form-group submitBtn">
                     <input type="submit" 
+                        id="submit" 
                         class="btn submitbtn" 
                         value="Submit">
+                    </div>
             </form>
 
             <?php endif; ?>
         </div>
     </div>
+
 </section>
-<pre>
-    <?php print_r($data->data); ?>
-</pre>
 
 <?php require APPROOT . '/views/inc/footer.php'; ?>

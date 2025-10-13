@@ -16,7 +16,9 @@ function initWorkOrders () {
 
     //Representational State Transfer (REST) -> GET, POST, PUT/PATCH, DELETE
    
-    if(window.location.href === 'localhost/SAM/workorders/index') {   
+    // if(window.location.href === 'localhost/SAM/workorders/index') {   
+    if(1===1) {   
+        console.log('we have started pagination function')
         const pgBtns = document.querySelectorAll(".pgBtn");
         const pageNumberInfoA = document.querySelector(".pageInfoA")
         const pageNumberInfoB = document.querySelector(".pageInfoB")
@@ -60,7 +62,7 @@ function initWorkOrders () {
                     .then(response => {
                         console.log(response) //testing response=
                         let length = Object.keys(response).length
-                        // console.log('length of returned object array is: '+length)
+                        console.log('length of returned object array is: '+length)
 
                         let trClass
                         let Table = ''
@@ -100,7 +102,7 @@ function initWorkOrders () {
                             tag === 'com' ? Tbody = document.querySelector("#tbodyCwo") : Tbody = document.querySelector("#tbodyAwo") 
 
                             let row = Tbody.insertRow(0)
-                            row.classList.add("text-center", "items-center", "border-4", "worow", trClass, "min-h-3")
+                            row.classList.add("text-center", "items-center", "border-4", "worow", trClass, "min-h-3","slow-fade-in")
 
                             const tdDate = document.createElement("td")
                                 tdDate.classList.add("text-nowrap")
@@ -108,13 +110,13 @@ function initWorkOrders () {
                             const tdAvn = document.createElement("td")
                             const tdPdesc = document.createElement("td")
                                 tdPdesc.classList.add("text-[10px]")
-                            const tdWheels = document.createElement("td")
                             const tdQuantityR = document.createElement("td")
                             const tdQuantityB = document.createElement("td")
                             const tdSerials = document.createElement("td")
                             const tdWkoS = document.createElement("td")
                             const tdWkoD = document.createElement("td")
                             const tdWkoN = document.createElement("td")
+                                tdWkoN.classList.add("min-w-24")
                             const tdComp = document.createElement("td")
                             const tdSplit = document.createElement("td")
                             const tdEdit = document.createElement("td")
@@ -141,10 +143,8 @@ function initWorkOrders () {
 
                             wko = document.createTextNode(response[i-1].wko)
                             avn = document.createTextNode(response[i-1].avn) 
-                            pdesc = document.createTextNode(response[i-1].pdesc)
-                            wheels = response[i-1].wheels === true ? document.createTextNode('Yes') : document.createTextNode('No') 
+                            pdesc = document.createTextNode(response[i-1].pdesc) 
                             quantity_required = document.createTextNode(response[i-1].quantity_required)
-                            quantity_built = document.createTextNode(response[i-1].quantity_built)
                             serials = response[i-1].serials === null ? document.createTextNode('') : document.createTextNode(response[i-1].serials)
                             wko_status = document.createTextNode(response[i-1].wko_status)
                             wko_delivery = document.createTextNode(response[i-1].wko_delivery)
@@ -170,9 +170,7 @@ function initWorkOrders () {
                             tdWko.appendChild(wko)
                             tdAvn.appendChild(avn)
                             tdPdesc.appendChild(pdesc)
-                            tdWheels.appendChild(wheels)
                             tdQuantityR.appendChild(quantity_required)
-                            tdQuantityB.appendChild(quantity_built)
                             tdSerials.appendChild(serials)
                             tdWkoS.appendChild(wko_status)
                             tdWkoD.appendChild(wko_delivery)
@@ -186,9 +184,7 @@ function initWorkOrders () {
                                 row.appendChild(tdWko)
                                 row.appendChild(tdAvn)
                                 row.appendChild(tdPdesc)
-                                row.appendChild(tdWheels)
                                 row.appendChild(tdQuantityR)
-                                row.appendChild(tdQuantityB)
                                 row.appendChild(tdSerials)
                                 row.appendChild(tdWkoS)
                                 row.appendChild(tdWkoD)
@@ -240,7 +236,6 @@ function initWorkOrders () {
 
     }; 
 
-    console.log("Test point Ghost");
     const addWkoBtn = document.querySelector(".addWkoBtn")
     const addWkoDialog = document.querySelector("#addWko")
     if(addWkoBtn) { 
@@ -283,5 +278,21 @@ function initWorkOrders () {
             })
         }
     }  
+
+    const dltBtns = document.querySelectorAll(".dltBtn");
+    let k;
+    if(dltBtns){
+        for (k=0; k < dltBtns.length; k++) {
+            dltBtns[k].addEventListener("click", (e) => {
+                const woid = e.target.parentElement.parentElement.parentElement.dataset.id
+                if(confirm("Are you sure you want to delete this workorder?") == true) {
+                    window.location.href = "http://localhost/SAM/workorders/delete/"+woid
+                    // console.log(e.target.parentElement.parentElement.parentElement)
+                    console.log(woid)
+                    console.log('delete button clicked');
+                }
+            })
+        }
+    }
 }
 export { initWorkOrders }

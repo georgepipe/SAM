@@ -18,12 +18,6 @@ function initAddOrder() {
   var gDiv = document.querySelector(".gDiv");
   var wDiv = document.querySelector(".wDiv");
   var whDiv = document.querySelector(".whDiv");
-  console.log('start of innAddOrder JS');
-  // if(ce) {
-  //     console.log('ce exists, checking state');
-  //     checkSelectors(ce.value); 
-  //     }
-  console.log(ce);
   if (ce) {
     ce.addEventListener("change", function (e) {
       var cText = 'text innit';
@@ -361,7 +355,9 @@ function initWorkOrders() {
 
   //Representational State Transfer (REST) -> GET, POST, PUT/PATCH, DELETE
 
-  if (window.location.href === 'localhost/SAM/workorders/index') {
+  // if(window.location.href === 'localhost/SAM/workorders/index') {   
+  if (true) {
+    console.log('we have started pagination function');
     var pgBtns = document.querySelectorAll(".pgBtn");
     var pageNumberInfoA = document.querySelector(".pageInfoA");
     var pageNumberInfoB = document.querySelector(".pageInfoB");
@@ -402,8 +398,7 @@ function initWorkOrders() {
         }).then(function (response) {
           console.log(response); //testing response=
           var length = Object.keys(response).length;
-          // console.log('length of returned object array is: '+length)
-
+          console.log('length of returned object array is: ' + length);
           var trClass;
           var Table = '';
           tag === 'com' ? Table = document.querySelector("#tblCwo") : Table = document.querySelector("#tblAwo");
@@ -438,20 +433,20 @@ function initWorkOrders() {
             var Tbody = void 0;
             tag === 'com' ? Tbody = document.querySelector("#tbodyCwo") : Tbody = document.querySelector("#tbodyAwo");
             var row = Tbody.insertRow(0);
-            row.classList.add("text-center", "items-center", "border-4", "worow", trClass, "min-h-3");
+            row.classList.add("text-center", "items-center", "border-4", "worow", trClass, "min-h-3", "slow-fade-in");
             var tdDate = document.createElement("td");
             tdDate.classList.add("text-nowrap");
             var tdWko = document.createElement("td");
             var tdAvn = document.createElement("td");
             var tdPdesc = document.createElement("td");
             tdPdesc.classList.add("text-[10px]");
-            var tdWheels = document.createElement("td");
             var tdQuantityR = document.createElement("td");
             var tdQuantityB = document.createElement("td");
             var tdSerials = document.createElement("td");
             var tdWkoS = document.createElement("td");
             var tdWkoD = document.createElement("td");
             var tdWkoN = document.createElement("td");
+            tdWkoN.classList.add("min-w-24");
             var tdComp = document.createElement("td");
             var tdSplit = document.createElement("td");
             var tdEdit = document.createElement("td");
@@ -474,9 +469,7 @@ function initWorkOrders() {
             wko = document.createTextNode(response[i - 1].wko);
             avn = document.createTextNode(response[i - 1].avn);
             pdesc = document.createTextNode(response[i - 1].pdesc);
-            wheels = response[i - 1].wheels === true ? document.createTextNode('Yes') : document.createTextNode('No');
             quantity_required = document.createTextNode(response[i - 1].quantity_required);
-            quantity_built = document.createTextNode(response[i - 1].quantity_built);
             serials = response[i - 1].serials === null ? document.createTextNode('') : document.createTextNode(response[i - 1].serials);
             wko_status = document.createTextNode(response[i - 1].wko_status);
             wko_delivery = document.createTextNode(response[i - 1].wko_delivery);
@@ -498,9 +491,7 @@ function initWorkOrders() {
             tdWko.appendChild(wko);
             tdAvn.appendChild(avn);
             tdPdesc.appendChild(pdesc);
-            tdWheels.appendChild(wheels);
             tdQuantityR.appendChild(quantity_required);
-            tdQuantityB.appendChild(quantity_built);
             tdSerials.appendChild(serials);
             tdWkoS.appendChild(wko_status);
             tdWkoD.appendChild(wko_delivery);
@@ -514,9 +505,7 @@ function initWorkOrders() {
               row.appendChild(tdWko);
               row.appendChild(tdAvn);
               row.appendChild(tdPdesc);
-              row.appendChild(tdWheels);
               row.appendChild(tdQuantityR);
-              row.appendChild(tdQuantityB);
               row.appendChild(tdSerials);
               row.appendChild(tdWkoS);
               row.appendChild(tdWkoD);
@@ -562,7 +551,6 @@ function initWorkOrders() {
     }
   }
   ;
-  console.log("Test point Ghost");
   var addWkoBtn = document.querySelector(".addWkoBtn");
   var addWkoDialog = document.querySelector("#addWko");
   if (addWkoBtn) {
@@ -597,6 +585,21 @@ function initWorkOrders() {
           window.alert("Error: Can't split from this point.");
         } else {
           window.location.href = "http://localhost/SAM/workorders/split/" + woid + "/" + splitPoint;
+        }
+      });
+    }
+  }
+  var dltBtns = document.querySelectorAll(".dltBtn");
+  var k;
+  if (dltBtns) {
+    for (k = 0; k < dltBtns.length; k++) {
+      dltBtns[k].addEventListener("click", function (e) {
+        var woid = e.target.parentElement.parentElement.parentElement.dataset.id;
+        if (confirm("Are you sure you want to delete this workorder?") == true) {
+          window.location.href = "http://localhost/SAM/workorders/delete/" + woid;
+          // console.log(e.target.parentElement.parentElement.parentElement)
+          console.log(woid);
+          console.log('delete button clicked');
         }
       });
     }

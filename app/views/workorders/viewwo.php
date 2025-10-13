@@ -65,6 +65,5 @@ $waveguide = $data->workorder->waveguide->name ?? '';
  
 
 
-<pre><?php print_r($data);?></pre>
-
+<!-- <pre><?php print_r($data);?></pre> -->
 <?php require APPROOT . '/views/inc/footer.php'; ?>

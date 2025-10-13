@@ -3,7 +3,7 @@
 
 <div class="relative rounded-2xl p-8 fade-in">
 <?php if(!empty($data->avaliableworkorders)) : ?>
-<div class=" m-8 border-4 border-red-600">
+<div class="uassTrans m-8 border-4 border-red-600">
         <h1 class="flex justify-center text-lg"><strong><U>Product Ready for Transport</U></strong></h1>
         <section class="flex flex-col">
             <table class="text-sm justify-evenly w-full border-4">
@@ -37,7 +37,7 @@
 </div>
 <?php endif; ?>
 <?php if(!empty($data->activetransportnotes)) : ?>
-	<div class="m-8 border-4 border-red-600">
+	<div class="assTrans dispContainer">
         <h1 class="flex justify-center text-lg"><strong><U>Active Collections & Deliveries</U></strong></h1>
         <section class="flex flex-col">
             <table class="text-sm justify-evenly w-full border-4">

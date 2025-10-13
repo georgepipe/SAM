@@ -5,12 +5,7 @@ function initAddOrder () {
     const wDiv = document.querySelector(".wDiv");
     const whDiv = document.querySelector(".whDiv");
 
-    console.log('start of innAddOrder JS');
-    // if(ce) {
-    //     console.log('ce exists, checking state');
-    //     checkSelectors(ce.value); 
-    //     }
-    console.log(ce)
+
     if(ce) { 
         ce.addEventListener("change", (e) => {
             var cText = 'text innit';
