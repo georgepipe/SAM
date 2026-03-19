@@ -43,8 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                 ($serialString === ' - ') ? $serialString = '' : '' ;}
             } else {
                 preg_match('/(\d{5})\s-\s(\d{5})/', $serialString, $matches);
+                if($matches) {
                 $serialString = ltrim($matches[1],'0').' - '.ltrim($matches[2],'0');
-                ($serialString === ' - ') ? $serialString = '' : '' ; 
+                ($serialString === ' - ') ? $serialString = '' : '' ; }
             }
             $serialString === '' ? $serialString = $serial : '';
             //remove any model name from start if present
