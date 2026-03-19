@@ -96,7 +96,7 @@
                         <select 
                             id="waveguide_finish_id"
                             name="waveguide_finish_id" 
-                            class= "<?php echo (!empty($data->errors->err_waveguide_colour))? 'is-invalid' : '';?>" 
+                            class= "<?php echo (!empty($data->errors->err_waveguide_finish))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->product->waveguide->id ?? '';?>">
                             <option value="<?php if(isset($data->data->waveguide->id)) {echo $data->data->waveguide->id;} else { echo '';} ?>"><?php if(isset($data->data->waveguide->id)) {echo $data->data->waveguide->name;} else { echo '';} ?></option>
                             <?php foreach($data->finishes as $finish) : ?>
@@ -105,7 +105,7 @@
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_colour ?? '';?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_finish ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="connectors">Connectors: </label>

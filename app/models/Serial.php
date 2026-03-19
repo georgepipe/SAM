@@ -11,7 +11,7 @@ class Serial {
 
         public function addSerials($work_order_id, $mid, $serials, $vOnly = false) {
             // echo 'wko: '.$work_order_id.'mid: '.$mid.'ser: '.$serials;
-            if ($serials === "To Be Confirmed") {throwErr(1024,'Function [addSerials] failed: No serials provided.');}
+            if (!$vOnly && $serials === "To Be Confirmed") {throwErr(1024,'Function [addSerials] failed: No serials provided.');}
             //work out how many serials there are, make a list of them all
             // echo '<pre>';
             if(empty($serials) | $serials === '' | $serials === 'TBC') {
@@ -47,7 +47,7 @@ class Serial {
                 return $duplicates ?? false;
             } else {
                 
-                if(!$vOnly) {
+                if(!$vOnly) { //if we're not just checking for duplicates then add the serials to the database
                     // echo '<PRE>';
                     // print_r($serialArr);
                     foreach($serialArr as $serial) {

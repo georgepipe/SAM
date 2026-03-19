@@ -1,6 +1,10 @@
 <?php   
-
+//FILLS IN DEFAULT DATA TO MEET PRODUCT RULESETS AND SETS DEFAULTS IS APPLICABLE
     class WorkorderRuleService {
+
+        public function applyRules() {
+
+        }
 
         public function requiresGrilleFinish($cabModelID): bool {
             return in_array((string) $cabModelID, WorkorderRuleConfig::REQUIRES_GRILLE_FINISH, TRUE);
@@ -18,8 +22,8 @@
             return WorkorderRuleConfig::DEFAULT_CONNECTORS[(string)$cabModelID] ?? 'NL4';
         }
 
-        public function requiresWaveguideColour($cabModelID): bool {
-            return in_array((string) $cabModelID, WorkorderRuleConfig::REQUIRE_WAVEGUIDE_FINISH);
+        public function requiresWaveguideFinish($cabModelID): bool {
+            return in_array((string) $cabModelID, WorkorderRuleConfig::REQUIRE_WAVEGUIDE_FINISH, TRUE);
         }
 
 

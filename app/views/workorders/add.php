@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         </select>
                         <span class="invalid-feedback"><?php echo $data->errors->err_cab_colour ?? '';?></span>
                     </div>
-                    <div class="gDiv <?php if(!empty($pdfdata['grille']) | !empty($data->data->grille_finish_id)){echo 'form-group';} else {echo 'hidden';} ?>">
+                    <div class="gDiv <?php if(!empty($pdfdata['grille']) || !empty($data->data->grille_finish_id) || !empty($data->errors->err_grille_colour)){echo 'form-group';} else {echo 'hidden';} ?>">
                         <label for="grille_finish_id">Speaker Grille: </label>
                         <select 
                             name="grille_finish_id" 
@@ -258,21 +258,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         </select>
                         <span class="invalid-feedback"><?php echo $data->errors->err_grille_colour ?? '';?></span>
                     </div>
-                    <div class="wDiv <?php if(!empty($pdfdata['waveguide']) | !empty($data->data->waveguide_finish_id)){echo 'form-group';} else {echo 'hidden';} ?> ">
+                    <div class="wDiv <?php if(!empty($pdfdata['waveguide']) || !empty($data->data->waveguide_finish_id) || !empty($data->errors->err_waveguide_finish)) {echo 'form-group';} else {echo 'hidden';} ?> ">
                         <label for="waveguide_finish_id">Waveguide Colour: </label>
                         <select 
                             name="waveguide_finish_id" 
                             id="waveguide_finish_id" 
-                            class="waveguideSel <?php echo (!empty($data->errors->err_waveguide_colour))? 'is-invalid' : '';?>" 
+                            class="waveguideSel <?php echo (!empty($data->errors->err_waveguide_finish))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->waveguide_finish_id ?? '';?>">
-                            <option value="<?php echo $data->data->waveguide ?? ($pdfdata['waveguide'] ?? '') ?>"><?php echo ($data->data->waveguide ?? ($pdfdata['waveguide'] ?? '')) ?? '- -' ?></option>
+                            <option value="<?php echo $data->data->waveguide_finish_id ?? ($pdfdata['waveguide'] ?? '') ?>"><?php echo ($data->data->waveguide_finish_id ?? ($pdfdata['waveguide'] ?? '')) ?? '- -' ?></option>
                             <?php foreach($data->finishes as $finish) : ?>
                                 <?php if($finish->type === 'Polyurethane') :?>
                                     <option value="<?php echo $finish->id;?>"><?php echo $finish->name;?></option> 
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_colour ?? '';?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_finish ?? '';?></span>
                     </div>
                     <div class="whDiv <?php if(!empty($pdfdata['wheels']) | !empty($data->data->wheels)){echo 'form-group';} else {echo 'hidden';} ?>">
                         <label for="wheels">Wheels:</label>
