@@ -172,6 +172,24 @@ class Workorder {
             }
         }
 
+        public function setSerials($wkoid, $serials) { //is this needed or will an api be more suitable?
+            //update wko with given serials
+            $this->db->query('
+                UPDATE work_orders SET 
+                serials = :serials
+                WHERE work_order_id = :work_order_id
+                            ');
+
+            $this->db->bind('work_order_id', $wkoid);
+            $this->db->bind('serials', $serials);
+
+            if($this->db->execute()){
+                return true;
+            } else { 
+                return false;
+            } 
+        }
+
         public function completeOrder($data) {
             $this->db->query('UPDATE work_orders SET 
                 work_order_id = :work_order_id,
@@ -335,7 +353,12 @@ class Workorder {
             };
             
             $results = $this->db->single();
-            return $results->pid; 
+            if(isset($results->pid)){
+                return $results->pid; 
+            } else {
+                return 0;
+            }
+            
         }
 
         public function updateWorkorderTnid($workorder) {

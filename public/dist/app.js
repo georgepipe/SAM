@@ -354,14 +354,13 @@ function initWorkOrders() {
    */
 
   //Representational State Transfer (REST) -> GET, POST, PUT/PATCH, DELETE
-
-  // if(window.location.href === 'localhost/SAM/workorders/index') {   
-  if (true) {
+  if (window.location.href === 'http://localhost/SAM/workorders/index') {
+    // if(1===1) {   
     console.log('we have started pagination function');
     var pgBtns = document.querySelectorAll(".pgBtn");
     var pageNumberInfoA = document.querySelector(".pageInfoA");
     var pageNumberInfoB = document.querySelector(".pageInfoB");
-    var _addWkoBtn = document.querySelector(".addWkoBtn");
+    var addWkoBtn = document.querySelector(".addWkoBtn");
     //const addWko
     var totalAResults = document.querySelector(".Acount");
     totalAResults = totalAResults.dataset.count;
@@ -377,7 +376,7 @@ function initWorkOrders() {
     var wheels;
     var quantity_required;
     var quantity_built;
-    var serials;
+    var _serials;
     var wko_status;
     var wko_delivery;
     var wko_notes;
@@ -426,7 +425,7 @@ function initWorkOrders() {
                   trClass = 'upcoming';
                   break;
                 default:
-                  trClass = null;
+                  trClass = '';
                   break;
               }
             }
@@ -470,7 +469,7 @@ function initWorkOrders() {
             avn = document.createTextNode(response[i - 1].avn);
             pdesc = document.createTextNode(response[i - 1].pdesc);
             quantity_required = document.createTextNode(response[i - 1].quantity_required);
-            serials = response[i - 1].serials === null ? document.createTextNode('') : document.createTextNode(response[i - 1].serials);
+            _serials = response[i - 1].serials === null ? document.createTextNode('') : document.createTextNode(response[i - 1].serials);
             wko_status = document.createTextNode(response[i - 1].wko_status);
             wko_delivery = document.createTextNode(response[i - 1].wko_delivery);
             wko_notes = document.createTextNode(response[i - 1].wko_notes);
@@ -492,7 +491,7 @@ function initWorkOrders() {
             tdAvn.appendChild(avn);
             tdPdesc.appendChild(pdesc);
             tdQuantityR.appendChild(quantity_required);
-            tdSerials.appendChild(serials);
+            tdSerials.appendChild(_serials);
             tdWkoS.appendChild(wko_status);
             tdWkoD.appendChild(wko_delivery);
             tdWkoN.appendChild(wko_notes);
@@ -551,15 +550,17 @@ function initWorkOrders() {
     }
   }
   ;
-  var addWkoBtn = document.querySelector(".addWkoBtn");
-  var addWkoDialog = document.querySelector("#addWko");
-  if (addWkoBtn) {
-    addWkoBtn.addEventListener("click", function (e) {
-      // window.open('http://localhost/SAM/workorders/add')
-      // addWkoDialog.classList.remove("hidden")
-      // addWkoDialog.classList.add("block")  
-    });
-  }
+
+  // const addWkoBtn = document.querySelector(".addWkoBtn")
+  // const addWkoDialog = document.querySelector("#addWko")
+  // if(addWkoBtn) { 
+  //     addWkoBtn.addEventListener("click", (e) => {
+  //         // window.open('http://localhost/SAM/workorders/add')
+  //         // addWkoDialog.classList.remove("hidden")
+  //         // addWkoDialog.classList.add("block")  
+  //    })
+  // }
+
   var tNoteRows = document.querySelectorAll(".worow");
   var i;
   if (tNoteRows) {
@@ -568,6 +569,59 @@ function initWorkOrders() {
         var woid = e.target.parentElement.dataset.id;
         if (!!woid) {
           window.location.href = "http://localhost/SAM/workorders/viewwo/" + woid;
+        }
+      });
+    }
+  }
+  var compBtns = document.querySelectorAll(".mrk-as-comp");
+  var serials;
+  var rowQty;
+  if (compBtns) {
+    for (var l = 0; l < compBtns.length; l++) {
+      compBtns[l].addEventListener("click", function (e) {
+        var woid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.id;
+        var serialStatus = e.target.parentElement.parentElement.parentElement.parentElement.children[5].textContent;
+        console.log(serialStatus);
+        if (serialStatus === "To Be Confirmed") {
+          var m;
+          var outputSerialRanges = [];
+          //get expected quantity
+          rowQty = e.target.parentElement.parentElement.parentElement.parentElement.children[4].textContent;
+          console.log('expected quantity: ' + rowQty);
+          var inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete", "").split(",");
+          console.log("input serial range length: " + inputSerialRanges.length);
+          if (inputSerialRanges = 'Sent without serials') {
+            //add note to wko
+          } else {
+            if (inputSerialRanges.length == 1 && rowQty == 1) {
+              //only one serial for this order
+              // window.alert("nice one!")
+              window.location.href = "http://localhost/SAM/workorders/complete/" + woid + "/" + inputSerialRanges;
+            } else {
+              //check range(s) and compare qty to expected
+              console.log('input serial range(s): ' + inputSerialRanges);
+              for (m = 0; m < inputSerialRanges.length; m++) {
+                console.log('serial number range: ' + inputSerialRanges[m]);
+                var numbers = inputSerialRanges[m].split("-");
+                var low = Number(numbers[0].trim());
+                var high = Number(numbers[1].trim());
+                console.log('low: ' + low);
+                console.log('high: ' + high);
+                for (var n = low; n <= high; n++) {
+                  console.log('number: ' + n);
+                  outputSerialRanges.push(n);
+                  //need to save the numbers to an array
+                }
+                if (outputSerialRanges.length != rowQty) {
+                  window.alert("Incorrect number of serials for this WKO!");
+                } else {
+                  window.location.href = "http://localhost/SAM/workorders/complete/" + woid + "/" + inputSerialRanges;
+                }
+              }
+            }
+          }
+        } else {
+          window.location.href = "http://localhost/SAM/workorders/complete/" + woid;
         }
       });
     }

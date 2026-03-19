@@ -7,7 +7,7 @@
 		'inventory' => 4,
 		default => 1
 };?>
-<nav class="bg-gray-800 flex flex-row w-full min-h-10"">
+<nav class="bg-gray-800 sideNav">
 	<button 
 		class="absolute top-2 left-2 z-[1] sm:hidden hover:bg-gray-700" 
 		data-target-action="nav" 

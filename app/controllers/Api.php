@@ -47,4 +47,8 @@
         exit;
         } 
 
+        public function setSerials($wkoID, $serials) {
+            
+        }
+
     }

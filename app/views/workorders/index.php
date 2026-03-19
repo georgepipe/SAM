@@ -91,16 +91,15 @@
                                     <td class="text-nowrap"><?php echo $workorder->wko ?></td>
                                     <td><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"></span> <?php echo $workorder->avn; ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
-                                    <td><?php echo $workorder->quantity_required ?></td>
+                                    <td id="qty"><?php echo $workorder->quantity_required ?></td>
                                     <td><?php echo $workorder->serials ?></td>
                                     <td><?php echo $workorder->wko_status ?></td>
                                     <td><?php echo $workorder->wko_delivery ?></td>
                                     <td class="min-w-24"><?php echo $workorder->wko_notes ?></td>
-                                    <td><a href="<?php echo URLROOT; ?>workorders/complete/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
+                                    <td><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
                                     <td><a href="javascript:void(0)" data-qty="<?php echo $workorder->quantity_required?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
                                     <td><a href="<?php echo URLROOT; ?>workorders/edit/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/editicon.php'; ?></a></td>
                                     <td class=""><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td>
-                                    <!-- <td class="dltBtn"><a href="<?php echo URLROOT; ?>workorders/delete/<?php echo $workorder->work_order_id?>" class="delete" data-confirm="Are you sure to delete wko <?php echo $workorder->wko;?> avn <?php echo $workorder->avn;?>?"><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td> -->
                                     <?php endif ;?>
                             </tr>
                         <?php endforeach; ?>
@@ -246,7 +245,7 @@
                         switch (TRUE) {
                             case ($pages > 5):
                                 //page btn 1
-                                echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="0">1</a>'; 
+                                echo '<a href="#" class="pgBtn pgBtnNum selPgBtn">1</a>'; 
                                 //page btn 2
                                 echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
                                 echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
@@ -257,13 +256,16 @@
                                 break;
                             default: 
                                 for ($i = 1; $i < $pages; $i++) {
-                                    echo '<a class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.($i===1 ? '' : '').'" data-page="'.($i-1).'">'.$i.'</a>'; 
+                                    if ($i === 1) {
+                                        echo '<a href="#" class="pgBtn pgBtnNum selPgBtn">1</a>';  
+                                    } else {
+                                        echo '<a class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
+                                        }
                                 }
                                 break;
                         }
                         
                     ?>
-                    <!-- <a href="#" aria-current="page" class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">1</a> -->
                     <!-- <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">2</a> -->
                     <!-- <a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">3</a> -->
                     <!-- <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span> -->
@@ -280,4 +282,7 @@
         </div>
     </div>
 </div>
+<?php 
+echo '<pre>'; print_r($data);
+?>
 <?php require APPROOT . '/views/inc/footer.php'; ?>

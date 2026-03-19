@@ -87,6 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             }
         }
         $pdfdata['grille'] = implode(' ',$grille);
+        if (str_contains($pdfdata['grille'],', No')) {
+            $pdfdata['grille'] = '';
+        }
 
         empty($pdfdata['serials']) ? $pdfdata['serials'] = extractData('/(\d{5}\s-\s\d{5})/', $text): '';
         $pdfdata['serials'] = cleanSerials($pdfdata['serials']);
@@ -186,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                                             {if(isset($pdfdata['model_id'])){echo $pdfdata['model_id'];} 
                                                 else {;};}
                                     ?>">
-                                    <?php if(isset($data->data->cab_model_id)) {echo $data->models[$data->data->cab_model_id-1]->name;} 
+                                    <?php if(isset($data->data->cab_model_id) && !empty($data->data->cab_model_id)) {echo $data->models[$data->data->cab_model_id-1]->name;} 
                                         else 
                                             {if(isset($pdfdata['model'])){echo $pdfdata['model'];} 
                                                 else {echo '- -';};} ?>
@@ -212,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                                             {if(isset($pdfdata['colour'])){echo $pdfdata['colour'];} 
                                                 else 
                                                     {echo '';};}?>">
-                                    <?php if(isset($data->data->cab_finish_id)) {echo $data->finishes[$data->data->cab_finish_id-1]->name;} 
+                                    <?php if(isset($data->data->cab_finish_id) && !empty($data->data->cab_finish_id)) {echo $data->finishes[$data->data->cab_finish_id-1]->name;} 
                                         else 
                                             {if(isset($pdfdata['colour'])){echo $pdfdata['colour'];} 
                                                 else 
@@ -325,7 +328,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             value="<?php echo $data->data->wko_notes ?? ''; ?>"><?php echo $data->data->wko_notes ?? ''; ?></textarea>
                         <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes ?? '';?></span>
                     </div>
-                    <!-- <input class="hidden" type="text" name="part_no" value="<?php echo $pdfdata['part_no'] ?? ''; ?>"></input> -->
                     <div class="form-group">
                         <label for="addAnother">Add Another:</label>
                         <input name="addAnother" 
