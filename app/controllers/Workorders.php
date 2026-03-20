@@ -31,7 +31,7 @@ class Workorders extends Controller {
             'grille_finish_id' => trim($_POST['grille_finish_id']),
             'connectors' => $_POST['connectors'] ?? '',
             'wheels' => $_POST['wheels'] ?? '0',
-            'quantity_required' => (int)$_POST['quantity_required'],
+            'quantity' => (int)$_POST['quantity'],
             'serials' => trim($_POST['serials']) ?? '',
             'wko_status' => trim($_POST['wko_status']),
             'wko_delivery' => trim($_POST['wko_delivery']),
@@ -40,6 +40,22 @@ class Workorders extends Controller {
             'addAnother' => $_POST['addAnother'] ?? ''
         ];
     }
+
+    public function initialiseErrors(){
+        return (object) [
+                'err_wko' => '',
+                'err_avn' => '',
+                'err_cab_model_id' => '',
+                'err_cab_finish_id' => '',
+                'err_waveguide_finish_id' => '',
+                'err_grille_finish' => '',
+                'err_connectors' => '',
+                'err_quantity' => '',
+                'err_serials' => '',
+                'err_wko_status' => ''
+        ];
+    }
+    
 
     public function index($arg = '') {
         // echo 'the arguments are: '.$arg;
@@ -91,157 +107,44 @@ class Workorders extends Controller {
  
     public function add() {
         if($_SERVER['REQUEST_METHOD'] == 'POST' && !isset(($_FILES['pdf']))) {
-            $data = $this->getPostedWorkorderData();
+            $data = (object) [
+                'form' => $this->getPostedWorkorderData(),
+                'errors' => $this->initialiseErrors()
+            ];
             $ruleService= new WorkorderRuleService();
-            $validationService = new WorkorderValidationService($this->woModel, $this->seModel);
+            $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
+            $data = $ruleService->applyDefaults($data);
+            $data = $validationService->validate($data);
 
             $explodedGrille = explode(' ',$data->grille_finish_id);
             // print_r($explodedGrille);
             // die('grille check?');
             $data->grille_finish_id = $explodedGrille[0];
             
-            
-            if(!isset($errors)) {
-                $errors = (object) array (
-                    'err_wko' => '',
-                    'err_avn' => '',
-                    'err_cab_model_id' => '',
-                    'err_cab_finish_id' => '',
-                    'err_connectors' => '',
-                    'err_quantity_required' => '',
-                    'err_wko_status' => '',
-                    'err_serials' => '',
-                    'err_waveguide_finish' => ''
-                );
-            }
-            
-            $data = (object) array ( 
-                'data' => $data,
-                'errors' => $errors
-            );
-            $fileName = 'AVN_'.str_pad($data->data->avn, 5 ,'0', STR_PAD_LEFT).'.pdf';
+            $fileName = 'AVN_'.str_pad($data->form->avn, 5 ,'0', STR_PAD_LEFT).'.pdf';
 //validate post data//
-         //search for WKO in the db //
-            if($this->woModel->getWorkorderByWko($data->data->wko)) {
-                if (!$data->data->wko == '') {
-                    $data->errors->err_wko = 'A work order already exists with this WKO';
-                }
-            }
-            
-         //search for avn in the db //
-            if($this->woModel->getWorkorderByAvn($data->data->avn) ) {
-                if(!$data->data->avn == '') {
-                    $data->errors->err_avn = 'A work order already exists with this AVN';
-                }
-            } 
-        //get finish ID from PDF string //
-            if(!is_numeric($data->data->cab_finish_id) && !empty($data->data->cab_finish_id)) {
-                $sh = preg_match('/(SH)/',$data->data->cab_model_id);
-                $data->data->cab_finish_id = $this->woModel->getFidFromName($data->data->cab_finish_id, !empty($sh));
-            }
-        //check for empty model field, then retreive model ID from string if field is NaN//
-            if(empty($data->data->cab_model_id)) {
-                $data->errors->err_cab_model = 'Please select the cabinet model';
-            } elseif (!is_numeric($data->data->cab_model_id)) {
-                $data->data->cab_model_id = $this->moModel->getMidFromName($data->data->cab_model_id);
-            }
-        //check for empty cabinet finish field//
-            if(empty($data->data->cab_finish_id) && empty($data->data->waveguide_finish_id)) {
-                $data->errors->err_cab_colour = 'Please select the cabinet finish';
-            } else {$data->errors->err_cab_colour = '';}
-
-        //get waveguide finish ID from string //
-            if(!is_numeric($data->data->waveguide_finish_id) && !empty($data->data->waveguide_finish_id)) {
-                $sh = preg_match('/(SH)/',$data->data->cab_model_id);
-                $data->data->waveguide_finish_id = $this->woModel->getFidFromName($data->data->waveguide_finish_id, isset($sh) ? true : false);
-            }
-        //check for grille finish requirment 
-            $defaultGrilleColour = $ruleService->defaultGrilleFinish($data->data->cab_model_id);
-            if(empty($data->data->grille_finish_id) && $defaultGrilleColour != null) {
-                $data->data->grille_finish_id = $defaultGrilleColour;
-            }
-            if(empty($data->data->grille_finish_id)) { 
-                if($ruleService->requiresGrilleFinish($data->data->cab_model_id)) {
-                    $data->errors->err_grille_colour = 'Please select a grille colour';
-                } else {$data->errors->err_grille_colour = '';}
-            };
-
-        //get grille finish id from string if NaN
-            if (!is_numeric($data->data->grille_finish_id) && !empty($data->data->grille_finish_id)) {
-                $data->data->grille_finish_id = $this->woModel->getFidFromName($data->data->grille_finish_id, 0); 
-            }
-            
-        //connectors!
-            //check and set default if exists
-            $defaultConnectors = $ruleService->defaultConnectors($data->data->cab_model_id);
-            if(empty($data->data->connectors) && $defaultConnectors != null) {
-                $data->data->connectors = $defaultConnectors;
-            }
-            //if empty and req set error
-            if(empty($data->data->connectors)) {
-                if($ruleService->requiresConnectorSelection($data->data->cab_model_id)) {
-                    $data->errors->err_connectors = "Please select a connector type";
-                }
-            }
-            
-        //SERIALS
-            //validate serial string
-            if(preg_match('/([A-z])/',$data->data->serials) && !$data->data->serials == 'To Be Confirmed') {
-                $data->errors->err_serials = "Serials cannot contain characters";
-            }
-            //set TBC for empty serial field
-            if(empty($data->data->serials)) {
-                $data->data->serials = 'To Be Confirmed';
-            } else {
-                //check serials!
-                $duplicates = $this->seModel->addSerials($data->data->work_order_id, $data->data->cab_model_id, $data->data->serials, 1);
-                if(isset($duplicates[0]->sid)) {
-                    //there are duplicate serials
-                    $data->errors->err_serials = 'Duplicate serials detected: ';
-                    foreach($duplicates as $duplicate) {
-                        $workorder = $this->woModel->getWorkorderById($duplicate->work_order_id);
-                        $data->errors->err_serials = $data->errors->err_serials.'AVN: '.$workorder->avn.' Serial ->'.$duplicate->serial_num.' :';
-                    }
-                } 
-            }
-            
-        //validate quantity exists & that qty of provided serials matches qty of cabs
         
-            if(empty($data->data->quantity_required)) {
-                $data->errors->err_quantity_required = 'Please enter a quantity';
-            } else { 
-                if($data->data->serials != 'To Be Confirmed') { 
-                    $sCount = $this->seModel->countSerials($data->data->serials);
-                    if($data->data->quantity_required != $sCount && !empty($data->data->serials)) {
-                        $data->errors->err_quantity_required = 'Quantity is '.$data->data->quantity_required.' but '.$sCount.' serial(s) has/have been specified.';
-                    }
-                }
-            } 
-        //check if waveguide finish is req
-            if(empty($data->data->waveguide_finish_id)) { 
-                if($ruleService->requiresWaveguideFinish($data->data->cab_model_id)) {
-                    $data->errors->err_waveguide_finish = 'Please select a waveguide colour';
-                } else {$data->errors->err_waveguide_finish = '';}
-            };
-            // if(empty($data->data->waveguide) && !empty($data->cab_model_id)) {
-            //     $data->errors->err_waveguide_finish = match ($data->cab_model_id) {
-            //     //this needs refactoring - current static setup is not growth friendly
-            //     38,39,40,41,42,43,44,45,46,47,48,49,50,52,53,54,55,56,57 => 'Please select a waveguide colour',
-            //     default => ''
-            //     };
-            // };
+        //get finish ID from PDF string // RULE
+            if(!is_numeric($data->form->cab_finish_id) && !empty($data->form->cab_finish_id)) {
+                $sh = preg_match('/(SH)/',$data->form->cab_model_id);
+                $data->form->cab_finish_id = $this->woModel->getFidFromName($data->form->cab_finish_id, !empty($sh));
+            }
+        //retreive model ID from string if field is NaN//  RULE
+            if (!is_numeric($data->form->cab_model_id)) {
+                $data->form->cab_model_id = $this->moModel->getMidFromName($data->form->cab_model_id);
+            }
 
+        //get waveguide finish ID from string // RULE
+            if(!is_numeric($data->form->waveguide_finish_id) && !empty($data->form->waveguide_finish_id)) {
+                $sh = preg_match('/(SH)/',$data->form->cab_model_id);
+                $data->form->waveguide_finish_id = $this->woModel->getFidFromName($data->form->waveguide_finish_id, isset($sh) ? true : false);
+            }
 
-            $pid = $this->woModel->getPidFromOptions($data->data); 
-            $data->data->pid = $pid;
-            // if(empty($pid)&&empty($data->data->fixings)) { //set default fixings for new pids
-            //     echo '<pre>';
-            //     print_r($data->data);
-            //     echo '<BR>';
-            //     print_r($pid);
-            //     die('PID?');
-            // } 
-            //todo: serial checker
+        //get grille finish id from string if NaN RULE
+            if (!is_numeric($data->form->grille_finish_id) && !empty($data->form->grille_finish_id)) {
+                $data->form->grille_finish_id = $this->woModel->getFidFromName($data->form->grille_finish_id, 0); 
+            }
+            
         // check for errors
         
             $errors = '';
@@ -256,26 +159,17 @@ class Workorders extends Controller {
                 print_r($data);
                 die('<BR>There should be no errors here');
         //validated
-                //$pid = $this->woModel->getPidFromOptions($data->data);
-                // echo '<PRE>';
-                // print_r($data);
-                // die('');
                 if (empty($pid)) {
-                    // echo '<PRE>';
-                    // $data->data->model = $this->moModel->getModelFromMid($data->data->cab_model_id);
-                    // $this->poModel->addPidFromOptions($data->data);
-                    // $pid = $this->woModel->getPidFromOptions($data->data);
-                    // $data->data->pid = $pid;
                     empty($pid) ? throwErr(999,'PID ERROR: Seek guidance from the almighty flying spaghetti monster'): '';
                 }
             //save to db
-                if ($this->woModel->addOrder($data->data)){
-                    // $this->seModel->addSerials($data->data->work_order_id, $data->data->cab_model_id, $data->data->serials);
+                if ($this->woModel->addOrder($data->form)){
+                    // $this->seModel->addSerials($data->form->work_order_id, $data->form->cab_model_id, $data->form->serials);
                     $pdfLoc = TEMPDIR.$fileName;
                     $pdfDest = AVNDIR.$fileName;
                     $file = rename($pdfLoc, $pdfDest);
                     flash('post_message', 'Workorder sucessfully added');
-                    if($data->data->addAnother == 1) {
+                    if($data->form->addAnother == 1) {
                         redirect('workorders/add');
                     } else {
                         redirect('workorders/index');    
@@ -288,18 +182,18 @@ class Workorders extends Controller {
             //reload view with errors
             $models = $this->moModel->getModelNames();
             $finishes = $this->woModel->getFinishes();
-            if (!empty($data->data) && !empty($data->data->cab_model_id)) {
-                $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
-                // $data->data->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
-                // $data->data->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
-                $data->data->waveguide = $this->woModel->getFinishfromId($data->product->waveguide_finish_id);
+            if (!empty($data->form) && !empty($data->form->cab_model_id)) {
+                $data->form->product = $this->poModel->getProductFromPid($data->form->pid);
+                // $data->form->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
+                // $data->form->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
+                $data->form->waveguide = $this->woModel->getFinishfromId($data->product->waveguide_finish_id);
             };
             $data = (object) [
                 
                 'finishes' => $finishes,
                 'errors' => $data->errors,
                 'models' => $models,
-                'data' => $data->data
+                'data' => $data->form
             ];
             // echo '<PRE>';
             // print_r($data);
@@ -333,7 +227,7 @@ class Workorders extends Controller {
                 'grille_finish_id' => trim($_POST['grille_finish_id']),
                 'connectors' => trim($_POST['connectors']),
                 'wheels' => $_POST['wheels'],
-                'quantity_required' => (int)$_POST['quantity_required'],
+                'quantity' => (int)$_POST['quantity'],
                 'serials' => trim($_POST['serials']),
                 'wko_status' => trim($_POST['wko_status']),
                 'wko_delivery' => trim($_POST['wko_delivery']),
@@ -347,7 +241,7 @@ class Workorders extends Controller {
                    'err_cab_model_id' => '',
                    'err_cab_finish_id' => '',
                    'err_connectors' => '',
-                   'err_quantity_required' => '',
+                   'err_quantity' => '',
                    'err_wko_status' => '',
                    'err_serials' => ''
                );
@@ -369,8 +263,8 @@ class Workorders extends Controller {
                if(empty($data->data->cab_finish_id) && empty($data->data->waveguide_finish_id)) {
                 $data->errors->err_cab_colour = 'Please select the cabinet finish';
             } 
-               if(empty($data->data->quantity_required)) {
-                   $data->errors->err_quantity_required = 'Please enter a quantity';
+               if(empty($data->data->quantity)) {
+                   $data->errors->err_quantity = 'Please enter a quantity';
                }
                if(empty($data->data->serials)) {
                    $data->data->serials = 'To Be Confirmed';
@@ -389,7 +283,7 @@ class Workorders extends Controller {
                    }
                }
                if (!$errors === TRUE) {
-           // if(empty($data['errors']->err_avn) && empty($data['errors']->err_wko) && empty($data['errors']->err_cab_model) && empty($data['errors']->err_cab_colour) && empty($data['errors']->err_quantity_required)) {
+           // if(empty($data['errors']->err_avn) && empty($data['errors']->err_wko) && empty($data['errors']->err_cab_model) && empty($data['errors']->err_cab_colour) && empty($data['errors']->err_quantity)) {
              //if validated run the edit method
                     if ($this->woModel->editOrder($data->data)){
                         flash('post_message', 'Workorder Updated');
@@ -482,7 +376,7 @@ class Workorders extends Controller {
     public function split($work_order_id, $sPoint) {
         $todaysDate = date('m/d/Y', time());
         $originalWorkorder = $this->woModel->getWorkorderById($work_order_id);
-        $newQuantity = $originalWorkorder->quantity_required - $sPoint; 
+        $newQuantity = $originalWorkorder->quantity - $sPoint; 
         $sCount = $this->seModel->expandSerials($originalWorkorder->serials);
         $firstHalf = array_slice($sCount,0, $sPoint); 
         $secondHalf = array_slice($sCount,$sPoint, );
@@ -499,8 +393,8 @@ class Workorders extends Controller {
         $newWorkorder->serials = $secondHalf;
         $newWorkorder->wko_notes = $newWorkorder->wko_notes.'Order split on '.$todaysDate; 
         $originalWorkorder->wko_notes = 'Order split on '.$todaysDate;
-        $originalWorkorder->quantity_required = $sPoint;
-        $newWorkorder->quantity_required = $newQuantity;
+        $originalWorkorder->quantity = $sPoint;
+        $newWorkorder->quantity = $newQuantity;
         // print_r($originalWorkorder);
         // print_r($newWorkorder);
         $this->woModel->editOrder($originalWorkorder);

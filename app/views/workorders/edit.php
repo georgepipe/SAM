@@ -123,12 +123,12 @@
                             value="<?php echo $data->data->wheels;?>"></input>
                     </div>
                     <div class="form-group">
-                        <label for="quantity_required">Quantity Required: </label>
-                        <input name="quantity_required" 
-                            id="quantity_required"
-                            class= "<?php echo (!empty($data->errors->err_quantity_required))? 'is-invalid' : '';?>" 
-                            value="<?php echo $data->data->quantity_required ?? '';?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity_required ?? '';?></span>
+                        <label for="quantity">Quantity Required: </label>
+                        <input name="quantity" 
+                            id="quantity"
+                            class= "<?php echo (!empty($data->errors->err_quantity))? 'is-invalid' : '';?>" 
+                            value="<?php echo $data->data->quantity ?? '';?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="serials">Serials: </label>

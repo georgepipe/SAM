@@ -124,7 +124,7 @@
 .form-group:has(#wheels) {
     grid-column: 4/6; 
 }
-.form-group:has(#quantity_required) {
+.form-group:has(#quantity) {
     grid-column: 1/span 2;
 }
 .form-group:has(#serials) {

@@ -374,7 +374,7 @@ function initWorkOrders() {
     var avn;
     var pdesc;
     var wheels;
-    var quantity_required;
+    var quantity;
     var quantity_built;
     var _serials;
     var wko_status;
@@ -468,7 +468,7 @@ function initWorkOrders() {
             wko = document.createTextNode(response[i - 1].wko);
             avn = document.createTextNode(response[i - 1].avn);
             pdesc = document.createTextNode(response[i - 1].pdesc);
-            quantity_required = document.createTextNode(response[i - 1].quantity_required);
+            quantity = document.createTextNode(response[i - 1].quantity);
             _serials = response[i - 1].serials === null ? document.createTextNode('') : document.createTextNode(response[i - 1].serials);
             wko_status = document.createTextNode(response[i - 1].wko_status);
             wko_delivery = document.createTextNode(response[i - 1].wko_delivery);
@@ -476,7 +476,7 @@ function initWorkOrders() {
             acomp.setAttribute("href", "http://localhost/SAM/workorders/complete/" + response[i - 1].work_order_id);
             acomp.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path class="mrk-as-comp" stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>';
             asplit.setAttribute("href", "javascript:void(0)");
-            asplit.setAttribute("data-qty", response[i - 1].quantity_required);
+            asplit.setAttribute("data-qty", response[i - 1].quantity);
             asplit.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path class="split-order" stroke-linecap="round" stroke-linejoin="round" d="m7.848 8.25 1.536.887M7.848 8.25a3 3 0 1 1-5.196-3 3 3 0 0 1 5.196 3Zm1.536.887a2.165 2.165 0 0 1 1.083 1.839c.005.351.054.695.14 1.024M9.384 9.137l2.077 1.199M7.848 15.75l1.536-.887m-1.536.887a3 3 0 1 1-5.196 3 3 3 0 0 1 5.196-3Zm1.536-.887a2.165 2.165 0 0 0 1.083-1.838c.005-.352.054-.695.14-1.025m-1.223 2.863 2.077-1.199m0-3.328a4.323 4.323 0 0 1 2.068-1.379l5.325-1.628a4.5 4.5 0 0 1 2.48-.044l.803.215-7.794 4.5m-2.882-1.664A4.33 4.33 0 0 0 10.607 12m3.736 0 7.794 4.5-.802.215a4.5 4.5 0 0 1-2.48-.043l-5.326-1.629a4.324 4.324 0 0 1-2.068-1.379M14.343 12l-2.882 1.664" /></svg>';
             aedit.setAttribute("href", "http://localhost/SAM/workorders/edit/" + response[i - 1].work_order_id);
             aedit.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path class="edit-order edit" stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>';
@@ -490,7 +490,7 @@ function initWorkOrders() {
             tdWko.appendChild(wko);
             tdAvn.appendChild(avn);
             tdPdesc.appendChild(pdesc);
-            tdQuantityR.appendChild(quantity_required);
+            tdQuantityR.appendChild(quantity);
             tdSerials.appendChild(_serials);
             tdWkoS.appendChild(wko_status);
             tdWkoD.appendChild(wko_delivery);

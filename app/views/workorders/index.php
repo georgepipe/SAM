@@ -91,13 +91,13 @@
                                     <td class="text-nowrap"><?php echo $workorder->wko ?></td>
                                     <td><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"></span> <?php echo $workorder->avn; ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
-                                    <td id="qty"><?php echo $workorder->quantity_required ?></td>
+                                    <td id="qty"><?php echo $workorder->quantity ?></td>
                                     <td><?php echo $workorder->serials ?></td>
                                     <td><?php echo $workorder->wko_status ?></td>
                                     <td><?php echo $workorder->wko_delivery ?></td>
                                     <td class="min-w-24"><?php echo $workorder->wko_notes ?></td>
                                     <td><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
-                                    <td><a href="javascript:void(0)" data-qty="<?php echo $workorder->quantity_required?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
+                                    <td><a href="javascript:void(0)" data-qty="<?php echo $workorder->quantity?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
                                     <td><a href="<?php echo URLROOT; ?>workorders/edit/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/editicon.php'; ?></a></td>
                                     <td class=""><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td>
                                     <?php endif ;?>

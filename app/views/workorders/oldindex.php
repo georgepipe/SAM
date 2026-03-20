@@ -66,14 +66,14 @@
                                     <td><?php echo $workorder->avn ?></td>
                                     <td style="font-size:10px"><?php echo $workorder->pdesc ?></td>
                                     <td><?php echo $workorder->wheels ? 'Yes' : 'No' ?></td>
-                                    <td><?php echo $workorder->quantity_required ?></td>
+                                    <td><?php echo $workorder->quantity ?></td>
                                     <td><?php echo $workorder->quantity_built ?></td>
                                     <td><?php echo $workorder->serials ?></td>
                                     <td><?php echo $workorder->wko_status ?></td>
                                     <td><?php echo $workorder->wko_delivery ?></td>
                                     <td><?php echo $workorder->wko_notes ?></td>
                                     <td><a href="<?php echo URLROOT; ?>workorders/complete/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
-                                    <td><a href="#" data-qty="<?php echo $workorder->quantity_required?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
+                                    <td><a href="#" data-qty="<?php echo $workorder->quantity?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
                                     <td><a href="<?php echo URLROOT; ?>workorders/edit/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/editicon.php'; ?></a></td>
                                     <td class="dltBtn"><a href="<?php echo URLROOT; ?>workorders/delete/<?php echo $workorder->work_order_id?>" class="delete" data-confirm="Are you sure to delete wko <?php echo $workorder->wko;?> avn <?php echo $workorder->avn;?>?"><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td>
                                 <?php endif ;?>
@@ -114,7 +114,7 @@
                                     <td><?php echo $workorder->avn ?></td>
                                     <td style="font-size:10px"><?php echo $workorder->pdesc ?></td>
                                     <td><?php echo $workorder->wheels ? 'Yes' : 'No' ?></td>
-                                    <td><?php echo $workorder->quantity_required ?></td>
+                                    <td><?php echo $workorder->quantity ?></td>
                                     <td><?php echo $workorder->quantity_built ?></td>
                                     <td><?php echo $workorder->serials ?></td>
                                     <td><?php echo $workorder->wko_status ?></td>

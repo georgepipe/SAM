@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             'WKO' => ltrim(extractData('/WKO\/(\d{5}\/[A-Z]-\d{2})/', $text),'0'),
             'desc' => trim(preg_replace('/\s+/', ' ', extractData('/Description:\s*(.*?)\s*Serial Numbers:/s', $text))),
             'serials' => extractData('/Serial Nos:\s*(.*?)\nCharge and Quantity/s', $text) ?? extractData('/Serial Numbers:(.*?)\sCharge/', $text),
-            'quantityRequired' => extractData('/Qty Required:\s*(\d+)/', $text),
+            'quantity' => extractData('/Qty Required:\s*(\d+)/', $text),
             'model' => extractData('/Description:(.*?)\s/',$text) ?? extractData('/(.*?)\s/',$text),
             'model_id' => '',
             'colour' => ucwords(extractData('/s, (.*?)\scabinet/', $text) ?? extractData('/s,(.*?)\swaveguide/', $text)," "),
@@ -181,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         <select 
                             name="cab_model_id" 
                             id="cab_model_id"
-                            class= "cabSel <?php echo (!empty($data->errors->err_cab_model))? 'is-invalid' : '';?>" 
+                            class= "cabSel <?php echo (!empty($data->errors->err_cab_model_id))? 'is-invalid' : '';?>" 
                             value="">
                             <option 
                                 value="
@@ -200,14 +200,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                                 <option value="<?php echo $model->mid;?>"><?php echo $model->name;?></option>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_model ?? '';?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_model_id ?? '';?></span>
                     </div>
                     <div class="ccDiv <?php if($pdf){if(!empty($pdfdata['colour']) | !empty($data->data->cab_finish_id)){echo 'form-group';} else {echo 'hidden';}} else {echo 'form-group';} ?>">
                         <label for="cab_finish_id">Speaker Colour: <sup>*</label>
                         <select
                             name="cab_finish_id" 
                             id="cab_finish_id"
-                            class= "<?php echo (!empty($data->errors->err_cab_colour))? 'is-invalid' : '';?> cabColourSel" 
+                            class= "<?php echo (!empty($data->errors->err_cab_finish_id))? 'is-invalid' : '';?> cabColourSel" 
                             value="<?php echo $data->data->cab_finish_id ?? '';?>">
                             <option 
                                 value="
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_colour ?? '';?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_cab_finish_id ?? '';?></span>
                     </div>
                     <div class="gDiv <?php if(!empty($pdfdata['grille']) || !empty($data->data->grille_finish_id) || !empty($data->errors->err_grille_colour)){echo 'form-group';} else {echo 'hidden';} ?>">
                         <label for="grille_finish_id">Speaker Grille: </label>
@@ -258,12 +258,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         </select>
                         <span class="invalid-feedback"><?php echo $data->errors->err_grille_colour ?? '';?></span>
                     </div>
-                    <div class="wDiv <?php if(!empty($pdfdata['waveguide']) || !empty($data->data->waveguide_finish_id) || !empty($data->errors->err_waveguide_finish)) {echo 'form-group';} else {echo 'hidden';} ?> ">
+                    <div class="wDiv <?php if(!empty($pdfdata['waveguide']) || !empty($data->data->waveguide_finish_id) || !empty($data->errors->err_waveguide_finish_id)) {echo 'form-group';} else {echo 'hidden';} ?> ">
                         <label for="waveguide_finish_id">Waveguide Colour: </label>
                         <select 
                             name="waveguide_finish_id" 
                             id="waveguide_finish_id" 
-                            class="waveguideSel <?php echo (!empty($data->errors->err_waveguide_finish))? 'is-invalid' : '';?>" 
+                            class="waveguideSel <?php echo (!empty($data->errors->err_waveguide_finish_id))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->waveguide_finish_id ?? '';?>">
                             <option value="<?php echo $data->data->waveguide_finish_id ?? ($pdfdata['waveguide'] ?? '') ?>"><?php echo ($data->data->waveguide_finish_id ?? ($pdfdata['waveguide'] ?? '')) ?? '- -' ?></option>
                             <?php foreach($data->finishes as $finish) : ?>
@@ -272,7 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_finish ?? '';?></span>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_finish_id ?? '';?></span>
                     </div>
                     <div class="whDiv <?php if(!empty($pdfdata['wheels']) | !empty($data->data->wheels)){echo 'form-group';} else {echo 'hidden';} ?>">
                         <label for="wheels">Wheels:</label>
@@ -283,12 +283,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             value="<?php echo $data->data->wheels ?? ($pdfdata['wheels'] ?? '');?>"></input>
                     </div>
                     <div class="form-group">
-                        <label for="quantity_required">Quantity Required: <sup>*</label>
-                        <input name="quantity_required" 
-                            class= "<?php echo (!empty($data->errors->err_quantity_required))? 'is-invalid' : '';?>" 
-                            id="quantity_required"
-                            value="<?php echo $data->data->quantity_required ?? ($pdfdata['quantityRequired'] ?? '');?>"></input>
-                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity_required ?? '';?></span>
+                        <label for="quantity">Quantity Required: <sup>*</label>
+                        <input name="quantity" 
+                            class= "<?php echo (!empty($data->errors->err_quantity))? 'is-invalid' : '';?>" 
+                            id="quantity"
+                            value="<?php echo $data->data->quantity ?? ($pdfdata['quantity'] ?? '');?>"></input>
+                        <span class="invalid-feedback"><?php echo $data->errors->err_quantity ?? '';?></span>
                     </div>
                     <div class="form-group">
                         <label for="serials">Serials: <sup>*</label>
