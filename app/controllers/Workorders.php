@@ -29,8 +29,8 @@ class Workorders extends Controller {
             'cab_finish_id' => trim($_POST['cab_finish_id']),
             'waveguide_finish_id' => trim($_POST['waveguide_finish_id']),
             'grille_finish_id' => trim($_POST['grille_finish_id']),
-            'connectors' => $_POST['connectors'] ?? '',
-            'wheels' => $_POST['wheels'] ?? '0',
+            'connectors' => (string)$_POST['connectors'] ?? '',
+            'wheels' => (bool)$_POST['wheels'] ?? '0',
             'quantity' => (int)$_POST['quantity'],
             'serials' => trim($_POST['serials']) ?? '',
             'wko_status' => trim($_POST['wko_status']),
@@ -111,60 +111,24 @@ class Workorders extends Controller {
                 'form' => $this->getPostedWorkorderData(),
                 'errors' => $this->initialiseErrors()
             ];
-            $ruleService= new WorkorderRuleService();
+            
+            $ruleService= new WorkorderRuleService($this->woModel, $this->moModel);
             $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
-            $data = $ruleService->applyDefaults($data);
+            $data = $ruleService->apply($data);
             $data = $validationService->validate($data);
-
-            $explodedGrille = explode(' ',$data->grille_finish_id);
-            // print_r($explodedGrille);
-            // die('grille check?');
-            $data->grille_finish_id = $explodedGrille[0];
+            $errors = $validationService->hasErrors($data->errors);
             
-            $fileName = 'AVN_'.str_pad($data->form->avn, 5 ,'0', STR_PAD_LEFT).'.pdf';
-//validate post data//
-        
-        //get finish ID from PDF string // RULE
-            if(!is_numeric($data->form->cab_finish_id) && !empty($data->form->cab_finish_id)) {
-                $sh = preg_match('/(SH)/',$data->form->cab_model_id);
-                $data->form->cab_finish_id = $this->woModel->getFidFromName($data->form->cab_finish_id, !empty($sh));
-            }
-        //retreive model ID from string if field is NaN//  RULE
-            if (!is_numeric($data->form->cab_model_id)) {
-                $data->form->cab_model_id = $this->moModel->getMidFromName($data->form->cab_model_id);
-            }
-
-        //get waveguide finish ID from string // RULE
-            if(!is_numeric($data->form->waveguide_finish_id) && !empty($data->form->waveguide_finish_id)) {
-                $sh = preg_match('/(SH)/',$data->form->cab_model_id);
-                $data->form->waveguide_finish_id = $this->woModel->getFidFromName($data->form->waveguide_finish_id, isset($sh) ? true : false);
-            }
-
-        //get grille finish id from string if NaN RULE
-            if (!is_numeric($data->form->grille_finish_id) && !empty($data->form->grille_finish_id)) {
-                $data->form->grille_finish_id = $this->woModel->getFidFromName($data->form->grille_finish_id, 0); 
-            }
-            
-        // check for errors
-        
-            $errors = '';
-            foreach($data->errors as $error) {
-                if($error != '') {
-                    $errors = 'TRUE';
-                }
-            };
-
-            if (empty($errors)) {
-                echo '<PRE>';
-                print_r($data);
-                die('<BR>There should be no errors here');
-        //validated
-                if (empty($pid)) {
-                    empty($pid) ? throwErr(999,'PID ERROR: Seek guidance from the almighty flying spaghetti monster'): '';
+            if (!$errors) {
+            // validated
+                if (empty($data->form->pid)) {
+                    // dumpAndDie($data);
+                    empty($data->form->pid) ? throwErr(999,'PID ERROR: Contact system admin'): '';
                 }
             //save to db
+                // dumpAndDie($data->form);
                 if ($this->woModel->addOrder($data->form)){
                     // $this->seModel->addSerials($data->form->work_order_id, $data->form->cab_model_id, $data->form->serials);
+                    $fileName = 'AVN_'.str_pad($data->form->avn, 5 ,'0', STR_PAD_LEFT).'.pdf';
                     $pdfLoc = TEMPDIR.$fileName;
                     $pdfDest = AVNDIR.$fileName;
                     $file = rename($pdfLoc, $pdfDest);

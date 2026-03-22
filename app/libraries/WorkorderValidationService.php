@@ -28,6 +28,15 @@
             return $data;
         }
 
+        public function hasErrors($errors): bool {
+            foreach ($errors as $error) {
+                if(!empty($error)) {
+                    return TRUE;
+                }
+            }
+            return FALSE;
+        }
+
         private function validateWKO(object $data): void {
             if($this->woModel->getWorkorderByWko($data->form->wko)) {
                 if (!$data->form->wko == '') {
@@ -60,8 +69,12 @@
             if(empty($data->form->grille_finish_id)) { 
                 if($this->ruleService->requiresGrilleFinish($data->form->cab_model_id)) {
                     $data->errors->err_grille_colour = 'Please select a grille colour';
-                } else {$data->errors->err_grille_colour = '';}
-            };
+                }
+            }
+            if(str_contains($data->form->grille_finish_id,'Steel')) {
+                $explodedGrille = explode(' ',$data->form->grille_finish_id);
+                $data->form->grille_finish_id = $explodedGrille[0]; 
+            }
         }
 
         private function validateConnectorSelection(object $data): void {

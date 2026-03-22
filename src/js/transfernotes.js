@@ -72,16 +72,7 @@ function initTransferNotes () {
             console.log(wkos)
             window.location.href = "http://localhost/SAM/transport/tnote/d/"+wkos
         })
-
-        // deleteBtn.addEventListener('click', (e) => {
-        //         //do the delivery note stuff innit
-        //         //event.preventDefault();
-        //         tnid = deleteBtn.parentElement.dataset.id
-        //         console.log('Hello!');
-        //         console.log(tnid);
-        //         // window.location.href = "http://localhost/SAM/transport/tnote/d/"+wkos
-        //     })
-        }
+    }
 
 //document.write('test point');
 }

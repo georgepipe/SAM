@@ -1,6 +1,6 @@
 <?php 
 
-    class Api extends Controller {
+    class ApiWorkorders extends Controller {
         private $woModel;
         private $poModel;
         private $moModel; 
@@ -12,7 +12,7 @@
             $this->poModel = $this->model('Product');
         }
 
-        public function workorder($type = '', $page = '') {
+        public function paginate($type = '', $page = '') {
             
             if ($type === 'active') {
                 $activeWorkorders = $this->woModel->getActiveOrders($page);
@@ -43,12 +43,21 @@
             }
 
 
-        print_r ($json_data);
-        exit;
+            print_r ($json_data);
+            exit;
         } 
 
         public function setSerials($wkoID, $serials) {
             
         }
 
+
+        private function jsonResponse(array $payload, int $statusCode = 200): void
+        {
+            http_response_code($statusCode);
+            header('Content-Type: application/json');
+            echo json_encode($payload);
+            exit;
+        }
+        
     }

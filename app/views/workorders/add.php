@@ -283,7 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             value="<?php echo $data->data->wheels ?? ($pdfdata['wheels'] ?? '');?>"></input>
                     </div>
                     <div class="form-group">
-                        <label for="quantity">Quantity Required: <sup>*</label>
+                        <label for="quantity">Quantity: <sup>*</label>
                         <input name="quantity" 
                             class= "<?php echo (!empty($data->errors->err_quantity))? 'is-invalid' : '';?>" 
                             id="quantity"

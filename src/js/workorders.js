@@ -50,7 +50,7 @@ function initWorkOrders () {
                 let tag = e.target.parentElement.dataset.wkos
 
                 console.log(tag)
-                tag === "com" ? apiFile = '../api/workorder/completed/' + page : apiFile = '../api/workorder/active/' + page
+                tag === "com" ? apiFile = '../apiworkorders/paginate/completed/' + page : apiFile = '../apiworkorders/paginate/active/' + page
                 //let apiFile = '../api/workorder/' + page
                 fetch(apiFile, {
                     headers: {

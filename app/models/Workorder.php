@@ -104,17 +104,18 @@ class Workorder {
 
 
         public function addOrder($data) {
+            // dumpAndDie($data);
             $data->avn = $data->avn ?? 0;
             $data->wko = $data->wko ?? 0;
             $this->db->query('INSERT INTO work_orders 
-                (wko, avn, pid, wheels, quantity_required, quantity_built, serials, wko_status, wko_delivery, wko_notes) 
+                (wko, avn, pid, wheels, quantity, quantity_built, serials, wko_status, wko_delivery, wko_notes) 
                                 VALUES
-                (:wko, :avn, :pid, :wheels, :quantity_required, :quantity_built, :serials, :wko_status, :wko_delivery, :wko_notes)');
+                (:wko, :avn, :pid, :wheels, :quantity, :quantity_built, :serials, :wko_status, :wko_delivery, :wko_notes)');
             $this->db->bind(':pid', $data->pid);
             $this->db->bind(':wko',  $data->wko);
             $this->db->bind(':avn',  $data->avn);
             $this->db->bind(':wheels',  $data->wheels);
-            $this->db->bind(':quantity_required',  $data->quantity_required);
+            $this->db->bind(':quantity',  $data->quantity);
             $this->db->bind(':quantity_built',  $data->quantity_built);
             $this->db->bind(':serials',  $data->serials);
             $this->db->bind(':wko_status',  $data->wko_status);
@@ -134,7 +135,7 @@ class Workorder {
                 avn = :avn, 
                 pid = :pid, 
                 wheels = :wheels,
-                quantity_required = :quantity_required,
+                quantity = :quantity,
                 serials = :serials,
                 wko_status = :wko_status,
                 wko_delivery = :wko_delivery,
@@ -152,7 +153,7 @@ class Workorder {
             $this->db->bind(':avn',  $data->avn);
             $this->db->bind(':pid',  $data->pid);
             $this->db->bind(':wheels',  empty($data->wheels) ? 0 : 1);
-            $this->db->bind(':quantity_required',  $data->quantity_required);
+            $this->db->bind(':quantity',  $data->quantity);
             $this->db->bind(':serials',  $data->serials);
             $this->db->bind(':wko_status',  $data->wko_status);
             $this->db->bind(':wko_delivery',  $data->wko_delivery);
@@ -197,7 +198,7 @@ class Workorder {
                 wko = :wko,
                 pid = :pid,
                 wheels = :wheels,
-                quantity_required = :quantity_required,
+                quantity = :quantity,
                 quantity_built = :quantity_built,
                 serials = :serials,
                 wko_status = :wko_status,
@@ -212,8 +213,7 @@ class Workorder {
             $this->db->bind(':avn',  $data->avn);
             $this->db->bind(':pid',  $data->pid);
             $this->db->bind(':wheels',  $data->wheels);
-            $this->db->bind(':quantity_required',  $data->quantity_required);
-            $this->db->bind(':quantity_built',  $data->quantity_required);
+            $this->db->bind(':quantity',  $data->quantity);
             $this->db->bind(':serials',  $data->serials);
             $this->db->bind(':wko_status',  "Completed");
             $this->db->bind(':wko_delivery',  $data->wko_delivery);
