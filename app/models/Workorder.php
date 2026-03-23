@@ -10,7 +10,7 @@ class Workorder {
 
         }
 
-        public function getOrders($page = 1){
+        public function getOrders(int $page = 1){
             switch ($page) {
                 case 1:
                     $this->db->query('select * from work_orders order by created_at desc limit 10');
@@ -29,7 +29,7 @@ class Workorder {
             return $results;
         }
 
-        public function getActiveOrders($page = 0){
+        public function getActiveOrders(int $page = 0){
             switch ($page) {
                 case 0:
                     $this->db->query('select * from work_orders where wko_status <> "Completed" order by created_at desc limit 10');
@@ -43,7 +43,7 @@ class Workorder {
             return $results;
         }
 
-        public function getCompletedOrders($page = 0){
+        public function getCompletedOrders(int $page = 0){
             switch ($page) {
                 case 0:
                     $this->db->query('select * from work_orders where wko_status = "Completed" order by created_at desc limit 10');
@@ -64,14 +64,14 @@ class Workorder {
             return $results;
         }
 
-        public function getFinishfromId($id){
+        public function getFinishfromId(int $id){
             $this->db->query('select * from finishes WHERE id = :id');
             $this->db->bind(':id', $id);
             $results = $this->db->Single();
             return $results;
         }
 
-        public function getFidfromName($finish, $isSH){
+        public function getFidfromName(int $finish,bool $isSH){
            
             if($isSH===true) {
                 $this->db->query('select * from finishes WHERE name = :name and type = :type');
@@ -103,7 +103,7 @@ class Workorder {
         }
 
 
-        public function addOrder($data) {
+        public function addOrder(object $data) {
             // dumpAndDie($data);
             $data->avn = $data->avn ?? 0;
             $data->wko = $data->wko ?? 0;
@@ -128,7 +128,7 @@ class Workorder {
             return $this->db->execute() ? true : false;
         }
 
-        public function editOrder($data) {
+        public function editOrder(object $data) {
             $this->db->query('UPDATE work_orders SET 
                 work_order_id = :work_order_id,
                 wko = :wko,
@@ -173,7 +173,7 @@ class Workorder {
             }
         }
 
-        public function setSerials($wkoid, $serials) { //is this needed or will an api be more suitable?
+        public function setSerials(int $wkoid,string $serials) { //is this needed or will an api be more suitable?
             //update wko with given serials
             $this->db->query('
                 UPDATE work_orders SET 
@@ -191,7 +191,7 @@ class Workorder {
             } 
         }
 
-        public function completeOrder($data) {
+        public function completeOrder(object $data) {
             $this->db->query('UPDATE work_orders SET 
                 work_order_id = :work_order_id,
                 avn = :avn, 
@@ -228,21 +228,21 @@ class Workorder {
             }
         }
 
-        public function getWorkorderByWko($wko) {
+        public function getWorkorderByWko(string $wko) {
             $this->db->query('SELECT * FROM work_orders WHERE wko = :wko');
             $this->db->bind(':wko', $wko);
             $row = $this->db->single();
             return $row;
         }
 
-        public function getWorkorderByAvn($avn) {
+        public function getWorkorderByAvn(int $avn) {
             $this->db->query('SELECT * FROM work_orders WHERE avn = :avn');
             $this->db->bind(':avn', $avn);
             $row = $this->db->single();
             return $row;
         }
 
-        public function getWorkorderById($id) {
+        public function getWorkorderById(int $id) {
             $this->db->query('SELECT * FROM work_orders WHERE work_order_id = :work_order_id');
             $this->db->bind(':work_order_id', $id);
             $this->db->execute();
@@ -250,7 +250,7 @@ class Workorder {
             return $row;
         }
 
-        public function deleteOrder($id) {
+        public function deleteOrder(int $id) {
             $this->db->query('DELETE FROM work_orders WHERE work_order_id = :work_order_id');
          //bind values
             $this->db->bind(':work_order_id', $id);
@@ -272,7 +272,7 @@ class Workorder {
             return $results; 
         }
 
-        public function getWorkOrdersFromTransportNote($tnid) {
+        public function getWorkOrdersFromTransportNote(int $tnid) {
             //do things
             $this->db->query('SELECT * FROM work_orders WHERE tnid = :tnid');
             $this->db->bind(':tnid', $tnid); 
@@ -286,7 +286,7 @@ class Workorder {
             return $results;
         }    
 
-        public function getPidFromOptions($data) {
+        public function getPidFromOptions(object $data) {
             switch(empty($data->waveguide_finish_id)) {
                 case 0: //has waveguide
                     switch(empty($data->grille_finish_id)) {
@@ -361,7 +361,7 @@ class Workorder {
             
         }
 
-        public function updateWorkorderTnid($workorder) {
+        public function updateWorkorderTnid(object $workorder): bool {
             $this->db->query('UPDATE work_orders SET tnid = :tnid WHERE work_order_id = :work_order_id');
             $this->db->bind(':tnid', $workorder->tnid);
             $this->db->bind(':work_order_id', $workorder->work_order_id);
@@ -372,7 +372,7 @@ class Workorder {
             return $this->db->execute() ? true : false;
         }
 
-        public function removeTnid($workorder) {
+        public function removeTnid(object $workorder): bool {
             $this->db->query('UPDATE work_orders SET tnid = :tnid WHERE work_order_id = :work_order_id');
             $this->db->bind(':tnid', NULL);
             $this->db->bind(':work_order_id', $workorder->work_order_id);
@@ -381,7 +381,14 @@ class Workorder {
                 print_r($e);
             }
             return $this->db->execute() ? true : false;
-
         }        
+
+        public function updateStatus(int $workorderId, string $workorderStatus): bool {
+            $this->db->query('UPDATE work_orders SET wko_status = :wko_status WHERE work_order_id = :work_order_id');
+            $this->db->bind(':wko_status', $workorderStatus);
+            $this->db->bind(':work_order_id', $workorderId);
+
+            return $this->db->execute() ? true : false;
+        }
 
     }

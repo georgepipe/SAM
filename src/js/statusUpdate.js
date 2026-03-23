@@ -1,4 +1,4 @@
-function updateStatus () {
+function initUpdateStatus () {
 
 const WORKORDER_STATUSES = [
     'In Progress',
@@ -6,6 +6,8 @@ const WORKORDER_STATUSES = [
     'To Be Built',
     'Upcoming'
 ];
+
+const URLROOT = "localhost/SAM/"
 
 /**
  * 
@@ -53,22 +55,43 @@ document.addEventListener('click', async function (e) {
     select.focus();
 
     const restoreText = (statusText) => {
-        cell.dataset.currentStatus = statusText;
+        cell.dataset.workorderStatus = statusText;
         cell.innerHTML = `<span class="wko-status-text">${statusText}</span>`; // ` <-- this is a back tick or grave accent, known in js as a template liberal
     }
 
-    select.addEventListener('blur', () => {
-        restoreText(currentStatus);
-    }, {once: true}) //<-- this makes the listener automatically remove itself after firing once
+    // select.addEventListener('blur', () => {
+    //     restoreText(workorderStatus);
+    // }, {once: true}) //<-- this makes the listener automatically remove itself after firing once
 
     select.addEventListener('change', async () => {
         //now trigger the API
         const newStatus = select.value;
         
-        // try {
-        //     const response = await fetch(`{$URLROOT}workorders`)
-        // }
-    })
+        try { //send this and `await` a response from the api endpoint
+            const response = await fetch(`../apiworkorders/updateStatus`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    workorder_id: workorderId,
+                    status: newStatus
+                })
+            });
+
+            const results = await response.json(); //results = the response when it arrives back from the endpoint
+
+            if(!response.ok || !response.success) {
+                throw new Error(results.message || 'Failed to update status.');
+            }
+            restoreText(newStatus);
+            
+        } catch (error) {
+            console.error(error);
+            restoreText(workorderStatus);
+            alert('Could not update workorder status');
+        }
+    }, {once: true});
 
 
 
@@ -77,5 +100,5 @@ document.addEventListener('click', async function (e) {
 })
 }
 
-export { updateStatus }
+export { initUpdateStatus }
 

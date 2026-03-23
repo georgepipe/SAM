@@ -2,7 +2,7 @@ import { initNav } from "./navigation";
 import { initWorkOrders } from "./workorders";
 import { initTransferNotes } from "./transfernotes";
 import { initAddOrder } from "./addOrder";
-import { updateStatus } from "./statusUpdate";
+import { initUpdateStatus } from "./statusUpdate";
 
 const URLROOT = 'http://localhost/SAM/';
 // const APPROOT = __dirname
@@ -13,7 +13,7 @@ const URLROOT = 'http://localhost/SAM/';
     initTransferNotes();
     initWorkOrders();
     initAddOrder();
-    updateStatus();
+    initUpdateStatus();
   })();
 
 

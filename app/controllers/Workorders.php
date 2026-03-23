@@ -69,9 +69,9 @@ class Workorders extends Controller {
             $coWkoCount = $this->woModel->getCompletedWorkorderCount();
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
             $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id);
-            $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
-            $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide);
+            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
+            $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
+            $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0);
             $workorder->pdesc = $this->poModel->createProductDescription($workorder);
             unset($workorder->product);
             unset($workorder->model);
@@ -82,9 +82,9 @@ class Workorders extends Controller {
             $coWkoCount = $this->woModel->getCompletedWorkorderCount();
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
             $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id);
-            $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
-            $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide);
+            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
+            $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
+            $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0);
             $workorder->pdesc = $this->poModel->createProductDescription($workorder);
             unset($workorder->product);
             unset($workorder->model);
@@ -308,9 +308,9 @@ class Workorders extends Controller {
         $workorder = $this->woModel->getWorkorderById($id);
         $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
         $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id);
-        $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
-        $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide);
+        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
+        $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
+        $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0);
         $workorder->pdesc = $this->poModel->createProductDescription($workorder);
         //unset($workorder->model);
 

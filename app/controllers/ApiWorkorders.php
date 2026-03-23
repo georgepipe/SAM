@@ -23,9 +23,11 @@
                     $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
                     $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
                     $workorder->pdesc = $this->poModel->createProductDescription($workorder);
+
                     unset($workorder->product);
                     unset($workorder->model);
-                    $json_data = json_encode((object) $activeWorkorders);
+
+                    $this->jsonResponse($activeWorkorders);
                 } 
             } elseif ($type === 'completed') {
                 $completedWorkorders = $this->woModel->getCompletedOrders($page);
@@ -36,28 +38,83 @@
                     $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
                     $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
                     $workorder->pdesc = $this->poModel->createProductDescription($workorder);
+
                     unset($workorder->product);
                     unset($workorder->model);
-                    $json_data = json_encode((object) $completedWorkorders);
+
+                    $this->jsonResponse($completedWorkorders);
                 } 
             }
-
-
-            print_r ($json_data);
-            exit;
         } 
 
-        public function setSerials($wkoID, $serials) {
+        public function updateStatus(){
+            header('Content-Type: application/json');
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405); //method error code
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Method not allowed'
+                ]);
+                return;
+            }
+
+            $input = json_decode(file_get_contents('php://input'), true);
             
+            $workorderId = $input['workorder_id'] ?? null;
+            $status = trim($input['status']) ?? '';
+
+            $allowedStatuses = [
+                'In Progress',
+                'On Hold',
+                'To Be Built',
+                'Upcoming'
+            ];
+
+            if(empty($workorderId || empty($status))) {
+                http_response_code(422); //unprocessable entity code
+                echo json_encode([
+                    'sucess' => false,
+                    'message' => 'Missing workorder ID or Status'
+                ]);
+                return;
+            }
+            if(!in_array($status, $allowedStatuses, true)) {
+                http_response_code(422);
+                echo json_encode([
+                    'sucess' => false,
+                    'message' => 'Invalid workorder status'
+                ]);
+                return;
+            }
+
+            $updated = $this->woModel->updateStatus($workorderId, $status);
+
+            if(!$updated) {
+                http_response_code(500);
+                echo json_encode([
+                    'sucess' => false,
+                    'message' => 'Internal database error'
+                ]);
+                return;
+            }
+            echo json_encode([
+                'sucess' => true,
+                'message' => 'Status updated sucessfully'
+            ]);
+
+        }
+
+        public function setSerials($wkoID, $serials) {
+            //To be constructed
         }
 
 
-        private function jsonResponse(array $payload, int $statusCode = 200): void
+        private function jsonResponse($payload, int $statusCode = 200): void
         {
             http_response_code($statusCode);
             header('Content-Type: application/json');
             echo json_encode($payload);
             exit;
         }
-        
+
     }
