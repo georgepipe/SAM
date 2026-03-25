@@ -25,7 +25,8 @@ class Transport extends Controller {
         foreach($avaliableworkorders as $workorder) {
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
             $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
+            if(!empty($workorder->product->finish_id)) {$workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);}
+
             $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
             $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
             $workorder->pdesc = $this->poModel->createProductDescription($workorder);

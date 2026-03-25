@@ -21,7 +21,7 @@
                     $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
                     $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
                     $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
-                    $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
+                    $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide_finish_id);
                     $workorder->pdesc = $this->poModel->createProductDescription($workorder);
 
                     unset($workorder->product);
@@ -97,6 +97,7 @@
                 ]);
                 return;
             }
+
             echo json_encode([
                 'sucess' => true,
                 'message' => 'Status updated sucessfully'

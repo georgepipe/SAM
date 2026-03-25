@@ -27,7 +27,7 @@
         public function getModelsForTNs($workorders) {
             // $this->db->query('select * from models');
             // $results = $this->db->resultSet();  
-            $models=[];  
+            // $models=[];  
             foreach($workorders as $workorder) {
                  array_push($models,$workorder->cab_model_id);
             };

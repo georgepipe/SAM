@@ -2,10 +2,10 @@
 
     function dumpAndDie(... $vars) {
         echo '<pre>';
-        echo 'VAR DUMP<BR>';
-        foreach($vars as $var) {
-            var_dump($var);
-        }
+        // echo 'VAR DUMP<BR>';
+        // foreach($vars as $var) {
+        //     var_dump($var);
+        // }
         echo 'print_r<BR>';
         foreach($vars as $var) {
             print_r($var);

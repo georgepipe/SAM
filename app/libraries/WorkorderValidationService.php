@@ -46,7 +46,7 @@
         }
 
         private function validateAVN(object $data): void {
-            if($this->woModel->getWorkorderByAvn($data->form->avn) ) {
+            if($this->woModel->getWorkorderByAvn((int) $data->form->avn) ) {
                 if(!$data->form->avn == '') {
                     $data->errors->err_avn = 'A work order already exists with this AVN';
                 }

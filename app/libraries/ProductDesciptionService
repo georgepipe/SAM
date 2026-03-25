@@ -1,0 +1,25 @@
+<?php
+
+
+
+class ProductDescriptionService{
+
+    private $moModel;
+    private $woModel;
+    private $poModel;
+
+    public function __construct($moModel, $poModel, $woModel) {
+        $this->moModel = $moModel;
+        $this->woModel = $woModel;
+        $this->poModel = $poModel;
+    }
+
+
+    public function createProductDescription(object $workorder) {
+        dumpAndDie($workorder);
+    }
+
+
+}
+
+

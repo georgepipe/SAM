@@ -1,13 +1,16 @@
 <?php
+
+
 class Workorder {
     
     private $db;
-    private $moModel;
-    private $poModel;
+    // private $moModel;
+    // private $poModel;
 
         public function __construct() {
-             $this->db = new Database;
-
+            $this->db = new Database;
+            // $this->moModel = new Model();
+            // $this->poModel = new Product();
         }
 
         public function getOrders(int $page = 1){
@@ -199,7 +202,6 @@ class Workorder {
                 pid = :pid,
                 wheels = :wheels,
                 quantity = :quantity,
-                quantity_built = :quantity_built,
                 serials = :serials,
                 wko_status = :wko_status,
                 wko_delivery = :wko_delivery,
@@ -389,6 +391,23 @@ class Workorder {
             $this->db->bind(':work_order_id', $workorderId);
 
             return $this->db->execute() ? true : false;
+        }
+
+    public function setProductDescription(object $workorder): object{
+            // $acWkoCount = $this->getActiveWorkorderCount();
+            // $coWkoCount = $this->getCompletedWorkorderCount();
+            // $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
+
+            // dumpAndDie($workorder);
+            // $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
+
+            
+            // $workorder->cab_finish = $this->getFinishfromId($workorder->product->cab_finish_id ?? 0);
+            // if(!empty($workorder->grille_finish)) {$workorder->grille_finish = $this->getFinishfromId($workorder->product->grille_finish_id ?? 0);}
+            // if (!empty($workorder->waveguide_finish)){$workorder->waveguide_finish = $this->getFinishfromId($workorder->product->waveguide ?? 0);}
+            // $workorder->pdesc = $this->poModel->createProductDescription($workorder);
+            // unset($workorder->product);
+            // unset($workorder->model);
         }
 
     }

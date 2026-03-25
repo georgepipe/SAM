@@ -60,26 +60,18 @@ class Workorders extends Controller {
     public function index($arg = '') {
         // echo 'the arguments are: '.$arg;
         // die(' [index stuff] ');
-        $products = (object)[];
+        // $products = (object)[];
         $activeWorkorders = $this->woModel->getActiveOrders();
         $completedWorkorders = $this->woModel->getCompletedOrders();
+        $acWkoCount = $this->woModel->getActiveWorkorderCount();
+        $coWkoCount = $this->woModel->getCompletedWorkorderCount();
+        new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
 
-        foreach($activeWorkorders as $workorder) {
-            $acWkoCount = $this->woModel->getActiveWorkorderCount();
-            $coWkoCount = $this->woModel->getCompletedWorkorderCount();
-            $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-            $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
-            $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
-            $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0);
-            $workorder->pdesc = $this->poModel->createProductDescription($workorder);
-            unset($workorder->product);
-            unset($workorder->model);
+        foreach($activeWorkorders as $workorder) { 
+            $workorder->pdesc = $ProductDescriptionService->createProductDescription($workorder); 
         } 
 
         foreach($completedWorkorders as $workorder) {
-            $acWkoCount = $this->woModel->getActiveWorkorderCount();
-            $coWkoCount = $this->woModel->getCompletedWorkorderCount();
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
             $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
             $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
