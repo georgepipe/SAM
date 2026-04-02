@@ -7,6 +7,7 @@ const WORKORDER_STATUSES = [
     'Upcoming'
 ];
 
+let statusClass = ''
 const URLROOT = "localhost/SAM/"
 
 /**
@@ -31,9 +32,7 @@ document.addEventListener('click', async function (e) {
 
     const workorderId = cell.dataset.wkoId;
     const workorderStatus = cell.dataset.wkoStatus;
-
-    console.log(workorderId);
-    console.log(workorderStatus);
+    
 
     const select = document.createElement('select');
     select.className = 'wko-status-select';
@@ -81,10 +80,16 @@ document.addEventListener('click', async function (e) {
 
             const results = await response.json(); //results = the response when it arrives back from the endpoint
 
-            if(!response.ok || !response.success) {
+            if(!response.ok || !results.sucess) {
                 throw new Error(results.message || 'Failed to update status.');
             }
+            statusClass = getStatusClass(workorderStatus);
+            select.parentElement.parentElement.classList.remove(statusClass)
+            statusClass = getStatusClass(newStatus)
+            select.parentElement.parentElement.classList.add(statusClass)
             restoreText(newStatus);
+            // updateStatusClass(e);
+
             
         } catch (error) {
             console.error(error);
@@ -98,6 +103,21 @@ document.addEventListener('click', async function (e) {
 
 
 })
+}
+
+function getStatusClass(status){
+    switch (status) {
+        case 'To be Built':
+            return 'tobebuilt'
+        case 'On Hold':
+            return 'onhold'
+        case 'Upcoming':
+            return 'upcoming'
+        case 'In Progress':
+            return 'inprogress'
+        default:
+            break;
+    }
 }
 
 export { initUpdateStatus }

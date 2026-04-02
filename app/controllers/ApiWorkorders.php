@@ -100,8 +100,9 @@
 
             echo json_encode([
                 'sucess' => true,
-                'message' => 'Status updated sucessfully'
+                'message' => 'Status updated sucessfully hee hee'
             ]);
+            return;
 
         }
 

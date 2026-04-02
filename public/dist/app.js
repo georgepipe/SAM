@@ -244,6 +244,7 @@ function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 function initUpdateStatus() {
   var WORKORDER_STATUSES = ['In Progress', 'On Hold', 'To Be Built', 'Upcoming'];
+  var statusClass = '';
   var URLROOT = "localhost/SAM/";
 
   /**
@@ -282,8 +283,6 @@ function initUpdateStatus() {
           case 5:
             workorderId = cell.dataset.wkoId;
             workorderStatus = cell.dataset.wkoStatus;
-            console.log(workorderId);
-            console.log(workorderStatus);
             select = document.createElement('select');
             select.className = 'wko-status-select';
             WORKORDER_STATUSES.forEach(function (status) {
@@ -330,30 +329,35 @@ function initUpdateStatus() {
                     return response.json();
                   case 7:
                     results = _context.sent;
-                    if (!(!response.ok || !response.success)) {
+                    if (!(!response.ok || !results.sucess)) {
                       _context.next = 10;
                       break;
                     }
                     throw new Error(results.message || 'Failed to update status.');
                   case 10:
+                    statusClass = getStatusClass(workorderStatus);
+                    select.parentElement.parentElement.classList.remove(statusClass);
+                    statusClass = getStatusClass(newStatus);
+                    select.parentElement.parentElement.classList.add(statusClass);
                     restoreText(newStatus);
-                    _context.next = 18;
+                    // updateStatusClass(e);
+                    _context.next = 22;
                     break;
-                  case 13:
-                    _context.prev = 13;
+                  case 17:
+                    _context.prev = 17;
                     _context.t0 = _context["catch"](1);
                     console.error(_context.t0);
                     restoreText(workorderStatus);
                     alert('Could not update workorder status');
-                  case 18:
+                  case 22:
                   case "end":
                     return _context.stop();
                 }
-              }, _callee, null, [[1, 13]]);
+              }, _callee, null, [[1, 17]]);
             })), {
               once: true
             });
-          case 17:
+          case 15:
           case "end":
             return _context2.stop();
         }
@@ -363,6 +367,20 @@ function initUpdateStatus() {
       return _ref.apply(this, arguments);
     };
   }());
+}
+function getStatusClass(status) {
+  switch (status) {
+    case 'To be Built':
+      return 'tobebuilt';
+    case 'On Hold':
+      return 'onhold';
+    case 'Upcoming':
+      return 'upcoming';
+    case 'In Progress':
+      return 'inprogress';
+    default:
+      break;
+  }
 }
 
 
