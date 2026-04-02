@@ -58,28 +58,17 @@ class Workorders extends Controller {
     
 
     public function index($arg = '') {
-        // echo 'the arguments are: '.$arg;
-        // die(' [index stuff] ');
-        // $products = (object)[];
         $activeWorkorders = $this->woModel->getActiveOrders();
         $completedWorkorders = $this->woModel->getCompletedOrders();
         $acWkoCount = $this->woModel->getActiveWorkorderCount();
         $coWkoCount = $this->woModel->getCompletedWorkorderCount();
-        new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
 
+        $descriptionService = new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
         foreach($activeWorkorders as $workorder) { 
-            $workorder->pdesc = $ProductDescriptionService->createProductDescription($workorder); 
+            $workorder = $descriptionService->createProductDescription($workorder); 
         } 
-
         foreach($completedWorkorders as $workorder) {
-            $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-            $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
-            $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
-            $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0);
-            $workorder->pdesc = $this->poModel->createProductDescription($workorder);
-            unset($workorder->product);
-            unset($workorder->model);
+            $workorder = $descriptionService->createProductDescription($workorder); 
         } 
 
         $models = $this->moModel->getModelNames();
@@ -295,21 +284,18 @@ class Workorders extends Controller {
     }
 
     public function viewwo($id) {
-        //load workorder into data
-        $debug = [];
-        $workorder = $this->woModel->getWorkorderById($id);
+        $descriptionService = new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
+        $workorder = $descriptionService->createProductDescription($this->woModel->getWorkorderById($id));
         $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
         $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
-        $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
-        $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0);
-        $workorder->pdesc = $this->poModel->createProductDescription($workorder);
-        //unset($workorder->model);
+        if(!empty($workorder->product->cab_finish_id)) {$workorder->product->cab_finish = $this->woModel->getFinishFromId($workorder->product->cab_finish_id); unset($workorder->product->cab_finish_id);}
+        if(!empty($workorder->product->grille_finish_id)) {$workorder->product->grille_finish_id = $this->woModel->getFinishFromId($workorder->product->grille_finish_id);}
+        if(!empty($workorder->product->waveguide_finish_id)) {$workorder->product->waveguide_finish_id = $this->woModel->getFinishFromId($workorder->product->waveguide_finish_id);}
 
         $data = (object) array (
             'workorder' => $workorder
         );
-        //load page
+        
         $this->view('workorders/viewwo', $data);
     }
 

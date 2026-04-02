@@ -74,7 +74,7 @@ class Workorder {
             return $results;
         }
 
-        public function getFidfromName(int $finish,bool $isSH){
+        public function getFidfromName(string $finish,bool $isSH){
            
             if($isSH===true) {
                 $this->db->query('select * from finishes WHERE name = :name and type = :type');
@@ -106,8 +106,7 @@ class Workorder {
         }
 
 
-        public function addOrder(object $data) {
-            // dumpAndDie($data);
+        public function addOrder(object $data): bool {
             $data->avn = $data->avn ?? 0;
             $data->wko = $data->wko ?? 0;
             $this->db->query('INSERT INTO work_orders 
@@ -124,9 +123,6 @@ class Workorder {
             $this->db->bind(':wko_status',  $data->wko_status);
             $this->db->bind(':wko_delivery',  $data->wko_delivery);
             $this->db->bind(':wko_notes',  $data->wko_notes);
-            // try {return $this->db->execute();} catch (PDOException $e) {
-            //     print_r($e);
-            // } 
             
             return $this->db->execute() ? true : false;
         }
