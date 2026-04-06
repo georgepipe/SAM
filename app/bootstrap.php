@@ -2,6 +2,7 @@
 
     //load config
     require_once 'config/Config.php';
+    require_once 'config/DbConfig.php';
     
     //load helpers
     require_once 'helpers/url_helper.php';

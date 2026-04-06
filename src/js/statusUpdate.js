@@ -78,7 +78,7 @@ document.addEventListener('click', async function (e) {
                 })
             });
 
-            const results = await response.json(); //results = the response when it arrives back from the endpoint
+            const results = await response.json(); //results = the extracted response when it arrives back from the endpoint
 
             if(!response.ok || !results.sucess) {
                 throw new Error(results.message || 'Failed to update status.');

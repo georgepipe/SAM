@@ -40,3 +40,4 @@ Thumbs.db
 vendor/
 node_modules/
 bin/
+app/config/DbConfig.php
