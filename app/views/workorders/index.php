@@ -89,10 +89,10 @@
                                 <?php if($workorder->wko_status !='Completed') :?>
                                     <td class="text-nowrap text-sm" style="font-size:0.7rem"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
                                     <td class="text-nowrap"><?php echo $workorder->wko ?></td>
-                                    <td><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"></span> <?php echo $workorder->avn; ?></a></td>
+                                    <td class=" text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
                                     <td id="qty"><?php echo $workorder->quantity ?></td>
-                                    <td><?= htmlspecialchars($workorder->serials) ?></td>
+                                    <td class=" font-size:10px"><?= htmlspecialchars($workorder->serials) ?></td>
                                     <td class="wko-status-cell" data-wko-id="<?= htmlspecialchars($workorder->work_order_id) ?>" data-wko-status="<?= htmlspecialchars($workorder->wko_status) ?>">
                                         <span class="wko-status-text"><?= htmlspecialchars($workorder->wko_status) ?></span>
                                     </td>
@@ -175,7 +175,7 @@
         </div>
         </div>
     </div>
-    <div class="completed dispContainer <?php
+    <div class="compWkos dispContainer <?php
                             //  if($url[3] != 'index?p=cw') { echo 'hidden'; } else {echo 'block';} 
                             if (isset($url[3])) { if ($url[3]==="index?p=cw") {echo 'block';} else {echo 'hidden';}}
                             ?>">
@@ -197,13 +197,14 @@
                     </thead>
                     <tbody id="tbodyCwo">
                     <?php foreach($data['completedWorkorders'] as $workorder) : ?>
-                            <tr class="text-center items-center border-4 worow min-h-4" data-id="<?php echo $workorder->work_order_id; ?>">
+                            <tr class="text-center items-center border-4 worow min-h-4 completed" data-id="<?php echo $workorder->work_order_id; ?>">
                                 <?php if($workorder->wko_status ='Completed') :?>
                                     <td class="text-nowrap"><?php  !$workorder->completed_at ? $myDateTime = 'N/A' : $myDateTime = $workorder->completed_at; echo substr($myDateTime,0,10); ?></td>
                                     <td><?php echo $workorder->wko ?></td>
-                                    <td><?php echo $workorder->avn ?></td>
+                                    <!-- <td><?php echo $workorder->avn ?></td> -->
+                                    <td class=" text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
-                                    <td><?php echo $workorder->quantity_built ?></td>
+                                    <td><?php echo $workorder->quantity ?></td>
                                     <td><?php echo $workorder->serials ?></td>
                                     <td><?php echo $workorder->wko_delivery ?></td>
                                     <td><?php echo $workorder->wko_notes ?></td>
@@ -284,7 +285,7 @@
         </div>
     </div>
 </div>
-<?php 
+<!-- <?php 
 echo '<pre>'; print_r($data);
-?>
+?> -->
 <?php require APPROOT . '/views/inc/footer.php'; ?>

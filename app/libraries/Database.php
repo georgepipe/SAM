@@ -25,7 +25,6 @@
         $dsn = 'mysql:host='.$this->host.';dbname='.$this->dbname;
         $options = array(
             PDO::ATTR_PERSISTENT => true,
-            //more elegant way to handle errors
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION 
         );
         
@@ -53,7 +52,7 @@
      * @param mixed $type
      * @return void
      */
-    public function bind($param, $value, $type = null){
+    public function bind(mixed $param,mixed $value,mixed $type = null){
         //check type of param passed
         if(is_null($type)){
             switch(true){
@@ -78,10 +77,6 @@
      * @return bool or last index
      */
     public function execute(){
-        // echo "\nPDO::errorInfo():\n<PRE>";
-        // print_r($this);
-        // return $this->stmt->execute();
-
         $exe = $this->stmt->execute();
         if ($exe) {
             if($this->dbhandler->lastInsertId()>0) {

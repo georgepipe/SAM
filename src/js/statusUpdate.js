@@ -30,11 +30,11 @@ document.addEventListener('click', async function (e) {
     if(!cell) return;
     if(cell.querySelector('select')) return;
 
-    const workorderId = cell.dataset.wkoId;
-    const workorderStatus = cell.dataset.wkoStatus;
+    let workorderId = cell.dataset.wkoId;
+    let workorderStatus = cell.dataset.wkoStatus;
     
 
-    const select = document.createElement('select');
+    let select = document.createElement('select');
     select.className = 'wko-status-select';
 
     WORKORDER_STATUSES.forEach(status =>{
@@ -53,21 +53,17 @@ document.addEventListener('click', async function (e) {
     cell.appendChild(select);
     select.focus();
 
-    const restoreText = (statusText) => {
-        cell.dataset.workorderStatus = statusText;
+    let restoreText = (statusText) => {
+        cell.dataset.wkoStatus = statusText;
         cell.innerHTML = `<span class="wko-status-text">${statusText}</span>`; // ` <-- this is a back tick or grave accent, known in js as a template liberal
     }
 
-    // select.addEventListener('blur', () => {
-    //     restoreText(workorderStatus);
-    // }, {once: true}) //<-- this makes the listener automatically remove itself after firing once
-
     select.addEventListener('change', async () => {
         //now trigger the API
-        const newStatus = select.value;
+        let newStatus = select.value;
         
         try { //send this and `await` a response from the api endpoint
-            const response = await fetch(`../apiworkorders/updateStatus`, {
+            let response = await fetch(`../apiworkorders/updateStatus`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -78,7 +74,7 @@ document.addEventListener('click', async function (e) {
                 })
             });
 
-            const results = await response.json(); //results = the extracted response when it arrives back from the endpoint
+            let results = await response.json(); //results = the extracted response when it arrives back from the endpoint
 
             if(!response.ok || !results.sucess) {
                 throw new Error(results.message || 'Failed to update status.');
@@ -88,7 +84,6 @@ document.addEventListener('click', async function (e) {
             statusClass = getStatusClass(newStatus)
             select.parentElement.parentElement.classList.add(statusClass)
             restoreText(newStatus);
-            // updateStatusClass(e);
 
             
         } catch (error) {
@@ -107,7 +102,8 @@ document.addEventListener('click', async function (e) {
 
 function getStatusClass(status){
     switch (status) {
-        case 'To be Built':
+        case 'To Be Built':
+            console.log('to be built class')
             return 'tobebuilt'
         case 'On Hold':
             return 'onhold'

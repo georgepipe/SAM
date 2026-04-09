@@ -26,24 +26,22 @@
                 } else {
                     if(!empty($url[0])) {
                         if($url[0]==='advice_notes'){
-                            //404!
                             header("Location: ".URLROOT."pages/_404");
-                            die('this will redirect to 404 page!');
                         } else {
-                            print_r(" !file not found in app/controllers ");
-                            print_r($url);
+                            throwErr(404, "Controller not found!");
                         }
                     }
                 }
                 require_once '../app/controllers/'. $this->currentController . '.php';
                 $this->currentController = new $this->currentController;
                 
-                // if ($currentMethod === 'index') {die('its index!');} else {$currentMethod = 'index';}
                 if (isset($url[1])){
                     if(method_exists($this->currentController, $url[1])){
                         $this->currentMethod = $url[1];
                         unset($url[1]);
-                    } else {print_r("!method not found ");echo '</br>';}
+                    } else {
+                            throwErr(404, "Method not found!");
+                        }
                 }
                 $this->params = $url ? array_values($url) : [];
                 call_user_func_array([$this->currentController, $this->currentMethod], $this->params);
@@ -62,10 +60,8 @@
             $url = rtrim($_GET['url'], '/');
             $url = filter_var($url, FILTER_SANITIZE_URL);
             $url = explode('/',$url);
-            //print_r($url); //debug point
             return $url;
         }
-
     }
 
 

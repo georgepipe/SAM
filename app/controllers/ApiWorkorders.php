@@ -16,19 +16,12 @@
             
             if ($type === 'active') {
                 $activeWorkorders = $this->woModel->getActiveOrders($page);
-                foreach($activeWorkorders as $workorder) {
-                    $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-                    $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-                    $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
-                    $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
-                    $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide_finish_id);
-                    $workorder->pdesc = $this->poModel->createProductDescription($workorder);
-
-                    unset($workorder->product);
-                    unset($workorder->model);
-
-                    $this->jsonResponse($activeWorkorders);
+                $descriptionService = new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
+                foreach($activeWorkorders as $workorder) { 
+                    $workorder = $descriptionService->createProductDescription($workorder); 
                 } 
+
+                $this->jsonResponse($activeWorkorders);
             } elseif ($type === 'completed') {
                 $completedWorkorders = $this->woModel->getCompletedOrders($page);
                 foreach($completedWorkorders as $workorder) {
@@ -116,7 +109,7 @@
             http_response_code($statusCode);
             header('Content-Type: application/json');
             echo json_encode($payload);
-            exit;
+            return;
         }
 
     }

@@ -49,8 +49,9 @@ function initWorkOrders () {
                 let page = e.target.dataset.page
                 let tag = e.target.parentElement.dataset.wkos
 
-                console.log(tag)
+               
                 tag === "com" ? apiFile = '../apiworkorders/paginate/completed/' + page : apiFile = '../apiworkorders/paginate/active/' + page
+                console.log(tag)
                 //let apiFile = '../api/workorder/' + page
                 fetch(apiFile, {
                     headers: {
@@ -74,34 +75,26 @@ function initWorkOrders () {
                         }
                     
                         for (i = 1; i < length+1; i++) {
-                            if (response[i-1].wko_status) {
-                                switch(response[i-1].wko_status) {
-                                    case 'In Progress':
-                                        trClass = 'inprogress';
-                                        break;
-                                    case 'To Be Built':
-                                        trClass = 'tobebuilt';
-                                        break;
-                                    case 'On Hold':
-                                        trClass = 'onhold';
-                                        break;
-                                    case 'Waiting For Parts':
-                                        trClass = 'waitingforparts';
-                                        break;
-                                    case 'Upcoming':
-                                        trClass = 'upcoming';
-                                        break;
-                                    default:
-                                        trClass = '';
-                                        break;
-                                }
-                            }
-                            let Tbody
-                            
-                            tag === 'com' ? Tbody = document.querySelector("#tbodyCwo") : Tbody = document.querySelector("#tbodyAwo") 
+                            const statusMap = {
+                                'In Progress' : 'inprogress',
+                                'To Be Built' : 'tobebuilt',
+                                'On Hold' : 'onhold',
+                                'Waiting For Parts' : 'waitingforparts',
+                                'Upcoming' : 'upcoming',
+                                '' : ''
+                            };
+                            let wkoStatus = response[i-1].wko_status || '';
+                            trClass = statusMap[wkoStatus] ?? null; 
 
-                            let row = Tbody.insertRow(0)
-                            row.classList.add("text-center", "items-center", "border-4", "worow", trClass, "min-h-3","slow-fade-in")
+
+                            let Tbody;
+                            
+                            tag === 'com' ? Tbody = document.querySelector("#tbodyCwo") : Tbody = document.querySelector("#tbodyAwo");
+
+                            let row = Tbody.insertRow(0);
+                            row.classList.add("text-center", "items-center", "border-4", "worow", "min-h-3","slow-fade-in");
+                            if(trClass) {row.classList.add(trClass)};
+                            if(response[i-1].wko_status == 'Completed') {row.classList.add('completed')};
 
                             const tdDate = document.createElement("td")
                                 tdDate.classList.add("text-nowrap")
@@ -113,6 +106,9 @@ function initWorkOrders () {
                             const tdQuantityB = document.createElement("td")
                             const tdSerials = document.createElement("td")
                             const tdWkoS = document.createElement("td")
+                                tdWkoS.classList.add("wko-status-cell")
+                                tdWkoS.setAttribute("data-wko-id",response[i-1].work_order_id)
+                                tdWkoS.setAttribute("data-wko-status",response[i-1].wko_status)
                             const tdWkoD = document.createElement("td")
                             const tdWkoN = document.createElement("td")
                                 tdWkoN.classList.add("min-w-24")

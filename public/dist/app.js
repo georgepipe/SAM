@@ -298,12 +298,9 @@ function initUpdateStatus() {
             cell.appendChild(select);
             select.focus();
             restoreText = function restoreText(statusText) {
-              cell.dataset.workorderStatus = statusText;
+              cell.dataset.wkoStatus = statusText;
               cell.innerHTML = "<span class=\"wko-status-text\">".concat(statusText, "</span>"); // ` <-- this is a back tick or grave accent, known in js as a template liberal
-            }; // select.addEventListener('blur', () => {
-            //     restoreText(workorderStatus);
-            // }, {once: true}) //<-- this makes the listener automatically remove itself after firing once
-
+            };
             select.addEventListener('change', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
               var newStatus, response, results;
               return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -340,7 +337,6 @@ function initUpdateStatus() {
                     statusClass = getStatusClass(newStatus);
                     select.parentElement.parentElement.classList.add(statusClass);
                     restoreText(newStatus);
-                    // updateStatusClass(e);
                     _context.next = 22;
                     break;
                   case 17:
@@ -370,7 +366,8 @@ function initUpdateStatus() {
 }
 function getStatusClass(status) {
   switch (status) {
-    case 'To be Built':
+    case 'To Be Built':
+      console.log('to be built class');
       return 'tobebuilt';
     case 'On Hold':
       return 'onhold';
@@ -534,8 +531,8 @@ function initWorkOrders() {
       pgBtns[h].addEventListener("click", function (e) {
         var page = e.target.dataset.page;
         var tag = e.target.parentElement.dataset.wkos;
-        console.log(tag);
         tag === "com" ? apiFile = '../apiworkorders/paginate/completed/' + page : apiFile = '../apiworkorders/paginate/active/' + page;
+        console.log(tag);
         //let apiFile = '../api/workorder/' + page
         fetch(apiFile, {
           headers: {
@@ -556,32 +553,29 @@ function initWorkOrders() {
             Table.deleteRow(1);
           }
           for (i = 1; i < length + 1; i++) {
-            if (response[i - 1].wko_status) {
-              switch (response[i - 1].wko_status) {
-                case 'In Progress':
-                  trClass = 'inprogress';
-                  break;
-                case 'To Be Built':
-                  trClass = 'tobebuilt';
-                  break;
-                case 'On Hold':
-                  trClass = 'onhold';
-                  break;
-                case 'Waiting For Parts':
-                  trClass = 'waitingforparts';
-                  break;
-                case 'Upcoming':
-                  trClass = 'upcoming';
-                  break;
-                default:
-                  trClass = '';
-                  break;
-              }
-            }
+            var _statusMap$wkoStatus;
+            var statusMap = {
+              'In Progress': 'inprogress',
+              'To Be Built': 'tobebuilt',
+              'On Hold': 'onhold',
+              'Waiting For Parts': 'waitingforparts',
+              'Upcoming': 'upcoming',
+              '': ''
+            };
+            var wkoStatus = response[i - 1].wko_status || '';
+            trClass = (_statusMap$wkoStatus = statusMap[wkoStatus]) !== null && _statusMap$wkoStatus !== void 0 ? _statusMap$wkoStatus : null;
             var Tbody = void 0;
             tag === 'com' ? Tbody = document.querySelector("#tbodyCwo") : Tbody = document.querySelector("#tbodyAwo");
             var row = Tbody.insertRow(0);
-            row.classList.add("text-center", "items-center", "border-4", "worow", trClass, "min-h-3", "slow-fade-in");
+            row.classList.add("text-center", "items-center", "border-4", "worow", "min-h-3", "slow-fade-in");
+            if (trClass) {
+              row.classList.add(trClass);
+            }
+            ;
+            if (response[i - 1].wko_status == 'Completed') {
+              row.classList.add('completed');
+            }
+            ;
             var tdDate = document.createElement("td");
             tdDate.classList.add("text-nowrap");
             var tdWko = document.createElement("td");
@@ -592,6 +586,9 @@ function initWorkOrders() {
             var tdQuantityB = document.createElement("td");
             var tdSerials = document.createElement("td");
             var tdWkoS = document.createElement("td");
+            tdWkoS.classList.add("wko-status-cell");
+            tdWkoS.setAttribute("data-wko-id", response[i - 1].work_order_id);
+            tdWkoS.setAttribute("data-wko-status", response[i - 1].wko_status);
             var tdWkoD = document.createElement("td");
             var tdWkoN = document.createElement("td");
             tdWkoN.classList.add("min-w-24");
