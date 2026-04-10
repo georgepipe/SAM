@@ -10,19 +10,22 @@
                 <thead>
                     <tr class="text-center">
                         <th scope="col" class="pr-5"></th>
-                        <th scope="col" class="pr-5">WKO</th>
+                        <th scope="col" class="pr-5">AVN</th>
                         <th scope="col" class="pr-5">Description</th>
                         <th scope="col" class="pr-5">Quantity</th>
+                        <th scope="col" class="pr-5">Weight (kg)</th>
                     </tr>
                 </thead>
                     <?php foreach($data->avaliableworkorders as $workorder) : ?>
-                        <tbody class="" ">
-                            <tr class="text-center items-center border-4 " >
+                        <tbody class="">
+                            <tr class="text-center items-center border-4 " data-weight="<?php echo ($workorder->weight * $workorder->quantity)?>" >
                                 <?php if($transport->completed !=1) :?>
 									<td data-id="<?php echo $workorder->work_order_id; ?>"><input type="checkbox" class="tCheck"></input></td>
-									<td class=""><?php echo $workorder->wko; ?></td>
-									<td class=""><?php echo $workorder->pdesc; ?></td>
-									<td class=""><?php echo $workorder->quantity_built; ?></td>
+									<!-- <td class=""><?php echo $workorder->avn; ?></td> -->
+                                    <td class=" text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
+									<td class=" text-[15px]"><?php echo $workorder->pdesc; ?></td>
+									<td class=""><?php echo $workorder->quantity; ?></td>
+                                    <td class="" ><?php echo ($workorder->weight * $workorder->quantity)?></td>
                                 <?php endif ;?>
                             </tr>
                         </tbody>
@@ -31,14 +34,15 @@
         </section>
     </div>
 <!-- create deliver/collection note buttons -->
-<div class="flex flex-row m-auto justify-center">
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-6 h-16 text-nowrap colBtn hidden">Create Collection</button>
-    <button class="btn btn-blue mx-6 h-16 delBtn hidden">Create Dellivery</button>
+<div class="flex flex-row m-auto justify-center btnContainer hidden">
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-6 h-16 text-nowrap colBtn ">Create Collection</button>
+    <button class="btn btn-blue mx-6 h-16 delBtn ">Create Dellivery</button>
+    <div class=" border-2">Current total Delivery Weight: <br><text class="weightTxt">kg</text></div>
 </div>
 <?php endif; ?>
 <?php if(!empty($data->activetransportnotes)) : ?>
 	<div class="assTrans dispContainer">
-        <h1 class="flex justify-center text-lg"><strong><U>Active Collections & Deliveries</U></strong></h1>
+        <h1 class="flex justify-center text-lg"><strong><U>Scheduled Collections & Deliveries</U></strong></h1>
         <section class="flex flex-col">
             <table class="text-sm justify-evenly w-full border-4">
                 <thead>

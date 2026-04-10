@@ -403,14 +403,18 @@ function initTransferNotes() {
   var URLROOT = 'http://localhost/SAM/';
   var tNoteRows = document.querySelectorAll(".tnoterow");
   var tnoteChecks = document.querySelectorAll(".tCheck");
+  var btnCont = document.querySelector(".btnContainer");
   var colBtn = document.querySelector(".colBtn");
   var delBtn = document.querySelector(".delBtn");
+  var weightTxt = document.querySelector('.weightTxt');
   var deleteBtn = document.querySelector(".delete");
   var i;
   var j;
   var k;
   var l;
   var checks;
+  var totalWeight = 0;
+  var avnWeight = 0;
   if (tNoteRows.length > 1) {
     for (i = 0; i < tNoteRows.length; i++) {
       tNoteRows[i].addEventListener("click", function (e) {
@@ -421,25 +425,34 @@ function initTransferNotes() {
   }
   var visibleBtns = 0;
   var wkos = [];
+  //this eventualy needs recoding to 'target nearest' listener instead of adding a listener to every checkbox
   if (tnoteChecks.length > 1) {
     for (j = 0; j < tnoteChecks.length; j++) {
       //need to check value of all check boxes and sum total
       tnoteChecks[j].addEventListener("change", function (e) {
         //if total is > 0 then show btns otherwise hide them
         var isChecked = e.target.checked;
-        var wkoid = e.target.parentElement.dataset.id;
-        isChecked ? visibleBtns++ : visibleBtns--;
+        // let wkoid = e.target.parentElement.dataset.id
+
+        // isChecked ? visibleBtns++ : visibleBtns--
+        if (isChecked) {
+          visibleBtns++;
+          avnWeight = Number(e.target.parentElement.parentElement.dataset.weight);
+          totalWeight = totalWeight + avnWeight;
+        } else {
+          visibleBtns--;
+          avnWeight = Number(e.target.parentElement.parentElement.dataset.weight);
+          totalWeight = totalWeight - avnWeight;
+        }
+        console.log(weightTxt.textContent);
+        weightTxt.textContent = totalWeight + 'kg';
         if (isChecked && visibleBtns > 0) {
-          colBtn.classList.remove('hidden');
-          colBtn.classList.add('block');
-          delBtn.classList.remove('hidden');
-          delBtn.classList.add('block');
+          btnCont.classList.remove('hidden');
+          btnCont.classList.add('block');
           return;
         } else if (visibleBtns < 1) {
-          colBtn.classList.remove('block');
-          colBtn.classList.add('hidden');
-          delBtn.classList.remove('block');
-          delBtn.classList.add('hidden');
+          btnCont.classList.remove('block');
+          btnCont.classList.add('hidden');
           return;
         }
       });

@@ -7,9 +7,11 @@ function initTransferNotes () {
      */
     const URLROOT = 'http://localhost/SAM/';
     const tNoteRows = document.querySelectorAll(".tnoterow");
-    const tnoteChecks = document.querySelectorAll(".tCheck")
+    const tnoteChecks = document.querySelectorAll(".tCheck");
+    const btnCont = document.querySelector(".btnContainer");
     const colBtn = document.querySelector(".colBtn");
     const delBtn = document.querySelector(".delBtn");
+    const weightTxt = document.querySelector('.weightTxt');
     const deleteBtn = document.querySelector(".delete");
 
     let i;
@@ -17,6 +19,8 @@ function initTransferNotes () {
     let k;
     let l;
     let checks;
+    let totalWeight = 0;
+    let avnWeight = 0;
 
     if(tNoteRows.length > 1) {
         for (i=0; i < tNoteRows.length; i++ ) {
@@ -28,26 +32,36 @@ function initTransferNotes () {
     }
     let visibleBtns = 0
     let wkos = []
+    //this eventualy needs recoding to 'target nearest' listener instead of adding a listener to every checkbox
     if(tnoteChecks.length > 1) {
         for (j=0; j < tnoteChecks.length; j++) { //need to check value of all check boxes and sum total
             tnoteChecks[j].addEventListener("change", (e) => { //if total is > 0 then show btns otherwise hide them
                 let isChecked = e.target.checked
-                let wkoid = e.target.parentElement.dataset.id
-                isChecked ? visibleBtns++ : visibleBtns--
+                // let wkoid = e.target.parentElement.dataset.id
+                
+                // isChecked ? visibleBtns++ : visibleBtns--
+                if (isChecked) {
+                    visibleBtns++;
+                    avnWeight = Number(e.target.parentElement.parentElement.dataset.weight);
+                    totalWeight = totalWeight + avnWeight;
+                } else {
+                    visibleBtns--;
+                    avnWeight = Number(e.target.parentElement.parentElement.dataset.weight);
+                    totalWeight = totalWeight - avnWeight;
+                }
+                console.log(weightTxt.textContent);
+                weightTxt.textContent = totalWeight + 'kg';
                 if (isChecked && visibleBtns>0) {
-                    colBtn.classList.remove('hidden');
-                    colBtn.classList.add('block');
-                    delBtn.classList.remove('hidden');
-                    delBtn.classList.add('block');
+                    btnCont.classList.remove('hidden');
+                    btnCont.classList.add('block');
                     return; 
                 } else if(visibleBtns<1) {
-                    colBtn.classList.remove('block');
-                    colBtn.classList.add('hidden');
-                    delBtn.classList.remove('block');
-                    delBtn.classList.add('hidden');
+                    btnCont.classList.remove('block');
+                    btnCont.classList.add('hidden');
                     return; 
                 } 
             })
+
         }
 
         colBtn.addEventListener('click', (e) => {

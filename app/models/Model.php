@@ -24,7 +24,7 @@
             return $results;
         }
 
-        public function getModelsForTNs($workorders) {
+        public function getModelsForTNs(object $workorders) {
             // $this->db->query('select * from models');
             // $results = $this->db->resultSet();  
             // $models=[];  
@@ -34,18 +34,25 @@
             return $models;
         }
 
-        public function getModelFromMid($mid) {
+        public function getModelFromMid(int $mid) {
             $this->db->query('SELECT * FROM models WHERE mid = :mid');
             $this->db->bind(':mid' , $mid);
             $model = $this->db->single();
             return $model;
         }           
 
-        public function getMidFromName($name) {
-            $this->db->query('Select mid FROM models WHERE name = :name');
+        public function getMidFromName(string $name) {
+            $this->db->query('SELECT mid FROM models WHERE name = :name');
             $this->db->bind(':name', $name);
             $mid = $this->db->single();
             return $mid->mid;
+        }
+
+        public function getWeightFromMid(int $mid) {
+            $this->db->query('SELECT weight FROM models WHERE mid = :mid');
+            $this->db->bind(':mid', $mid);
+            $weight = $this->db->single();
+            return $weight->weight;
         }
     }
 

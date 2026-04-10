@@ -17,6 +17,7 @@
             - Pop-up function to add serials to AVNs with To Be Confirmed serial range<br>
             - Fix pagination<br>
             - Fix grille saving/loading/pdesc for mb212 brushed steel <br>
+            - Fix serial retreival from PDF in weird edge cases where product name is specified in given serial ranges <br>
         <BR>
         <strong class="border-b-2">Transport Page:</strong><BR>
             - Calculate total weight for delivery<BR>  

@@ -20,7 +20,12 @@
             return $product;
         }
 
-
+        public function getMidfromPid(int $pid):int {
+            $this->db->query('SELECT cab_model_id from finished_product WHERE pid = :pid');
+            $this->db->bind(':pid', $pid);
+            $mid = $this->db->single();
+            return $mid->cab_model_id;
+        }
        
        
         public function addPidFromOptions($data) {
