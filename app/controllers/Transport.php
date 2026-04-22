@@ -28,20 +28,7 @@ class Transport extends Controller {
             $mid = $this->poModel->getMidFromPid($workorder->pid);
             $workorder->weight = $this->moModel->getWeightFromMid($mid);
         } 
-        // foreach($avaliableworkorders as $workorder) {
-        //     $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-        //     $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-        //     if(!empty($workorder->product->finish_id)) {$workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);}
-
-        //     $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
-        //     $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
-        //     $workorder->pdesc = $this->poModel->createProductDescription($workorder);
-        //     unset($workorder->product);
-        //     unset($workorder->model);
-        //     unset($workorder->cab_finish);
-        //     unset($workorder->grille_finish);
-        //     unset($workorder->waveguide);
-        // } 
+        
         
         $data = (object) array (
             'activetransportnotes' => $activetransportnotes,
@@ -58,19 +45,25 @@ class Transport extends Controller {
         $workorders = $this->woModel->getWorkOrdersFromTransportNote($tnid);
         $models = $this->moModel->getModelsForTNs($workorders);
         // $models = [];
+        $descriptionService = new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
         foreach($workorders as $workorder) {
-            $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-            $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
-            $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
-            $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
-            $workorder->pdesc = $this->poModel->createProductDescription($workorder);
-            unset($workorder->product);
-            unset($workorder->model);
-            unset($workorder->cab_finish);
-            unset($workorder->grille_finish);
-            unset($workorder->waveguide);
+            $workorder = $descriptionService->createShortProductDescription($workorder);
+            $mid = $this->poModel->getMidFromPid($workorder->pid);
+            $workorder->weight = $this->moModel->getWeightFromMid($mid);
         } 
+        // foreach($workorders as $workorder) {
+        //     $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
+        //     $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
+        //     $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
+        //     $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
+        //     $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
+        //     $workorder->pdesc = $this->poModel->createProductDescription($workorder);
+        //     unset($workorder->product);
+        //     unset($workorder->model);
+        //     unset($workorder->cab_finish);
+        //     unset($workorder->grille_finish);
+        //     unset($workorder->waveguide);
+        // } 
         $data = (object) array (
             'transportnote' => $transportnote,
             'workorders' => $workorders

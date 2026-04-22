@@ -85,7 +85,7 @@
                                         break;
                                 }
                             ?>
-                            <tr class="text-center items-center border-4 worow <?php if(!empty($trClass)){echo $trClass;} ?>" data-id="<?php echo $workorder->work_order_id; ?>">
+                            <tr class="text-center border-4 worow <?php if(!empty($trClass)){echo $trClass;} ?>" data-id="<?php echo $workorder->work_order_id; ?>">
                                 <?php if($workorder->wko_status !='Completed') :?>
                                     <td class="text-nowrap text-sm" style="font-size:0.7rem"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
                                     <td class="text-nowrap"><?php echo $workorder->wko ?></td>
@@ -101,7 +101,7 @@
                                     <td><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
                                     <td><a href="javascript:void(0)" data-qty="<?php echo $workorder->quantity?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
                                     <td><a href="<?php echo URLROOT; ?>workorders/edit/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/editicon.php'; ?></a></td>
-                                    <td class=""><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td>
+                                    <td><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td>
                                     <?php endif ;?>
                             </tr>
                         <?php endforeach; ?>
@@ -129,7 +129,7 @@
                 </p>
             </div>
             <div>
-            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination" data-wkos="act">
                 
                 <a href="#" class="pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
                 <span class="sr-only">Previous</span><?php include APPROOT.'/views/components/icons/previousicon.php';?>
@@ -147,25 +147,18 @@
                                 echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
                                 echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
                                 //page btn $pages -1
-                                echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" id="'.($pages-2).'"">'.($pages-1).'</a>'; 
+                                echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-2).'"">'.($pages-1).'</a>'; 
                                 //page btn $pages
                                 echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
                                 break;
                             default: 
-                                for ($i = 1; $i <= $pages; $i++) {
+                                for ($i = 1; $i < $pages; $i++) {
                                     echo '<a class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.($i===1 ? '' : '').'" data-page="'.($i-1).'">'.$i.'</a>'; 
                                 }
                                 break;
                         }
                         
                     ?>
-                    <!-- <a href="#" aria-current="page" class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">1</a> -->
-                    <!-- <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">2</a> -->
-                    <!-- <a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">3</a> -->
-                    <!-- <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span> -->
-                    <!-- <a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">8</a> -->
-                    <!-- <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">9</a> -->
-                    <!-- <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">10</a> -->
                 <?php endif ?>
                 <a href="#" class="pgBtn pgBtnArrow rounded-r-md  hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
                 <span class="sr-only">Next</span><?php include APPROOT.'/views/components/icons/nexticon.php';?>

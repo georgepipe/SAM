@@ -31,9 +31,9 @@
     margin: 0 auto 2rem;
     padding: 0 1.25rem;
     text-align: center;
-    font-size: 0.98rem;
+    font-size: 1.5rem;
     line-height: 1.6;
-    color: #444444;
+    color:#000000;
 }
 
 .spec-page {

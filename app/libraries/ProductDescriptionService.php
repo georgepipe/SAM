@@ -110,7 +110,8 @@ class ProductDescriptionService{
             };
         };
         if($grille == '') {$grille = 'no grille, ';}
-        $workorder->pdesc = $name.' '.$scolour.' ('.$workorder->model->type.')'.$cabFinishName.$grille;    
+        $scolour ? '' : $scolour = $waveguide_finish_id;
+        $workorder->pdesc = $name.' '.$scolour.' '.$cabFinishName.$grille;    
         
         unset($workorder->product);
         unset($workorder->model);
