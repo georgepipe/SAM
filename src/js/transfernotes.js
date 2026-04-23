@@ -88,7 +88,6 @@ function initTransferNotes () {
         })
     }
 
-//document.write('test point');
 }
 
 export { initTransferNotes }

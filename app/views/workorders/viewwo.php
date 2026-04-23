@@ -126,6 +126,7 @@
 }
 </style>
 <?php
+
 // model
 $model = $data->workorder->model->name ?? '';
 
@@ -137,7 +138,7 @@ if ($finish !== '') {
 }
 
 // grille
-$grille = $data->workorder->product->grille_finish_id ?? '';
+$grille = $data->workorder->product->grille_finish_id->name ?? '';
 
 // waveguide
 $waveguide = $data->workorder->waveguide->name ?? '';

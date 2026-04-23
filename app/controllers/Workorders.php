@@ -124,26 +124,21 @@ class Workorders extends Controller {
                     die ('something went wrong');
                 }
             } else {
-            //reload view with errors
-            $models = $this->moModel->getModelNames();
-            $finishes = $this->woModel->getFinishes();
-            if (!empty($data->form) && !empty($data->form->cab_model_id)) {
-                $data->form->product = $this->poModel->getProductFromPid($data->form->pid);
-                // $data->form->cab_finish = $this->woModel->getFinishfromId($data->product->finish_id);
-                // $data->form->grille_finish = $this->woModel->getFinishfromId($data->product->grille_finish_id);
-                $data->form->waveguide = $this->woModel->getFinishfromId($data->product->waveguide_finish_id);
-            };
-            $data = (object) [
-                
-                'finishes' => $finishes,
-                'errors' => $data->errors,
-                'models' => $models,
-                'data' => $data->form
-            ];
-            // echo '<PRE>';
-            // print_r($data);
-            // die('<BR>we dyin');
-            $this->view('workorders/add', $data);
+                //reload view with errors
+                $models = $this->moModel->getModelNames();
+                $finishes = $this->woModel->getFinishes();
+                if (!empty($data->form) && !empty($data->form->cab_model_id)) {
+                    $data->form->product = $this->poModel->getProductFromPid($data->form->pid);
+                    $data->form->waveguide = $this->woModel->getFinishfromId($data->product->waveguide_finish_id);
+                };
+                $data = (object) [
+                    
+                    'finishes' => $finishes,
+                    'errors' => $data->errors,
+                    'models' => $models,
+                    'data' => $data->form
+                ];
+                $this->view('workorders/add', $data);
             }
 
         }   else {
@@ -162,7 +157,7 @@ class Workorders extends Controller {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             //sanitise POST array
                $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-               $data = (object) array (
+               $form = (object) array (
                 'work_order_id' => $id,
                 'wko' => trim($_POST['wko']),
                 'avn' => trim($_POST['avn']),
@@ -180,76 +175,41 @@ class Workorders extends Controller {
                 'pid' => ''
             );
    
-               $errors = (object) array (
-                   'err_wko' => '',
-                   'err_avn' => '',
-                   'err_cab_model_id' => '',
-                   'err_cab_finish_id' => '',
-                   'err_connectors' => '',
-                   'err_quantity' => '',
-                   'err_wko_status' => '',
-                   'err_serials' => ''
-               );
+               $errors = $this->initialiseErrors();
    
                $data = (object) array ( 
-                   'data' => $data,
+                   'form' => $data,
                    'errors' => $errors
                );
                 //validate post data//
-            //    if(empty($data->data->wko)) {
-            //        $data->errors->err_wko = 'Please enter work order reference';
-            //    }
-            //    if(empty($data->data->avn)) {
-            //        $data->errors->err_avn = 'Please enter advice note reference';
-            //    }
-               if(empty($data->data->cab_model_id)) {
-                   $data->errors->err_cab_model = 'Please select the cabinet model';
-               }
-               if(empty($data->data->cab_finish_id) && empty($data->data->waveguide_finish_id)) {
-                $data->errors->err_cab_colour = 'Please select the cabinet finish';
-            } 
-               if(empty($data->data->quantity)) {
-                   $data->errors->err_quantity = 'Please enter a quantity';
-               }
-               if(empty($data->data->serials)) {
-                   $data->data->serials = 'To Be Confirmed';
-               }
+                $ruleService= new WorkorderRuleService($this->woModel, $this->moModel);
+                $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
+                $data = $ruleService->apply($data);
+                $data = $validationService->validate($data);
+                $errors = $validationService->hasErrors($data->errors);
 
-               $data->data->pid = $this->woModel->getPidFromOptions($data->data); 
-            //    echo $data->pid;
-            //    die('osahdoihas');
-           //if number of serials doesnt match quantity throw error
-               //todo
-           // check for errors
-               $errors = '';
-                   foreach($data->errors as $error) {
-                   if($error != '') {
-                       $errors = 'TRUE';
-                   }
-               }
-               if (!$errors === TRUE) {
-           // if(empty($data['errors']->err_avn) && empty($data['errors']->err_wko) && empty($data['errors']->err_cab_model) && empty($data['errors']->err_cab_colour) && empty($data['errors']->err_quantity)) {
-             //if validated run the edit method
-                    if ($this->woModel->editOrder($data->data)){
-                        flash('post_message', 'Workorder Updated');
-                        redirect('workorders/index');
-                    } else {
-                        die ('<br> something went wrong');
-                    };
+               
+            if (!$errors) {
+                if ($this->woModel->editOrder($data->data)){
+                    flash('post_message', 'Workorder Updated');
+                    redirect('workorders/index');
+                } else {
+                    die ('<br> something went wrong');
+                };
             } else {
-         //else reload with errors
-         $data = (object) [
-            'models' => $this->moModel->getModelNames(),
-            'finishes' => $this->woModel->getFinishes(),
-            'data' => $this->woModel->getWorkorderById($id),
-            'errors' => $data->errors
-        ];
-        if (!empty($data->data)) {
-            $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
-            if(!empty($data->data->product->waveguide_finish_id)) {
-            $data->data->waveguide_finish_id = $this->woModel->getFinishfromId($data->data->product->waveguide_finish_id);}
-        };
-            $this->view('workorders/edit', $data);
+            //else reload with errors
+                $data = (object) [
+                    'models' => $this->moModel->getModelNames(),
+                    'finishes' => $this->woModel->getFinishes(),
+                    'data' => $this->woModel->getWorkorderById($id),
+                    'errors' => $data->errors
+                ];
+                if (!empty($data->data)) {
+                    $data->data->product = $this->poModel->getProductFromPid($data->data->pid);
+                    if(!empty($data->data->product->waveguide_finish_id)) {
+                    $data->data->waveguide_finish_id = $this->woModel->getFinishfromId($data->data->product->waveguide_finish_id);}
+                };
+                    $this->view('workorders/edit', $data);
             }
         }  else { //not a post request
             if ($id === 0) { //no order ID
@@ -266,8 +226,6 @@ class Workorders extends Controller {
                 if(!empty($data->data->product->waveguide_finish_id)) {
                 $data->data->waveguide_finish_id = $this->woModel->getFinishfromId($data->data->product->waveguide);}
             };
-            
-
          //load edit page with workorder data 
             $this->view('workorders/edit', $data);
             };
@@ -317,11 +275,14 @@ class Workorders extends Controller {
 
     public function split($work_order_id, $sPoint) {
         $todaysDate = date('m/d/Y', time());
+
         $originalWorkorder = $this->woModel->getWorkorderById($work_order_id);
+
         $newQuantity = $originalWorkorder->quantity - $sPoint; 
         $sCount = $this->seModel->expandSerials($originalWorkorder->serials);
         $firstHalf = array_slice($sCount,0, $sPoint); 
         $secondHalf = array_slice($sCount,$sPoint, );
+
         //contract serials again before saving back to original WKO and creating new WKO
         $firstHalf = $this->seModel->contractSerials($firstHalf);
         $secondHalf = $this->seModel->contractSerials($secondHalf);
@@ -329,16 +290,15 @@ class Workorders extends Controller {
         //echo 'second half: '.$secondHalf.'<BR>';
         $newWorkorder = unserialize(serialize($originalWorkorder));
         $originalWorkorder->serials = $firstHalf;
-        unset($newWorkorder->created_at);
-        unset($newWorkorder->updated_at);
-        unset($newWorkorder->work_order_id);
         $newWorkorder->serials = $secondHalf;
+        
         $newWorkorder->wko_notes = $newWorkorder->wko_notes.'Order split on '.$todaysDate; 
         $originalWorkorder->wko_notes = 'Order split on '.$todaysDate;
         $originalWorkorder->quantity = $sPoint;
         $newWorkorder->quantity = $newQuantity;
-        // print_r($originalWorkorder);
-        // print_r($newWorkorder);
+
+        unset($newWorkorder->created_at);
+        unset($newWorkorder->work_order_id);
         $this->woModel->editOrder($originalWorkorder);
         $this->woModel->addOrder($newWorkorder);
         redirect('workorders/index');

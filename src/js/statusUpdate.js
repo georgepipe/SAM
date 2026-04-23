@@ -26,6 +26,7 @@ const URLROOT = "localhost/SAM/"
  */
 
 document.addEventListener('click', async function (e) {
+    e.stopPropagation();
     const cell = e.target.closest('.wko-status-cell'); //<--- this sets the cell to be the closest wko status cell
     if(!cell) return;
     if(cell.querySelector('select')) return;
@@ -35,7 +36,7 @@ document.addEventListener('click', async function (e) {
     
 
     let select = document.createElement('select');
-    select.className = 'wko-status-select';
+    select.className = 'wko-status-select text-black';
 
     WORKORDER_STATUSES.forEach(status =>{
         const option = document.createElement('option');
@@ -57,6 +58,10 @@ document.addEventListener('click', async function (e) {
         cell.dataset.wkoStatus = statusText;
         cell.innerHTML = `<span class="wko-status-text">${statusText}</span>`; // ` <-- this is a back tick or grave accent, known in js as a template liberal
     }
+
+    select.addEventListener("blur", () => {
+        restoreText(workorderStatus);
+    })
 
     select.addEventListener('change', async () => {
         //now trigger the API

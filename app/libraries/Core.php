@@ -28,7 +28,8 @@
                         if($url[0]==='advice_notes'){
                             header("Location: ".URLROOT."pages/_404");
                         } else {
-                            throwErr(404, "Controller not found!");
+                            $url = $this->getUrl();
+                            throwErr(404, "The controller '".$url[0]."' cannot be found! Please check your url & try again.");
                         }
                     }
                 }

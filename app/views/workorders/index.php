@@ -4,37 +4,37 @@
 
 
 <?php 
-        $url = rtrim($_SERVER['REQUEST_URI'], '/');
-        $url = filter_var($url, FILTER_SANITIZE_URL);
-        $url = explode('/',$url);?>
+    $url = rtrim($_SERVER['REQUEST_URI'], '/');
+    $url = filter_var($url, FILTER_SANITIZE_URL);
+    $url = explode('/',$url);?>
 
 <div class="fade-in">
     <div class=" border-b-4 ">
         <ul 
-                    class="hidden w-full py-5 px-5 flex-row sm:flex sm:w-fit gap-3 items-center" 
-                    type="menu" 
-                    data-target="nav" 
+            class="hidden w-full py-5 px-5 flex-row sm:flex sm:w-fit gap-3 items-center" 
+            type="menu" 
+            data-target="nav" 
             >
             <li class="py-3 px-2 rounded-md group relative">
-                    <a 
-                        class="p-2 text-black actWkosBtn" 
-                        href="<?php echo URLROOT.'workorders/index?p=aw';?>">
-                    Active Workorders</a>
-                    <span class="absolute -bottom-1 left-0 w-0 fill-black block"></span>
+                <a 
+                    class="p-2 text-black actWkosBtn" 
+                    href="<?php echo URLROOT.'workorders/index?p=aw';?>">
+                Active Workorders</a>
+                <span class="absolute -bottom-1 left-0 w-0 fill-black block"></span>
             </li>
             <li class="py-3 px-2 rounded-md group relative">
-                    <a 
-                        class="text-black p-2 comWkosBtn" 
-                        href="<?php echo URLROOT.'workorders/index?p=cw';?>">
-                    Completed Workorders</a>
-                    <span class="absolute -bottom-1 left-0 w-0 fill-black block"></span>
+                <a 
+                    class="text-black p-2 comWkosBtn" 
+                    href="<?php echo URLROOT.'workorders/index?p=cw';?>">
+                Completed Workorders</a>
+                <span class="absolute -bottom-1 left-0 w-0 fill-black block"></span>
             </li>
             <li class="py-3 px-2 rounded-md group relative">
-                    <a 
-                        class="text-black p-2 addWkoBtn" 
-                        href="<?php echo URLROOT.'workorders/add';?>">
-                    Add Workorder</a>
-                    <span class="absolute -bottom-1 left-0 w-0 fill-black block"></span>
+                <a 
+                    class="text-black p-2 addWkoBtn" 
+                    href="<?php echo URLROOT.'workorders/add';?>">
+                Add Workorder</a>
+                <span class="absolute -bottom-1 left-0 w-0 fill-black block"></span>
             </li>
         </ul>
     </div>
@@ -42,8 +42,8 @@
     <?php if(isset($_SESSION['post_message'])) {echo flash('post_message');} ?>
 
     <div class="activeWkos dispContainer <?php 
-                                if (isset($url[3])) { if ($url[3]!="index?p=cw") {echo 'block';} else {echo 'hidden';}}
-                            ?>">
+        if (isset($url[3])) { if ($url[3]!="index?p=cw") {echo 'block';} else {echo 'hidden';}}
+        ?>">
         <div class="border-red-600">
             <h1 class="flex justify-center text-lg"><strong><U>Active Work Orders</U></strong></h1>
             <section class="flex flex-col">
@@ -87,22 +87,20 @@
                             ?>
                             <tr class="text-center border-4 worow <?php if(!empty($trClass)){echo $trClass;} ?>" data-id="<?php echo $workorder->work_order_id; ?>">
                                 <?php if($workorder->wko_status !='Completed') :?>
-                                    <td class="text-nowrap text-sm" style="font-size:0.7rem"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
+                                    <td class="text-nowrap text-sm" style="font-size: 0.7rem"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
                                     <td class="text-nowrap"><?php echo $workorder->wko ?></td>
-                                    <td class=" text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
+                                    <td class="text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
                                     <td id="qty"><?php echo $workorder->quantity ?></td>
-                                    <td class=" font-size:10px"><?= htmlspecialchars($workorder->serials) ?></td>
-                                    <td class="wko-status-cell" data-wko-id="<?= htmlspecialchars($workorder->work_order_id) ?>" data-wko-status="<?= htmlspecialchars($workorder->wko_status) ?>">
-                                        <span class="wko-status-text"><?= htmlspecialchars($workorder->wko_status) ?></span>
-                                    </td>
+                                    <td class="text-xs"><?= htmlspecialchars($workorder->serials) ?></td>
+                                    <td class="wko-status-cell" data-wko-id="<?= htmlspecialchars($workorder->work_order_id) ?>" data-wko-status="<?= htmlspecialchars($workorder->wko_status) ?>"><?= htmlspecialchars($workorder->wko_status) ?></td>
                                     <td><?= htmlspecialchars($workorder->wko_delivery) ?></td>
                                     <td class="min-w-24"><?php echo $workorder->wko_notes ?></td>
                                     <td><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
                                     <td><a href="javascript:void(0)" data-qty="<?php echo $workorder->quantity?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
                                     <td><a href="<?php echo URLROOT; ?>workorders/edit/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/editicon.php'; ?></a></td>
-                                    <td><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></td>
-                                    <?php endif ;?>
+                                    <td><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></a></td>
+                                <?php endif ;?>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -138,7 +136,7 @@
                 <?php if($data['acWkoCount']>0) :?>
                     <?php 
                         $i = 0;
-                        $pages = $data['acWkoCount'] % 10 != 0 ? round($data['acWkoCount'] / 10 + 1,0,PHP_ROUND_HALF_DOWN) : $data['acWkoCount'] / 10; //calculate no of pages from results
+                        $pages = ceil($data['acWkoCount'] / 10); //calculate no of pages from results
                         switch (TRUE) {
                             case ($pages > 5):
                                 //page btn 1
@@ -152,7 +150,8 @@
                                 echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
                                 break;
                             default: 
-                                for ($i = 1; $i < $pages; $i++) {
+                                //for i
+                                for ($i = 1; $i <= $pages; $i++) {
                                     echo '<a class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.($i===1 ? '' : '').'" data-page="'.($i-1).'">'.$i.'</a>'; 
                                 }
                                 break;
@@ -237,7 +236,7 @@
                 <?php if($data['coWkoCount']>0) :?>
                     <?php 
                         $i = 0;
-                        $pages = $data['coWkoCount'] % 10 != 0 ? round($data['coWkoCount'] / 10 + 1,0,PHP_ROUND_HALF_DOWN) : $data['coWkoCount'] / 10; //calculate no of pages from results
+                        $pages = ceil($data['coWkoCount'] / 10); //calculate no of pages from results
                         switch (TRUE) {
                             case ($pages > 5):
                                 //page btn 1
@@ -251,9 +250,9 @@
                                 echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
                                 break;
                             default: 
-                                for ($i = 1; $i < $pages; $i++) {
+                                for ($i = 1; $i <= $pages; $i++) {
                                     if ($i === 1) {
-                                        echo '<a href="#" class="pgBtn pgBtnNum selPgBtn">1</a>';  
+                                        echo '<a href="#" class="pgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
                                     } else {
                                         echo '<a class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
                                         }

@@ -22,21 +22,14 @@
                 } 
 
                 $this->jsonResponse($activeWorkorders);
+
             } elseif ($type === 'completed') {
                 $completedWorkorders = $this->woModel->getCompletedOrders($page);
+                $descriptionService = new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
                 foreach($completedWorkorders as $workorder) {
-                    $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-                    $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-                    $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->finish_id);
-                    $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id);
-                    $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide);
-                    $workorder->pdesc = $this->poModel->createProductDescription($workorder);
-
-                    unset($workorder->product);
-                    unset($workorder->model);
-
-                    $this->jsonResponse($completedWorkorders);
+                    $workorder = $descriptionService->createProductDescription($workorder);
                 } 
+                $this->jsonResponse($completedWorkorders);
             }
         } 
 

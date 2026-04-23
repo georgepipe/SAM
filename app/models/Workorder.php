@@ -107,6 +107,7 @@ class Workorder {
 
 
         public function addOrder(object $data): bool {
+            // dumpAndDie($data);
             $data->avn = $data->avn ?? 0;
             $data->wko = $data->wko ?? 0;
             $this->db->query('INSERT INTO work_orders 
