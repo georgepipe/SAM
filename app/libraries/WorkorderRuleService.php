@@ -70,8 +70,9 @@
 
         private function getGrilleFinishIdFromString(object $data): void {
             //  get grille colour from pdf grille input
-            $explodedGrille = explode(' ',$data->form->grille_finish_id);
-            $data->form->grille_finish_id = $explodedGrille[0];
+            $decoded = html_entity_decode($data->form->grille_finish_id);
+            $regex = "/\s*s'steel/i";
+            $data->form->grille_finish_id = preg_replace($regex,'',$decoded);
             if (!is_numeric($data->form->grille_finish_id) && !empty($data->form->grille_finish_id)) {
                 $data->form->grille_finish_id = $this->woModel->getFidFromName($data->form->grille_finish_id, 0); 
             }
@@ -97,7 +98,12 @@
         }
 
         public function defaultConnectors($cabModelID): string {
-            return WorkorderRuleConfig::DEFAULT_CONNECTORS[(string)$cabModelID] ?? 'NL4';
+            foreach(WorkorderRuleConfig::DEFAULT_CONNECTORS as $connector => $values) {
+                if(in_array($cabModelID, $values, TRUE)) {
+                    return $connector;
+                }
+            }
+            // return WorkorderRuleConfig::DEFAULT_CONNECTORS[(string)$cabModelID] ?? 'NL4';
         }
 
         public function requiresWaveguideFinish($cabModelID): bool {

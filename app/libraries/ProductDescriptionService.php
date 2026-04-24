@@ -101,9 +101,10 @@ class ProductDescriptionService{
             if(!is_bool($workorder->grille_finish)) {
                 if(!is_bool($workorder->grille_finish->type)) {
                     $grille = match($workorder->grille_finish->type) {
-                        'Standard' => "M/Steel ".$workorder->grille_finish->name." grille, ",
-                        'Weather Resitant' => "S/Steel ".$workorder->grille_finish->name." grille, ",
-                        'Custom Weather Resistant' => "S/Steel ".$workorder->grille_finish->name." grille, ",
+                        'Standard' => $workorder->grille_finish->name."m/steel grille, ",
+                        'Weather Resitant' => $workorder->grille_finish->name."s/steel grille, ",
+                        'Custom Weather Resistant' => $workorder->grille_finish->name."s/steel grille, ",
+                        'Metal' => $workorder->grille_finish->name."s/steel grille, ",
                         default => '',
                     };
                 };

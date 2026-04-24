@@ -4,15 +4,13 @@
 class Workorder {
     
     private $db;
-    // private $moModel;
-    // private $poModel;
 
         public function __construct() {
             $this->db = new Database;
             // $this->moModel = new Model();
             // $this->poModel = new Product();
         }
-
+//GETTERS
         public function getOrders(int $page = 1){
             switch ($page) {
                 case 1:
@@ -49,17 +47,16 @@ class Workorder {
         public function getCompletedOrders(int $page = 0){
             switch ($page) {
                 case 0:
-                    $this->db->query('select * from work_orders where wko_status = "Completed" order by created_at desc limit 10');
+                    $this->db->query('select * from work_orders where wko_status = "Completed" order by completed_at desc limit 10');
                     break;
                 default:
                     $offset = $page * 10;
-                    $this->db->query('select * from work_orders where wko_status = "Completed" order by created_at desc limit 10 offset :offset');
+                    $this->db->query('select * from work_orders where wko_status = "Completed" order by completed_at desc limit 10 offset :offset');
                     $this->db->bind(':offset',$offset);    
             }
             $results = $this->db->resultSet();
             return $results;
         }
-
 
         public function getFinishes(){
             $this->db->query('select * from finishes');
@@ -105,7 +102,130 @@ class Workorder {
             return $results;
         }
 
+        public function getWorkorderByWko(string $wko) {
+            $this->db->query('SELECT * FROM work_orders WHERE wko = :wko');
+            $this->db->bind(':wko', $wko);
+            $row = $this->db->single();
+            return $row;
+        }
 
+        public function getWorkorderByAvn(int $avn) {
+            $this->db->query('SELECT * FROM work_orders WHERE avn = :avn');
+            $this->db->bind(':avn', $avn);
+            $row = $this->db->single();
+            return $row;
+        }
+
+        public function getWorkorderById(int $id) {
+            $this->db->query('SELECT * FROM work_orders WHERE work_order_id = :work_order_id');
+            $this->db->bind(':work_order_id', $id);
+            $this->db->execute();
+            $row = $this->db->single();
+            return $row;
+        }
+
+        public function getAvaliableWorkOrdersForTransport() {
+            $this->db->query('SELECT * FROM work_orders WHERE tnid is null and wko_status = "Completed" LIMIT 25');
+            try {
+                $results = $this->db->resultSet();} catch (PDOException $e) {
+                    print_r($e);
+                }
+            return $results; 
+        }
+
+        public function getWorkOrdersFromTransportNote(int $tnid) {
+            //do things
+            $this->db->query('SELECT * FROM work_orders WHERE tnid = :tnid');
+            $this->db->bind(':tnid', $tnid); 
+            $results = $this->db->resultSet();
+            return $results;
+        }
+
+        public function getWorkOrdersWithTransportNotes() {
+            $this->db->query('select * from work_orders where not tnid = "null"');
+            $results = $this->db->resultSet();
+            return $results;
+        }    
+
+        public function getPidFromOptions(object $data) {
+            switch(empty($data->waveguide_finish_id)) {
+                case 0: //has waveguide
+                    switch(empty($data->grille_finish_id)) {
+                        case 0: //has grille
+                            $this->db->query('SELECT pid FROM finished_product WHERE 
+                            cab_model_id = :cab_model_id AND 
+                            cab_finish_id = :cab_finish_id AND 
+                            grille_finish_id = :grille_finish_id AND 
+                            waveguide = :waveguide');
+                            $this->db->bind(':cab_model_id', $data->cab_model_id);
+                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
+                            $this->db->bind(':grille_finish_id', $data->grille_finish_id);
+                            $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
+                            break;
+                        case 1: //no grille
+                            switch(empty($data->cab_finish_id)) {
+                                case 0:
+                                    $this->db->query('SELECT pid FROM finished_product WHERE 
+                                    cab_model_id = :cab_model_id AND 
+                                    cab_finish_id = :cab_finish_id AND 
+                                    grille_finish_id is null AND 
+                                    waveguide = :waveguide_finish_id');
+                                    $this->db->bind(':cab_model_id', $data->cab_model_id);
+                                    $this->db->bind(':cab_finish_id', $data->cab_finish_id);
+                                    $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
+                                    break;
+                                case 1:
+                                    $this->db->query('SELECT pid FROM finished_product WHERE 
+                                    cab_model_id = :cab_model_id AND 
+                                    cab_finish_id is null AND 
+                                    grille_finish_id is null AND 
+                                    waveguide = :waveguide_finish_id');
+                                    $this->db->bind(':cab_model_id', $data->cab_model_id);
+                                    $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
+                            }
+                            break;
+                    }
+                    break;
+                case 1: //no waveguide
+                    switch(empty($data->grille_finish_id)) {
+                        case 0: //has grille
+
+                            $this->db->query('SELECT * FROM finished_product WHERE 
+                                cab_model_id = :cab_model_id and 
+                                cab_finish_id = :cab_finish_id AND 
+                                grille_finish_id = :grille_finish_id AND 
+                                waveguide is NULL');
+                            $this->db->bind(':cab_model_id', $data->cab_model_id);
+                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
+                            $this->db->bind(':grille_finish_id', $data->grille_finish_id);
+
+                            // dumpAndDie($data);
+
+                        break;
+                        case 1: //no grille
+                            $this->db->query('SELECT pid FROM finished_product WHERE 
+                                cab_model_id = :cab_model_id AND 
+                                cab_finish_id = :cab_finish_id AND 
+                                grille_finish_id is null AND 
+                                waveguide is null');
+                            $this->db->bind(':cab_model_id', $data->cab_model_id);
+                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
+                        break;
+
+                    }
+                    break;
+            };
+            
+            $results = $this->db->single();
+            if(isset($results->pid)){
+                return $results->pid; 
+            } else {
+                return 0;
+            }
+            
+        }
+
+//SETTERS
         public function addOrder(object $data): bool {
             // dumpAndDie($data);
             $data->avn = $data->avn ?? 0;
@@ -141,13 +261,14 @@ class Workorder {
                 wko_delivery = :wko_delivery,
                 wko_notes = :wko_notes,
                 updated_at = :updated_at
-                WHERE work_order_id = :work_order_id');
+                WHERE work_order_id = :work_order_id'
+            );
             // print 'prebind <br>';
 
             date_default_timezone_set('Europe/London');
-        ////bind values
-        // print_r($data);
-        // die('asdadas');
+            ////bind values
+            // print_r($data);
+            // die('asdadas');
             $this->db->bind(':work_order_id',  $data->work_order_id);
             $this->db->bind(':wko',  $data->wko);
             $this->db->bind(':avn',  $data->avn);
@@ -227,28 +348,26 @@ class Workorder {
             }
         }
 
-        public function getWorkorderByWko(string $wko) {
-            $this->db->query('SELECT * FROM work_orders WHERE wko = :wko');
-            $this->db->bind(':wko', $wko);
-            $row = $this->db->single();
-            return $row;
+        public function updateWorkorderTnid(object $workorder): bool {
+            $this->db->query('UPDATE work_orders SET tnid = :tnid WHERE work_order_id = :work_order_id');
+            $this->db->bind(':tnid', $workorder->tnid);
+            $this->db->bind(':work_order_id', $workorder->work_order_id);
+
+            try {$this->db->execute();} catch (PDOException $e) {
+                print_r($e);
+            }
+            return $this->db->execute() ? true : false;
+        }      
+
+        public function updateStatus(int $workorderId, string $workorderStatus): bool {
+            $this->db->query('UPDATE work_orders SET wko_status = :wko_status WHERE work_order_id = :work_order_id');
+            $this->db->bind(':wko_status', $workorderStatus);
+            $this->db->bind(':work_order_id', $workorderId);
+
+            return $this->db->execute() ? true : false;
         }
 
-        public function getWorkorderByAvn(int $avn) {
-            $this->db->query('SELECT * FROM work_orders WHERE avn = :avn');
-            $this->db->bind(':avn', $avn);
-            $row = $this->db->single();
-            return $row;
-        }
-
-        public function getWorkorderById(int $id) {
-            $this->db->query('SELECT * FROM work_orders WHERE work_order_id = :work_order_id');
-            $this->db->bind(':work_order_id', $id);
-            $this->db->execute();
-            $row = $this->db->single();
-            return $row;
-        }
-
+//DELETERS
         public function deleteOrder(int $id) {
             $this->db->query('DELETE FROM work_orders WHERE work_order_id = :work_order_id');
          //bind values
@@ -262,115 +381,6 @@ class Workorder {
                 }
         }
 
-        public function getAvaliableWorkOrdersForTransport() {
-            $this->db->query('SELECT * FROM work_orders WHERE tnid is null and wko_status = "Completed" LIMIT 25');
-            try {
-                $results = $this->db->resultSet();} catch (PDOException $e) {
-                    print_r($e);
-                }
-            return $results; 
-        }
-
-        public function getWorkOrdersFromTransportNote(int $tnid) {
-            //do things
-            $this->db->query('SELECT * FROM work_orders WHERE tnid = :tnid');
-            $this->db->bind(':tnid', $tnid); 
-            $results = $this->db->resultSet();
-            return $results;
-        }
-
-        public function getWorkOrdersWithTransportNotes() {
-            $this->db->query('select * from work_orders where not tnid = "null"');
-            $results = $this->db->resultSet();
-            return $results;
-        }    
-
-        public function getPidFromOptions(object $data) {
-            switch(empty($data->waveguide_finish_id)) {
-                case 0: //has waveguide
-                    switch(empty($data->grille_finish_id)) {
-                        case 0: //has grille
-                            $this->db->query('SELECT pid FROM finished_product WHERE 
-                            cab_model_id = :cab_model_id AND 
-                            cab_finish_id = :cab_finish_id AND 
-                            grille_finish_id = :grille_finish_id AND 
-                            waveguide = :waveguide');
-                            $this->db->bind(':cab_model_id', $data->cab_model_id);
-                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
-                            $this->db->bind(':grille_finish_id', $data->grille_finish_id);
-                            $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
-                            break;
-                        case 1: //no grille
-                            switch(empty($data->cab_finish_id)) {
-                                case 0:
-                                    $this->db->query('SELECT pid FROM finished_product WHERE 
-                                    cab_model_id = :cab_model_id AND 
-                                    cab_finish_id = :cab_finish_id AND 
-                                    grille_finish_id is null AND 
-                                    waveguide = :waveguide_finish_id');
-                                    $this->db->bind(':cab_model_id', $data->cab_model_id);
-                                    $this->db->bind(':cab_finish_id', $data->cab_finish_id);
-                                    $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
-                                    break;
-                                case 1:
-                                    $this->db->query('SELECT pid FROM finished_product WHERE 
-                                    cab_model_id = :cab_model_id AND 
-                                    cab_finish_id is null AND 
-                                    grille_finish_id is null AND 
-                                    waveguide = :waveguide_finish_id');
-                                    $this->db->bind(':cab_model_id', $data->cab_model_id);
-                                    $this->db->bind(':waveguide_finish_id', $data->waveguide_finish_id);
-                            }
-                            break;
-                    }
-                    break;
-                case 1: //no waveguide
-                    switch(empty($data->grille_finish_id)) {
-                        case 0: //has grille
-                            $this->db->query('SELECT * FROM finished_product WHERE 
-                                cab_model_id = :cab_model_id and 
-                                cab_finish_id = :cab_finish_id AND 
-                                grille_finish_id = :grille_finish_id AND 
-                                waveguide is NULL');
-                            $this->db->bind(':cab_model_id', $data->cab_model_id);
-                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
-                            $this->db->bind(':grille_finish_id', $data->grille_finish_id);
-
-                        break;
-                        case 1: //no grille
-                            $this->db->query('SELECT pid FROM finished_product WHERE 
-                                cab_model_id = :cab_model_id AND 
-                                cab_finish_id = :cab_finish_id AND 
-                                grille_finish_id is null AND 
-                                waveguide is null');
-                            $this->db->bind(':cab_model_id', $data->cab_model_id);
-                            $this->db->bind(':cab_finish_id', $data->cab_finish_id);
-                        break;
-
-                    }
-                    break;
-            };
-            
-            $results = $this->db->single();
-            if(isset($results->pid)){
-                return $results->pid; 
-            } else {
-                return 0;
-            }
-            
-        }
-
-        public function updateWorkorderTnid(object $workorder): bool {
-            $this->db->query('UPDATE work_orders SET tnid = :tnid WHERE work_order_id = :work_order_id');
-            $this->db->bind(':tnid', $workorder->tnid);
-            $this->db->bind(':work_order_id', $workorder->work_order_id);
-
-            try {$this->db->execute();} catch (PDOException $e) {
-                print_r($e);
-            }
-            return $this->db->execute() ? true : false;
-        }
-
         public function removeTnid(object $workorder): bool {
             $this->db->query('UPDATE work_orders SET tnid = :tnid WHERE work_order_id = :work_order_id');
             $this->db->bind(':tnid', NULL);
@@ -380,31 +390,5 @@ class Workorder {
                 print_r($e);
             }
             return $this->db->execute() ? true : false;
-        }        
-
-        public function updateStatus(int $workorderId, string $workorderStatus): bool {
-            $this->db->query('UPDATE work_orders SET wko_status = :wko_status WHERE work_order_id = :work_order_id');
-            $this->db->bind(':wko_status', $workorderStatus);
-            $this->db->bind(':work_order_id', $workorderId);
-
-            return $this->db->execute() ? true : false;
-        }
-
-    public function setProductDescription(object $workorder): object{
-            // $acWkoCount = $this->getActiveWorkorderCount();
-            // $coWkoCount = $this->getCompletedWorkorderCount();
-            // $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-
-            // dumpAndDie($workorder);
-            // $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-
-            
-            // $workorder->cab_finish = $this->getFinishfromId($workorder->product->cab_finish_id ?? 0);
-            // if(!empty($workorder->grille_finish)) {$workorder->grille_finish = $this->getFinishfromId($workorder->product->grille_finish_id ?? 0);}
-            // if (!empty($workorder->waveguide_finish)){$workorder->waveguide_finish = $this->getFinishfromId($workorder->product->waveguide ?? 0);}
-            // $workorder->pdesc = $this->poModel->createProductDescription($workorder);
-            // unset($workorder->product);
-            // unset($workorder->model);
-        }
-
+        }  
     }

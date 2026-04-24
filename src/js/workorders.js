@@ -96,9 +96,9 @@ function initWorkOrders () {
                 const formatDate = (date) => {return date ? date.slice(0,10) : 'N/A'};
                 var dateCell = null;
                 if(tag === 'com') {
-                    row.appendChild(td(formatDate(item.completed_at),['text-nowrap','text-sm'],'',{fontSize:'0.7rem'}));
+                    row.appendChild(td(formatDate(item.completed_at),['text-nowrap']));
                 } else {
-                    row.appendChild(td(formatDate(item.created_at),['text-nowrap','text-sm'],'',{fontSize:'0.7rem'}));
+                    row.appendChild(td(formatDate(item.created_at),['text-nowrap']));
                 };
                 row.appendChild(td(item.wko, ['text-nowrap']));
 
@@ -130,7 +130,7 @@ function initWorkOrders () {
                 const qtyCell = td(item.quantity);
                 qtyCell.id = 'qty';
                 row.appendChild(qtyCell);
-                row.appendChild(td(item.serials, ['text-xs']));
+                row.appendChild(td(item.serials, ['text-xs', 'wkoSerials']));
 
                 //data: workorder status
                 if(tag !== 'com'){
@@ -207,19 +207,6 @@ function initWorkOrders () {
     }
 
 //event handler to open 'viewWO' pages by clicking work order rows on WO index page
-    // const tNoteRows = document.querySelectorAll(".worow");
-    // let i;
-    // if(tNoteRows){
-    //     for (i=0; i < tNoteRows.length; i++ ) {
-    //         tNoteRows[i].addEventListener("click", (e) => {
-    //             const woid = e.target.parentElement.dataset.id
-    //             if(!!woid) {
-    //                 window.location.href = "http://localhost/SAM/workorders/viewwo/"+woid
-    //             }
-    //         })
-    //     }
-    // }   
-    //REFACTOR!
     document.addEventListener('click', function (e) {
         if(e.target.closest('.wko-status-cell')) return; //stop firing if we're trying to change the wko status
         if(e.target.closest('dltBtn')) return;
@@ -236,60 +223,113 @@ function initWorkOrders () {
 
 
 //event handler for marking workorders as complete when clicking the 'tick' SVG
-    const compBtns = document.querySelectorAll(".mrk-as-comp")
-    let serials
-    let rowQty
-    if(compBtns) {
-        for (let l = 0; l < compBtns.length; l++) {
-            compBtns[l].addEventListener("click" ,(e) => {
-                const woid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.id
-                const serialStatus = e.target.parentElement.parentElement.parentElement.parentElement.children[5].textContent
-                console.log(serialStatus)
-                if (serialStatus === "To Be Confirmed") {
-                    let m
-                    let outputSerialRanges = []
-                    //get expected quantity
-                    rowQty = e.target.parentElement.parentElement.parentElement.parentElement.children[4].textContent
-                    console.log('expected quantity: '+rowQty)
-                    let inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete","").split(",")
-                    console.log("input serial range length: "+inputSerialRanges.length)
-                    if(inputSerialRanges = 'Sent without serials'){
-                        //add note to wko
-                    } else {
-                        if(inputSerialRanges.length == 1 && rowQty == 1) {
-                            //only one serial for this order
-                            // window.alert("nice one!")
-                            window.location.href = "http://localhost/SAM/workorders/complete/"+woid+"/"+inputSerialRanges
-                        } else {
-                            //check range(s) and compare qty to expected
-                            console.log('input serial range(s): '+inputSerialRanges)
-                            for (m = 0; m < inputSerialRanges.length; m++) {
-                                console.log('serial number range: '+inputSerialRanges[m])
-                                let numbers = inputSerialRanges[m].split("-")
-                                let low = Number(numbers[0].trim())
-                                let high = Number(numbers[1].trim())
-                                console.log('low: '+low)
-                                console.log('high: '+high)
-                                for (let n = low; n <= high; n++) {
-                                    console.log('number: '+n)
-                                    outputSerialRanges.push(n)
-                                    //need to save the numbers to an array
-                                }
-                                if(outputSerialRanges.length != rowQty) {
-                                    window.alert("Incorrect number of serials for this WKO!")
-                                } else {
-                                    window.location.href = "http://localhost/SAM/workorders/complete/"+woid+"/"+inputSerialRanges 
-                                }
-                            }
-                        }
-                    }
+    document.addEventListener('click', function (e) {
+
+        if(!e.target.closest('.compBtn')) return;
+        const row = e.target.closest('.worow'); 
+        let serials;
+        let woid;
+        let high;
+        let low;
+        // console.log(row);return;
+        if(row) {
+            woid = row.dataset.id
+            serials = row.querySelector('.wkoSerials').textContent;
+        };
+        if(serials === 'To Be Confirmed') {
+            let m;
+            let outputSerialRanges = [];
+            //get expected quantity
+            const rowQty = +row.querySelector('#qty').textContent;
+            let inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete","");
+            if(inputSerialRanges) {
+                inputSerialRanges = inputSerialRanges.split(",")
+            } else return;
+            if(inputSerialRanges[0] === 'Sent without serials'){
+                //add note to wko without serials
+            }
+            //check range(s) and compare qty to expected
+            for (m = 0; m < inputSerialRanges.length; m++) {
+                let numbers = inputSerialRanges[m].split("-");
+                low = Number(numbers[0].trim());
+                if(numbers[1]){
+                    high = Number(numbers[1].trim())
+                    for (let n = low; n <= high; n++) {
+                        outputSerialRanges.push(n);
+                    };
+                };
+                let totalSerials = high ? high - low: 1;
+                if(totalSerials == 1) {
+                    if(rowQty === 1){
+                        window.location.href = `${URLROOT}workorders/complete/${woid}/${inputSerialRanges[0]}`;
+                    };
+                };
+                if(outputSerialRanges.length != rowQty) {
+                    console.log(outputSerialRanges, outputSerialRanges.length, rowQty);
+                    window.alert(`Incorrect number of serials for this workorder! ${rowQty} are required and ${totalSerials} have been supplied.`); 
+                    return;
                 } else {
-                    window.location.href = "http://localhost/SAM/workorders/complete/"+woid
-                }
+                    window.location.href = `${URLROOT}Sworkorders/complete/${woid}/${inputSerialRanges}`;
+                };
+            }
+        } else {
+            window.location.href = `${URLROOT}workorders/complete/${woid}/${serials.replace(/\s+/g, '')}`;
+        };
+    });
+    // const compBtns = document.querySelectorAll(".mrk-as-comp")
+    // let serials
+    // let rowQty
+    // if(compBtns) {
+    //     for (let l = 0; l < compBtns.length; l++) {
+    //         compBtns[l].addEventListener("click" ,(e) => {
+    //             const woid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.id
+    //             const serialStatus = e.target.parentElement.parentElement.parentElement.parentElement.children[5].textContent
+    //             console.log(serialStatus)
+    //             if (serialStatus === "To Be Confirmed") {
+    //                 let m
+    //                 let outputSerialRanges = []
+    //                 //get expected quantity
+    //                 rowQty = e.target.parentElement.parentElement.parentElement.parentElement.children[4].textContent
+    //                 console.log('expected quantity: '+rowQty)
+    //                 let inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete","").split(",")
+    //                 console.log("input serial range length: "+inputSerialRanges.length)
+    //                 if(inputSerialRanges = 'Sent without serials'){
+    //                     //add note to wko
+    //                 } else {
+    //                     if(inputSerialRanges.length == 1 && rowQty == 1) {
+    //                         //only one serial for this order
+    //                         // window.alert("nice one!")
+    //                         window.location.href = "http://localhost/SAM/workorders/complete/"+woid+"/"+inputSerialRanges
+    //                     } else {
+    //                         //check range(s) and compare qty to expected
+    //                         console.log('input serial range(s): '+inputSerialRanges)
+    //                         for (m = 0; m < inputSerialRanges.length; m++) {
+    //                             console.log('serial number range: '+inputSerialRanges[m])
+    //                             let numbers = inputSerialRanges[m].split("-")
+    //                             let low = Number(numbers[0].trim())
+    //                             let high = Number(numbers[1].trim())
+    //                             console.log('low: '+low)
+    //                             console.log('high: '+high)
+    //                             for (let n = low; n <= high; n++) {
+    //                                 console.log('number: '+n)
+    //                                 outputSerialRanges.push(n)
+    //                                 //need to save the numbers to an array
+    //                             }
+    //                             if(outputSerialRanges.length != rowQty) {
+    //                                 window.alert("Incorrect number of serials for this WKO!")
+    //                             } else {
+    //                                 window.location.href = "http://localhost/SAM/workorders/complete/"+woid+"/"+inputSerialRanges 
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             } else {
+    //                 window.location.href = "http://localhost/SAM/workorders/complete/"+woid
+    //             }
                 
-            })
-        }
-    }
+    //         })
+    //     }
+    // }
 
 //event handler for splitting work orders when they are part complete by clicking the 'scissor' SVG
     const splitBtns = document.querySelectorAll(".split-order");
@@ -313,20 +353,6 @@ function initWorkOrders () {
     }  
 
 //event handler for deleting workorders by clicking the 'bin' SVG
-// document.addEventListener('click', function (e) {
-//     if(e.target.closest('.wko-status-cell')) return; //stop firing if we're trying to change the wko status
-//     if(e.target.closest('dltBtn')) return;
-
-//     const row = e.target.closest('.worow');
-//     if(!row) return;
-//     if(e.target.closest('a')) return;
-    
-//     const woid = row.dataset.id;
-//     if(!woid) return;
-   
-//     window.location.href = `${URLROOT}workorders/viewwo/${woid}`;
-// });
-
     document.addEventListener('click', function (e) {
         const row = e.target.closest('.worow');
         const woid = row.dataset.id;
@@ -336,21 +362,6 @@ function initWorkOrders () {
             };
         };
     })
-    // const dltBtns = document.querySelectorAll(".dltBtn");
-    // let k;
-    // if(dltBtns){
-    //     for (k=0; k < dltBtns.length; k++) {
-    //         dltBtns[k].addEventListener("click", (e) => {
-    //             const woid = e.target.parentElement.parentElement.parentElement.dataset.id
-    //             if(confirm("Are you sure you want to delete this workorder?") == true) {
-    //                 window.location.href = "http://localhost/SAM/workorders/delete/"+woid
-    //                 // console.log(e.target.parentElement.parentElement.parentElement)
-    //                 console.log(woid)
-    //                 console.log('delete button clicked');
-    //             }
-    //         })
-    //     }
-    // }
 
 
     initPagination();

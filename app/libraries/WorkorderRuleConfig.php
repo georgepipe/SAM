@@ -19,8 +19,8 @@ class WorkorderRuleConfig {
     ];
 
     public const DEFAULT_CONNECTORS = [
-        '7','8','11','12','15','16' => 'NL4 & PHX', //.2 Compact range
-        '43','45','52' => 'NL8' //Triamped fullrange speakers
+        'NL4 & PHX' => ['7','8','11','12','15','16'],   //.2 compact range
+        'NL8' => ['43','45','52']                       //Triamped fullrange speakers
     ];
 
     public const REQUIRE_WAVEGUIDE_FINISH = [

@@ -23,8 +23,8 @@ class Workorders extends Controller {
     public function getPostedWorkorderData(){
         $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING); 
         return (object) [
-            'wko' => trim($_POST['wko']),
-            'avn' => trim($_POST['avn']),
+            'wko' => (int)trim($_POST['wko']),
+            'avn' => (string)trim($_POST['avn']),
             'cab_model_id' => trim($_POST['cab_model_id']),
             'cab_finish_id' => trim($_POST['cab_finish_id']),
             'waveguide_finish_id' => trim($_POST['waveguide_finish_id']),
@@ -32,7 +32,7 @@ class Workorders extends Controller {
             'connectors' => (string)$_POST['connectors'] ?? '',
             'wheels' => (bool)$_POST['wheels'] ?? '0',
             'quantity' => (int)$_POST['quantity'],
-            'serials' => trim($_POST['serials']) ?? '',
+            'serials' => (string)trim($_POST['serials']) ?? '',
             'wko_status' => trim($_POST['wko_status']),
             'wko_delivery' => trim($_POST['wko_delivery']),
             'wko_notes' => trim($_POST['wko_notes']),
@@ -103,7 +103,7 @@ class Workorders extends Controller {
             // validated
                 if (empty($data->form->pid)) {
                     // dumpAndDie($data);
-                    empty($data->form->pid) ? throwErr(999,'PID ERROR: Contact system admin'): '';
+                    empty($data->form->pid) ? throwErr(999,'PID ERROR: Contact system admin',$data->form): '';
                 }
             //save to db
                 // dumpAndDie($data->form);
@@ -128,8 +128,9 @@ class Workorders extends Controller {
                 $models = $this->moModel->getModelNames();
                 $finishes = $this->woModel->getFinishes();
                 if (!empty($data->form) && !empty($data->form->cab_model_id)) {
-                    $data->form->product = $this->poModel->getProductFromPid($data->form->pid);
-                    $data->form->waveguide = $this->woModel->getFinishfromId($data->product->waveguide_finish_id);
+                    dumpAndDie($data->form);
+                    if($data->form->product) $data->form->product = $this->poModel->getProductFromPid($data->form->pid);
+                    if($data->form->waveguide) $data->form->waveguide = $this->woModel->getFinishfromId($data->product->waveguide_finish_id);
                 };
                 $data = (object) [
                     
@@ -277,21 +278,24 @@ class Workorders extends Controller {
         $todaysDate = date('m/d/Y', time());
 
         $originalWorkorder = $this->woModel->getWorkorderById($work_order_id);
-
         $newQuantity = $originalWorkorder->quantity - $sPoint; 
-        $sCount = $this->seModel->expandSerials($originalWorkorder->serials);
-        $firstHalf = array_slice($sCount,0, $sPoint); 
-        $secondHalf = array_slice($sCount,$sPoint, );
+        $newWorkorder = unserialize(serialize($originalWorkorder)); 
 
-        //contract serials again before saving back to original WKO and creating new WKO
-        $firstHalf = $this->seModel->contractSerials($firstHalf);
-        $secondHalf = $this->seModel->contractSerials($secondHalf);
-        //echo 'first half: '.$firstHalf.'<BR>';
-        //echo 'second half: '.$secondHalf.'<BR>';
-        $newWorkorder = unserialize(serialize($originalWorkorder));
-        $originalWorkorder->serials = $firstHalf;
-        $newWorkorder->serials = $secondHalf;
-        
+        if(!$originalWorkorder->serials === 'To Be Confirmed' && !$originalWorkorder->serials === ''){ //check whether serials are set
+            $sCount = $this->seModel->expandSerials($originalWorkorder->serials);
+            $firstHalf = array_slice($sCount,0, $sPoint); 
+            $secondHalf = array_slice($sCount,$sPoint, );
+
+            //contract serials again before saving back to original WKO and creating new WKO
+            $firstHalf = $this->seModel->contractSerials($firstHalf);
+            $secondHalf = $this->seModel->contractSerials($secondHalf);
+            //echo 'first half: '.$firstHalf.'<BR>';
+            //echo 'second half: '.$secondHalf.'<BR>';
+            $originalWorkorder->serials = $firstHalf;
+            $newWorkorder->serials = $secondHalf;
+        } else { //
+        }
+
         $newWorkorder->wko_notes = $newWorkorder->wko_notes.'Order split on '.$todaysDate; 
         $originalWorkorder->wko_notes = 'Order split on '.$todaysDate;
         $originalWorkorder->quantity = $sPoint;
@@ -299,6 +303,7 @@ class Workorders extends Controller {
 
         unset($newWorkorder->created_at);
         unset($newWorkorder->work_order_id);
+
         $this->woModel->editOrder($originalWorkorder);
         $this->woModel->addOrder($newWorkorder);
         redirect('workorders/index');

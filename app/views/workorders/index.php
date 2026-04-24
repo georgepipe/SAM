@@ -87,19 +87,19 @@
                             ?>
                             <tr class="text-center border-4 worow <?php if(!empty($trClass)){echo $trClass;} ?>" data-id="<?php echo $workorder->work_order_id; ?>">
                                 <?php if($workorder->wko_status !='Completed') :?>
-                                    <td class="text-nowrap text-sm" style="font-size: 0.7rem"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
+                                    <td class="text-nowrap" style="font-size: 0.7rem"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
                                     <td class="text-nowrap"><?php echo $workorder->wko ?></td>
                                     <td class="text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
                                     <td id="qty"><?php echo $workorder->quantity ?></td>
-                                    <td class="text-xs"><?= htmlspecialchars($workorder->serials) ?></td>
+                                    <td class="text-xs wkoSerials"><?= htmlspecialchars($workorder->serials) ?></td>
                                     <td class="wko-status-cell" data-wko-id="<?= htmlspecialchars($workorder->work_order_id) ?>" data-wko-status="<?= htmlspecialchars($workorder->wko_status) ?>"><?= htmlspecialchars($workorder->wko_status) ?></td>
                                     <td><?= htmlspecialchars($workorder->wko_delivery) ?></td>
                                     <td class="min-w-24"><?php echo $workorder->wko_notes ?></td>
-                                    <td><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
+                                    <td class="compBtn"><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/checkicon.php'; ?></a></td>
                                     <td><a href="javascript:void(0)" data-qty="<?php echo $workorder->quantity?>"><?php include APPROOT.'/views/components/icons/cuticon.php'; ?></a></td>
                                     <td><a href="<?php echo URLROOT; ?>workorders/edit/<?php echo $workorder->work_order_id?>"><?php include APPROOT.'/views/components/icons/editicon.php'; ?></a></td>
-                                    <td><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></a></td>
+                                    <td class="dltBtn"><a href="javascript:void(0)"><?php include APPROOT.'/views/components/icons/deleteicon.php'; ?></a></td>
                                 <?php endif ;?>
                             </tr>
                         <?php endforeach; ?>
@@ -192,12 +192,11 @@
                             <tr class="text-center items-center border-4 worow min-h-4 completed" data-id="<?php echo $workorder->work_order_id; ?>">
                                 <?php if($workorder->wko_status ='Completed') :?>
                                     <td class="text-nowrap"><?php  !$workorder->completed_at ? $myDateTime = 'N/A' : $myDateTime = $workorder->completed_at; echo substr($myDateTime,0,10); ?></td>
-                                    <td><?php echo $workorder->wko ?></td>
-                                    <!-- <td><?php echo $workorder->avn ?></td> -->
+                                    <td class="text-nowrap"><?php echo $workorder->wko ?></td>
                                     <td class=" text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
                                     <td><?php echo $workorder->quantity ?></td>
-                                    <td><?php echo $workorder->serials ?></td>
+                                    <td class="text-xs"><?php echo $workorder->serials ?></td>
                                     <td><?php echo $workorder->wko_delivery ?></td>
                                     <td><?php echo $workorder->wko_notes ?></td>
                                     <?php endif ;?>
