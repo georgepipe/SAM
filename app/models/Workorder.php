@@ -199,7 +199,6 @@ class Workorder {
                             $this->db->bind(':cab_finish_id', $data->cab_finish_id);
                             $this->db->bind(':grille_finish_id', $data->grille_finish_id);
 
-                            // dumpAndDie($data);
 
                         break;
                         case 1: //no grille
@@ -227,7 +226,6 @@ class Workorder {
 
 //SETTERS
         public function addOrder(object $data): bool {
-            // dumpAndDie($data);
             $data->avn = $data->avn ?? 0;
             $data->wko = $data->wko ?? 0;
             $this->db->query('INSERT INTO work_orders 

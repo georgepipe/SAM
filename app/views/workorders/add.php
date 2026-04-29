@@ -15,10 +15,12 @@ $error = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
     if($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
         $pdf = true;
+
         function extractData($pattern, $text) {
             preg_match($pattern, $text, $matches);
             return isset($matches[1]) ? trim($matches[1]) : null;
         }
+
         $parser = new Parser();
         $pdf = $parser->parseFile($_FILES['pdf']['tmp_name']);
         $text = $pdf->getText();
@@ -65,11 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             'serials' => extractData('/Serial Nos:\s*(.*?)\nCharge and Quantity/s', $text) ?? extractData('/Serial Numbers:(.*?)\sCharge/', $text),
             'quantity' => extractData('/Qty Required:\s*(\d+)/', $text),
             'model' => extractData('/Description:(.*?)\s/',$text) ?? extractData('/(.*?)\s/',$text),
-            'model_id' => '',
             'colour' => ucwords(extractData('/s, (.*?)\scabinet/', $text) ?? extractData('/s,(.*?)\swaveguide/', $text)," "),
             'grille' => ucwords(extractData('/t, (.*?)\sgrille/',$text)," \t\r\n\f\v'"),
             'connectors' => extractData('/d,(.*?)\sconnectors/',$text) ?? extractData('/\),(.*?)\sconnectors/',$text),
-            'fixings' => ucwords(extractData('/e,\s(.*?)\sfixings,/',$text),"'"),
+            'fixings' => ucwords(extractData('/\s([sm][\W]steel)\s[\s\S]?f/',$text),"'"),
             'waveguide' => extractData('/t,\s(.*?)\swaveguide,/',$text),
             'transport' => (extractData('/(Deliver\sto\sF1)/',$text) ?? extractData('/(To\sstorage)/',$text)) ?? 'TBC',
             'wheels' => (extractData('/WK-4IN\sto\sbe\sfitted/',$text)) ? true : false,
@@ -328,6 +329,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             id="wko_notes"
                             value="<?php echo $data->data->wko_notes ?? ''; ?>"><?php echo $data->data->wko_notes ?? ''; ?></textarea>
                         <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes ?? '';?></span>
+                    </div>
+                    <div class="hidden">
+                                    <input name="fixings"
+                                        id="fixings"
+                                        value="<?= $pdfdata['fixings'] ?>"></input>
                     </div>
                     <div class="form-group">
                         <label for="addAnother">Add Another:</label>

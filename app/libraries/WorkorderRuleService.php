@@ -71,7 +71,7 @@
         private function getGrilleFinishIdFromString(object $data): void {
             //  get grille colour from pdf grille input
             $decoded = html_entity_decode($data->form->grille_finish_id);
-            $regex = "/\s*s'steel/i";
+            $regex = "/\s*.'steel/i";
             $data->form->grille_finish_id = preg_replace($regex,'',$decoded);
             if (!is_numeric($data->form->grille_finish_id) && !empty($data->form->grille_finish_id)) {
                 $data->form->grille_finish_id = $this->woModel->getFidFromName($data->form->grille_finish_id, 0); 

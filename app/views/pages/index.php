@@ -18,6 +18,9 @@
             - Fix pagination<br>
             - Fix grille saving/loading/pdesc for mb212 brushed steel <br>
             - Fix serial retreival from PDF in weird edge cases where product name is specified in given serial ranges <br>
+        <strong>Suggested Improvements:</strong><br>
+        - Batch avn uploads<br>
+
         <BR>
         <strong class="border-b-2">Transport Page:</strong><BR>
             - Calculate total weight for delivery<BR>  

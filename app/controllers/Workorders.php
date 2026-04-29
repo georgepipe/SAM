@@ -33,9 +33,10 @@ class Workorders extends Controller {
             'wheels' => (bool)$_POST['wheels'] ?? '0',
             'quantity' => (int)$_POST['quantity'],
             'serials' => (string)trim($_POST['serials']) ?? '',
-            'wko_status' => trim($_POST['wko_status']),
-            'wko_delivery' => trim($_POST['wko_delivery']),
-            'wko_notes' => trim($_POST['wko_notes']),
+            'wko_status' => (string)trim($_POST['wko_status']),
+            'wko_delivery' => (string)trim($_POST['wko_delivery']),
+            'fixings' => (string)html_entity_decode(trim($_POST['fixings'])),
+            'wko_notes' => (string)trim($_POST['wko_notes']),
             'pid' => '',
             'addAnother' => $_POST['addAnother'] ?? ''
         ];
@@ -92,7 +93,6 @@ class Workorders extends Controller {
                 'form' => $this->getPostedWorkorderData(),
                 'errors' => $this->initialiseErrors()
             ];
-            
             $ruleService= new WorkorderRuleService($this->woModel, $this->moModel);
             $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
             $data = $ruleService->apply($data);
@@ -102,11 +102,11 @@ class Workorders extends Controller {
             if (!$errors) {
             // validated
                 if (empty($data->form->pid)) {
-                    // dumpAndDie($data);
-                    empty($data->form->pid) ? throwErr(999,'PID ERROR: Contact system admin',$data->form): '';
+                    
+                    $data->form->pid = $this->poModel->addPidFromOptions($data->form);
+                    // empty($data->form->pid) ? throwErr(999,'PID ERROR: Contact system admin',$data->form): '';
                 }
             //save to db
-                // dumpAndDie($data->form);
                 if ($this->woModel->addOrder($data->form)){
                     // $this->seModel->addSerials($data->form->work_order_id, $data->form->cab_model_id, $data->form->serials);
                     $fileName = 'AVN_'.str_pad($data->form->avn, 5 ,'0', STR_PAD_LEFT).'.pdf';
@@ -128,7 +128,7 @@ class Workorders extends Controller {
                 $models = $this->moModel->getModelNames();
                 $finishes = $this->woModel->getFinishes();
                 if (!empty($data->form) && !empty($data->form->cab_model_id)) {
-                    dumpAndDie($data->form);
+                    dumpAndDie($data);
                     if($data->form->product) $data->form->product = $this->poModel->getProductFromPid($data->form->pid);
                     if($data->form->waveguide) $data->form->waveguide = $this->woModel->getFinishfromId($data->product->waveguide_finish_id);
                 };
@@ -246,6 +246,7 @@ class Workorders extends Controller {
         $descriptionService = new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
         $workorder = $descriptionService->createProductDescription($this->woModel->getWorkorderById($id));
         $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
+        dumpAndDie($id,$workorder);
         $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
         if(!empty($workorder->product->cab_finish_id)) {$workorder->product->cab_finish = $this->woModel->getFinishFromId($workorder->product->cab_finish_id); unset($workorder->product->cab_finish_id);}
         if(!empty($workorder->product->grille_finish_id)) {$workorder->product->grille_finish_id = $this->woModel->getFinishFromId($workorder->product->grille_finish_id);}

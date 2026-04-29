@@ -34,7 +34,7 @@
             return $models;
         }
 
-        public function getModelFromMid(int $mid) {
+        public function getModelFromMid($mid) {
             $this->db->query('SELECT * FROM models WHERE mid = :mid');
             $this->db->bind(':mid' , $mid);
             $model = $this->db->single();
