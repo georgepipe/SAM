@@ -3,7 +3,7 @@
 
 <div class="relative rounded-2xl p-8 fade-in">
 <?php if(!empty($data->avaliableworkorders)) : ?>
-<div class="uassTrans m-8 border-4 border-red-600">
+<div class="divTrans m-8 border-4 border-red-600">
         <h1 class="flex justify-center text-lg"><strong><U>Product Ready for Transport</U></strong></h1>
         <section class="flex flex-col">
             <table class="text-sm justify-evenly w-full border-4">
@@ -37,7 +37,7 @@
 <div class="flex flex-row m-auto justify-center btnContainer hidden">
     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-6 h-16 text-nowrap colBtn ">Create Collection</button>
     <button class="btn btn-blue mx-6 h-16 delBtn ">Create Dellivery</button>
-    <div class=" border-2">Current total Delivery Weight: <br><text class="weightTxt">kg</text></div>
+    <div class="weightDiv border-2">Current total Delivery Weight: <br><text class="weightTxt">kg</text></div>
 </div>
 <?php endif; ?>
 <?php if(!empty($data->activetransportnotes)) : ?>

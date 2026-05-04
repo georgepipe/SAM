@@ -87,7 +87,7 @@
                             ?>
                             <tr class="text-center border-4 worow <?php if(!empty($trClass)){echo $trClass;} ?>" data-id="<?php echo $workorder->work_order_id; ?>">
                                 <?php if($workorder->wko_status !='Completed') :?>
-                                    <td class="text-nowrap" style="font-size: 0.7rem"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
+                                    <td class="text-nowrap"><?php  $myDateTime = $workorder->created_at; echo substr($myDateTime,0,10); ?></td>
                                     <td class="text-nowrap"><?php echo $workorder->wko ?></td>
                                     <td class="text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
@@ -228,7 +228,7 @@
             <div>
             <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination" data-wkos="com">
                 
-                <a href="#" class="pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                <a href="#" class="pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0" value="disabled">
                 <span class="sr-only">Previous</span><?php include APPROOT.'/views/components/icons/previousicon.php';?>
                 </a>
                 <!-- Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" -->
@@ -276,7 +276,7 @@
         </div>
     </div>
 </div>
-<!-- <?php 
+<?php 
 echo '<pre>'; print_r($data);
-?> -->
+?>
 <?php require APPROOT . '/views/inc/footer.php'; ?>

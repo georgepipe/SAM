@@ -18,7 +18,7 @@ class ProductDescriptionService{
     public function createProductDescription(object $workorder) {
             $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
             $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            dumpAndDie($workorder, $workorder->product->cab_model_id);
+            // dumpAndDie($workorder, $workorder->product->cab_model_id);
             $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
             $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
             $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0);
@@ -69,6 +69,7 @@ class ProductDescriptionService{
             unset($workorder->product);
             unset($workorder->model);
             unset($workorder->cab_finish);
+            unset($workorder->waveguide_finish_id);
             unset($workorder->grille_finish);
             return $workorder;
     }

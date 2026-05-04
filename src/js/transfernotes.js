@@ -13,6 +13,7 @@ function initTransferNotes () {
     const delBtn = document.querySelector(".delBtn");
     const weightTxt = document.querySelector('.weightTxt');
     const deleteBtn = document.querySelector(".delete");
+    const weightDiv = document.querySelector(".weightDiv");
 
     let i;
     let j;
@@ -49,17 +50,22 @@ function initTransferNotes () {
                     avnWeight = Number(e.target.parentElement.parentElement.dataset.weight);
                     totalWeight = totalWeight - avnWeight;
                 }
-                console.log(weightTxt.textContent);
                 weightTxt.textContent = totalWeight + 'kg';
                 if (isChecked && visibleBtns>0) {
                     btnCont.classList.remove('hidden');
                     btnCont.classList.add('block');
-                    return; 
+                    // return; 
                 } else if(visibleBtns<1) {
                     btnCont.classList.remove('block');
                     btnCont.classList.add('hidden');
-                    return; 
+                    // return; 
                 } 
+                console.log(totalWeight);
+                if(totalWeight > 1100) {
+                    weightDiv.classList.add("overweight");
+                } else {
+                    if(weightDiv.classList.contains("overweight")) weightDiv.classList.remove("overweight");
+                }
             })
 
         }
@@ -71,7 +77,6 @@ function initTransferNotes () {
                     wkos.push(tnoteChecks[k].parentElement.dataset.id)
                 }
             }
-            console.log(wkos)
             window.location.href = "http://localhost/SAM/transport/tnote/c/"+wkos
         })
         
@@ -83,7 +88,6 @@ function initTransferNotes () {
                     wkos.push(tnoteChecks[l].parentElement.dataset.id)
                 }
             }
-            console.log(wkos)
             window.location.href = "http://localhost/SAM/transport/tnote/d/"+wkos
         })
     }

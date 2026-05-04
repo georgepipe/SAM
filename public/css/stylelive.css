@@ -1404,6 +1404,10 @@ video {
   color: rgb(255 255 255 / var(--tw-text-opacity)) /* #ffffff */;
 }
 
+.overweight {
+  background-color: indianred;
+}
+
 /*                                    elements                                */
 
 tr.tnoterow:hover {
@@ -1419,6 +1423,10 @@ td.wkoAvn a {
   background: rgba(255,255,255,0.2);
   padding: 2px 6px;
   border-radius: 4px;
+}
+
+tr.checked {
+  background-color: greenyellow;
 }
 
 td.wkoAvn a:hover {

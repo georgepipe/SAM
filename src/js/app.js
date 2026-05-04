@@ -3,6 +3,7 @@ import { initWorkOrders } from "./workorders";
 import { initTransferNotes } from "./transfernotes";
 import { initAddOrder } from "./addOrder";
 import { initUpdateStatus } from "./statusUpdate";
+import { initTransport } from "./transport.js";
 
 const URLROOT = 'http://localhost/SAM/';
 // const APPROOT = __dirname
@@ -14,6 +15,7 @@ const URLROOT = 'http://localhost/SAM/';
     initWorkOrders();
     initAddOrder();
     initUpdateStatus();
+    initTransport();
   })();
 
 

@@ -15,7 +15,7 @@ function initWorkOrders () {
             const pageNumberInfoB = document.querySelector(".pageInfoB");
             const totalAResults = +document.querySelector(".Acount").dataset.count;
             const totalCResults = +document.querySelector(".Ccount").dataset.count;
-            const currentPage = 0
+            let currentPage = 0
 
             // const totalPages = <?= $pages ?>;
 
@@ -352,18 +352,24 @@ function initWorkOrders () {
         }
     }  
 
-//event handler for deleting workorders by clicking the 'bin' SVG
-    document.addEventListener('click', function (e) {
-        const row = e.target.closest('.worow');
-        const woid = row.dataset.id;
-        if(e.target.closest('.dltBtn')){
-            if(confirm("Are you sure you want to delete this workorder?")) {
-                window.location.href = `${URLROOT}workorders/delete/${woid}`;
-            };
-        };
-    })
+    function initDelete() {
+    //event handler for deleting workorders by clicking the 'bin' SVG
+        const tableA = document.querySelector(".activeWkos");
+        if(tableA) {
+            document.addEventListener('click', function (e) {
+                const row = e.target.closest('.worow');
+                let woid; 
+                if(row) row.dataset.id;
+                if(e.target.closest('.dltBtn')){
+                    if(confirm("Are you sure you want to delete this workorder?")) {
+                        window.location.href = `${URLROOT}workorders/delete/${woid}`;
+                    };
+                };
+            })
+        }
+    }
 
-
+    initDelete();
     initPagination();
 }
 

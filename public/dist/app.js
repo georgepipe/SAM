@@ -412,6 +412,7 @@ function initTransferNotes() {
   var delBtn = document.querySelector(".delBtn");
   var weightTxt = document.querySelector('.weightTxt');
   var deleteBtn = document.querySelector(".delete");
+  var weightDiv = document.querySelector(".weightDiv");
   var i;
   var j;
   var k;
@@ -448,16 +449,21 @@ function initTransferNotes() {
           avnWeight = Number(e.target.parentElement.parentElement.dataset.weight);
           totalWeight = totalWeight - avnWeight;
         }
-        console.log(weightTxt.textContent);
         weightTxt.textContent = totalWeight + 'kg';
         if (isChecked && visibleBtns > 0) {
           btnCont.classList.remove('hidden');
           btnCont.classList.add('block');
-          return;
+          // return; 
         } else if (visibleBtns < 1) {
           btnCont.classList.remove('block');
           btnCont.classList.add('hidden');
-          return;
+          // return; 
+        }
+        console.log(totalWeight);
+        if (totalWeight > 1100) {
+          weightDiv.classList.add("overweight");
+        } else {
+          if (weightDiv.classList.contains("overweight")) weightDiv.classList.remove("overweight");
         }
       });
     }
@@ -468,7 +474,6 @@ function initTransferNotes() {
           wkos.push(tnoteChecks[k].parentElement.dataset.id);
         }
       }
-      console.log(wkos);
       window.location.href = "http://localhost/SAM/transport/tnote/c/" + wkos;
     });
     delBtn.addEventListener('click', function (e) {
@@ -479,10 +484,42 @@ function initTransferNotes() {
           wkos.push(tnoteChecks[l].parentElement.dataset.id);
         }
       }
-      console.log(wkos);
       window.location.href = "http://localhost/SAM/transport/tnote/d/" + wkos;
     });
   }
+}
+
+
+/***/ }),
+
+/***/ "./src/js/transport.js":
+/*!*****************************!*\
+  !*** ./src/js/transport.js ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   initTransport: () => (/* binding */ initTransport)
+/* harmony export */ });
+function initTransport() {
+  function checkboxStyler() {
+    var divTrans = document.querySelector(".divTrans");
+    if (divTrans) {
+      var checkBoxes = document.querySelectorAll(".tCheck");
+      checkBoxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+          var row = checkbox.closest("tr");
+          if (checkbox.checked) {
+            row.classList.add("checked");
+          } else {
+            row.classList.remove("checked");
+          }
+        });
+      });
+    }
+  }
+  checkboxStyler();
 }
 
 
@@ -866,19 +903,25 @@ function initWorkOrders() {
       });
     }
   }
-
-  //event handler for deleting workorders by clicking the 'bin' SVG
-  document.addEventListener('click', function (e) {
-    var row = e.target.closest('.worow');
-    var woid = row.dataset.id;
-    if (e.target.closest('.dltBtn')) {
-      if (confirm("Are you sure you want to delete this workorder?")) {
-        window.location.href = "".concat(URLROOT, "workorders/delete/").concat(woid);
-      }
-      ;
+  function initDelete() {
+    //event handler for deleting workorders by clicking the 'bin' SVG
+    var tableA = document.querySelector(".activeWkos");
+    if (tableA) {
+      document.addEventListener('click', function (e) {
+        var row = e.target.closest('.worow');
+        var woid;
+        if (row) row.dataset.id;
+        if (e.target.closest('.dltBtn')) {
+          if (confirm("Are you sure you want to delete this workorder?")) {
+            window.location.href = "".concat(URLROOT, "workorders/delete/").concat(woid);
+          }
+          ;
+        }
+        ;
+      });
     }
-    ;
-  });
+  }
+  initDelete();
   initPagination();
 }
 
@@ -951,6 +994,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _transfernotes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./transfernotes */ "./src/js/transfernotes.js");
 /* harmony import */ var _addOrder__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./addOrder */ "./src/js/addOrder.js");
 /* harmony import */ var _statusUpdate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./statusUpdate */ "./src/js/statusUpdate.js");
+/* harmony import */ var _transport_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./transport.js */ "./src/js/transport.js");
+
 
 
 
@@ -965,6 +1010,7 @@ var URLROOT = 'http://localhost/SAM/';
   (0,_workorders__WEBPACK_IMPORTED_MODULE_1__.initWorkOrders)();
   (0,_addOrder__WEBPACK_IMPORTED_MODULE_3__.initAddOrder)();
   (0,_statusUpdate__WEBPACK_IMPORTED_MODULE_4__.initUpdateStatus)();
+  (0,_transport_js__WEBPACK_IMPORTED_MODULE_5__.initTransport)();
 })();
 /******/ })()
 ;
