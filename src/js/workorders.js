@@ -2,7 +2,8 @@ function initWorkOrders () {
 
     //GLOBALS
     const URLROOT = 'http://localhost/SAM/'
-    
+    let page = 0;
+    let delta = 0;
     function initPagination() {
     //pagination code
         //setup
@@ -14,10 +15,12 @@ function initWorkOrders () {
             const pageNumberInfoA = document.querySelector(".pageInfoA");
             const pageNumberInfoB = document.querySelector(".pageInfoB");
             const totalAResults = +document.querySelector(".Acount").dataset.count;
+            const aPageMax = Math.ceil(totalAResults / 10);
             const totalCResults = +document.querySelector(".Ccount").dataset.count;
-            let currentPage = 0
-
-            // const totalPages = <?= $pages ?>;
+            const cPageMax = Math.ceil(totalCResults / 10);
+            const urlParams = new URLSearchParams(window.location.search)
+            let tag;
+            if(urlParams.get("p") === "cw") tag = "com";
 
             //event binding
             pgBtns.forEach(btn => {
@@ -26,9 +29,18 @@ function initWorkOrders () {
 
             //click handler
             async function handlePaginationClick(e) {
-                e.preventDefault() //stop default link behaviour
-                const page = +e.target.dataset.page;
-                const tag = e.target.parentElement.dataset.wkos;
+                e.preventDefault(); //stop default link behaviour
+
+                if(e.target.closest(".pgBtnArrow")){ //was the button click an arrow?
+                    let arrowBtn = e.target.closest(".pgBtnArrow");
+                    delta = Number(arrowBtn.dataset.delta);
+                    page = calculateNextPage(page, delta, tag);
+                } else {
+                    page = +e.target.dataset.page;
+                    tag = e.target.parentElement.dataset.wkos;
+                };
+
+
 
                 const endpoint = tag === "com" 
                     ? `../apiworkorders/paginate/completed/${page}`
@@ -38,6 +50,23 @@ function initWorkOrders () {
 
                 renderTable(data, tag);
                 updatePaginationInfo(page, data.length, tag);
+                updatePaginationUX(page, tag);
+            }
+
+            function calculateNextPage(page, delta, tag){
+                let newPage = page + delta;
+                return validatePageBounds(newPage, tag) 
+                    ? newPage 
+                    : page;
+            }
+
+            function validatePageBounds(page, tag) {
+                if (tag === 'com') {
+                    if(page >= 0 && page <= cPageMax-1) return true;
+                } else {
+                    if(page >= 0 && page <= aPageMax-1) return true;
+                }
+                return false;
             }
 
             //fetch logic
@@ -94,7 +123,6 @@ function initWorkOrders () {
                 
                 //data: date
                 const formatDate = (date) => {return date ? date.slice(0,10) : 'N/A'};
-                var dateCell = null;
                 if(tag === 'com') {
                     row.appendChild(td(formatDate(item.completed_at),['text-nowrap']));
                 } else {
@@ -185,6 +213,21 @@ function initWorkOrders () {
                 to <span class="font-medium">${end}</span> 
                 of <span class="font-medium">${total}</span> results
                 `;
+            }
+
+            function updatePaginationUX(page, tag) {
+                //update page buttons to reflect currently selected page
+                // maybe its better to search for the tag first and then choose the query selector based on that
+                //so we only need to do this loop once
+                if (tag==="com") {
+                    const cPageBtns = document.querySelectorAll(".cPgBtn");
+                    cPageBtns.forEach(button =>{
+                        if(button.classList.contains("selPgBtn")) button.classList.remove("selPgBtn"); //remove the current page class from previous page button
+                        if(Number(button.dataset.page) === Number(page)) { //if the dataset 'page' matches the selected page
+                            button.classList.add("selPgBtn"); //add the current page class to the button
+                        }
+                    })
+                }
             }
 
             const ICONS = {

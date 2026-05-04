@@ -128,7 +128,7 @@ class Workorders extends Controller {
                 $models = $this->moModel->getModelNames();
                 $finishes = $this->woModel->getFinishes();
                 if (!empty($data->form) && !empty($data->form->cab_model_id)) {
-                    dumpAndDie($data);
+                    // dumpAndDie($data);
                     if($data->form->product) $data->form->product = $this->poModel->getProductFromPid($data->form->pid);
                     if($data->form->waveguide) $data->form->waveguide = $this->woModel->getFinishfromId($data->product->waveguide_finish_id);
                 };

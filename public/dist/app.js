@@ -552,6 +552,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 function initWorkOrders() {
   //GLOBALS
   var URLROOT = 'http://localhost/SAM/';
+  var page = 0;
+  var delta = 0;
   function initPagination() {
     //pagination code
     //setup
@@ -561,13 +563,22 @@ function initWorkOrders() {
       //click handler
       var handlePaginationClick = /*#__PURE__*/function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(e) {
-          var page, tag, endpoint, data;
+          var arrowBtn, endpoint, data;
           return _regeneratorRuntime().wrap(function _callee$(_context) {
             while (1) switch (_context.prev = _context.next) {
               case 0:
                 e.preventDefault(); //stop default link behaviour
-                page = +e.target.dataset.page;
-                tag = e.target.parentElement.dataset.wkos;
+
+                if (e.target.closest(".pgBtnArrow")) {
+                  //was the button click an arrow?
+                  arrowBtn = e.target.closest(".pgBtnArrow");
+                  delta = Number(arrowBtn.dataset.delta);
+                  page = calculateNextPage(page, delta, tag);
+                } else {
+                  page = +e.target.dataset.page;
+                  tag = e.target.parentElement.dataset.wkos;
+                }
+                ;
                 endpoint = tag === "com" ? "../apiworkorders/paginate/completed/".concat(page) : "../apiworkorders/paginate/active/".concat(page);
                 _context.next = 6;
                 return fetchWorkorders(endpoint);
@@ -575,7 +586,8 @@ function initWorkOrders() {
                 data = _context.sent;
                 renderTable(data, tag);
                 updatePaginationInfo(page, data.length, tag);
-              case 9:
+                updatePaginationUX(page, tag);
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -584,7 +596,19 @@ function initWorkOrders() {
         return function handlePaginationClick(_x) {
           return _ref.apply(this, arguments);
         };
-      }(); //fetch logic
+      }();
+      var calculateNextPage = function calculateNextPage(page, delta, tag) {
+        var newPage = page + delta;
+        return validatePageBounds(newPage, tag) ? newPage : page;
+      };
+      var validatePageBounds = function validatePageBounds(page, tag) {
+        if (tag === 'com') {
+          if (page >= 0 && page <= cPageMax - 1) return true;
+        } else {
+          if (page >= 0 && page <= aPageMax - 1) return true;
+        }
+        return false;
+      }; //fetch logic
       var fetchWorkorders = /*#__PURE__*/function () {
         var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(url) {
           var response;
@@ -655,7 +679,6 @@ function initWorkOrders() {
         var formatDate = function formatDate(date) {
           return date ? date.slice(0, 10) : 'N/A';
         };
-        var dateCell = null;
         if (tag === 'com') {
           row.appendChild(td(formatDate(item.completed_at), ['text-nowrap']));
         } else {
@@ -723,6 +746,21 @@ function initWorkOrders() {
         var el = tag === 'com' ? pageNumberInfoB : pageNumberInfoA;
         el.innerHTML = "\n                Showing <span class=\"font-medium\"> ".concat(start, " </span> \n                to <span class=\"font-medium\">").concat(end, "</span> \n                of <span class=\"font-medium\">").concat(total, "</span> results\n                ");
       };
+      var updatePaginationUX = function updatePaginationUX(page, tag) {
+        //update page buttons to reflect currently selected page
+        // maybe its better to search for the tag first and then choose the query selector based on that
+        //so we only need to do this loop once
+        if (tag === "com") {
+          var cPageBtns = document.querySelectorAll(".cPgBtn");
+          cPageBtns.forEach(function (button) {
+            if (button.classList.contains("selPgBtn")) button.classList.remove("selPgBtn"); //remove the current page class from previous page button
+            if (Number(button.dataset.page) === Number(page)) {
+              //if the dataset 'page' matches the selected page
+              button.classList.add("selPgBtn"); //add the current page class to the button
+            }
+          });
+        }
+      };
       var createActionLink = function createActionLink(href, svg) {
         var extraAttrs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
         var a = document.createElement('a');
@@ -740,10 +778,12 @@ function initWorkOrders() {
       var pageNumberInfoA = document.querySelector(".pageInfoA");
       var pageNumberInfoB = document.querySelector(".pageInfoB");
       var totalAResults = +document.querySelector(".Acount").dataset.count;
+      var aPageMax = Math.ceil(totalAResults / 10);
       var totalCResults = +document.querySelector(".Ccount").dataset.count;
-      var currentPage = 0;
-
-      // const totalPages = <?= $pages ?>;
+      var cPageMax = Math.ceil(totalCResults / 10);
+      var urlParams = new URLSearchParams(window.location.search);
+      var tag;
+      if (urlParams.get("p") === "cw") tag = "com";
 
       //event binding
       pgBtns.forEach(function (btn) {
