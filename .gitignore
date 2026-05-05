@@ -36,7 +36,7 @@
 ehthumbs.db
 Thumbs.db
 
-
+public/advice_notes
 vendor/
 node_modules/
 bin/

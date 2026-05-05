@@ -140,19 +140,24 @@
                         switch (TRUE) {
                             case ($pages > 5):
                                 //page btn 1
-                                echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="0">1</a>'; 
+                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="0">1</a>'; 
                                 //page btn 2
-                                echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
+                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
                                 echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
                                 //page btn $pages -1
-                                echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-2).'"">'.($pages-1).'</a>'; 
+                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-2).'"">'.($pages-1).'</a>'; 
                                 //page btn $pages
-                                echo '<a href="#" class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
+                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
                                 break;
                             default: 
                                 //for i
                                 for ($i = 1; $i <= $pages; $i++) {
-                                    echo '<a class="pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.($i===1 ? '' : '').'" data-page="'.($i-1).'">'.$i.'</a>'; 
+                                    if ($i === 1) {
+                                        echo '<a class="aPgBtn pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
+                                    } else {
+                                        echo '<a class="aPgBtn pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
+                                    }
+                                    // echo '<a class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.($i===1 ? '' : '').'" data-page="'.($i-1).'">'.$i.'</a>'; 
                                 }
                                 break;
                         }
@@ -254,7 +259,7 @@
                                         echo '<a href="#" class="pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
                                     } else {
                                         echo '<a class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
-                                        }
+                                    }
                                 }
                                 break;
                         }
@@ -276,7 +281,7 @@
         </div>
     </div>
 </div>
-<?php 
+<!-- <?php 
 echo '<pre>'; print_r($data);
-?>
+?> -->
 <?php require APPROOT . '/views/inc/footer.php'; ?>
