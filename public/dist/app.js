@@ -591,18 +591,28 @@ function initWorkOrders() {
                 }
                 ;
                 endpoint = localTag === "com" ? "../apiworkorders/paginate/completed/".concat(localPage) : "../apiworkorders/paginate/active/".concat(localPage);
-                _context.next = 6;
+                _context.prev = 4;
+                _context.next = 7;
                 return fetchWorkorders(endpoint);
-              case 6:
+              case 7:
                 data = _context.sent;
+                _context.next = 14;
+                break;
+              case 10:
+                _context.prev = 10;
+                _context.t0 = _context["catch"](4);
+                console.err("Pagination fetch failed: ", _context.t0);
+                return _context.abrupt("return");
+              case 14:
+                ;
                 renderTable(data, localTag);
                 updatePaginationInfo(localPage, data.length, localTag);
                 updatePaginationUX(localPage, localTag);
-              case 10:
+              case 18:
               case "end":
                 return _context.stop();
             }
-          }, _callee);
+          }, _callee, null, [[4, 10]]);
         }));
         return function handlePaginationClick(_x) {
           return _ref.apply(this, arguments);
@@ -613,12 +623,8 @@ function initWorkOrders() {
         return validatePageBounds(newPage, tag) ? newPage : localPage;
       };
       var validatePageBounds = function validatePageBounds(localPage, tag) {
-        if (tag === 'com') {
-          if (localPage >= 0 && localPage <= cPageMax - 1) return true;
-        } else {
-          if (localPage >= 0 && localPage <= aPageMax - 1) return true;
-        }
-        return false;
+        var max = tag == 'com' ? cPageMax : aPageMax;
+        return localPage >= 0 && localPage <= max;
       }; //fetch logic
       var fetchWorkorders = /*#__PURE__*/function () {
         var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(url) {
@@ -634,8 +640,14 @@ function initWorkOrders() {
                 });
               case 2:
                 response = _context2.sent;
+                if (response.ok) {
+                  _context2.next = 5;
+                  break;
+                }
+                throw new Error("HTTP error ".concat(response.status));
+              case 5:
                 return _context2.abrupt("return", response.json());
-              case 4:
+              case 6:
               case "end":
                 return _context2.stop();
             }
@@ -704,10 +716,9 @@ function initWorkOrders() {
         var avnLink = document.createElement('a');
         if (item.avn) {
           var url = "/SAM/advice_notes/AVN_".concat(String(item.avn).padStart(5, '0'), ".pdf");
-          avnLink.href = url;
-          avnLink.target = 'AVNwindow';
           avnLink.addEventListener('click', function () {
-            window.open("/SAM/advice_notes/AVN_".concat(String(item.avn).padStart(5, '0'), ".pdf"), 'AVNwindow', 'width=400,height=600');
+            // e.preventDefault();
+            window.open(url, 'AVNwindow', 'width=400,height=600');
           });
           avnLink.textContent = item.avn;
         } else {
@@ -885,11 +896,8 @@ function initWorkOrders() {
   if (splitBtns) {
     for (j = 0; j < splitBtns.length; j++) {
       splitBtns[j].addEventListener("click", function (e) {
-        // const woid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.id;
         var woid = e.target.closest(".worow").dataset.id;
         var quantity = e.target.closest("#qty").dataset.qty;
-        // const quantity = e.target.parentElement.parentElement.dataset.qty
-
         splitPoint = Number(window.prompt("After how many cabinets should the WKO be split?", ""));
         if (splitPoint > quantity - 1 | splitPoint === 0 | isNaN(splitPoint)) {
           window.alert("Error: Can't split from this point.");

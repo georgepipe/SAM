@@ -57,7 +57,14 @@ function initWorkOrders () {
                     ? `../apiworkorders/paginate/completed/${localPage}`
                     : `../apiworkorders/paginate/active/${localPage}`;
 
-                const data = await fetchWorkorders(endpoint);
+
+                let data;
+                try {
+                    data = await fetchWorkorders(endpoint);
+                } catch (err) {
+                   console.err("Pagination fetch failed: ",err); 
+                   return;
+                };
 
                 renderTable(data, localTag);
                 updatePaginationInfo(localPage, data.length, localTag);
@@ -72,12 +79,8 @@ function initWorkOrders () {
             }
 
             function validatePageBounds(localPage, tag) {
-                if (tag === 'com') {
-                    if(localPage >= 0 && localPage <= cPageMax-1) return true;
-                } else {
-                    if(localPage >= 0 && localPage <= aPageMax-1) return true;
-                }
-                return false;
+                const max = tag == 'com' ? cPageMax : aPageMax;
+                return localPage >= 0 && localPage <= max;
             }
 
             //fetch logic
@@ -85,6 +88,9 @@ function initWorkOrders () {
                 const response = await fetch(url, {
                     headers: {"Content-Type": "application/json",}
                 });
+                if(!response.ok) {
+                    throw new Error(`HTTP error ${response.status}`);
+                }
                 return response.json();
             }
 
@@ -147,12 +153,11 @@ function initWorkOrders () {
                 const avnLink = document.createElement('a');
                 if(item.avn){
                     const url = `/SAM/advice_notes/AVN_${String(item.avn).padStart(5, '0')}.pdf`;
-                    avnLink.href = url;
-                    avnLink.target = 'AVNwindow';
 
                     avnLink.addEventListener('click', () =>{
+                        // e.preventDefault();
                         window.open(
-                            `/SAM/advice_notes/AVN_${String(item.avn).padStart(5, '0')}.pdf`,
+                            url,
                             'AVNwindow', 
                             'width=400,height=600' 
                         );
@@ -336,10 +341,8 @@ function initWorkOrders () {
     if(splitBtns){
         for (j=0; j < splitBtns.length; j++) {
             splitBtns[j].addEventListener("click", (e) => {
-                // const woid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.id;
                 const woid = e.target.closest(".worow").dataset.id;
                 const quantity = e.target.closest("#qty").dataset.qty;
-                // const quantity = e.target.parentElement.parentElement.dataset.qty
 
                 splitPoint = Number(window.prompt("After how many cabinets should the WKO be split?",""))
                 if(splitPoint > quantity-1 | splitPoint === 0| isNaN(splitPoint)) {
