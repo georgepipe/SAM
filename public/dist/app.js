@@ -766,6 +766,7 @@ function initWorkOrders() {
         var end = start + length - 1;
         var total = tag === 'com' ? totalCResults : totalAResults;
         var el = tag === 'com' ? pageNumberInfoB : pageNumberInfoA;
+        //this could be refactored to not use innerHTML
         el.innerHTML = "\n                Showing <span class=\"font-medium\"> ".concat(start, " </span> \n                to <span class=\"font-medium\">").concat(end, "</span> \n                of <span class=\"font-medium\">").concat(total, "</span> results\n                ");
       };
       var updatePaginationUX = function updatePaginationUX(page, tag) {

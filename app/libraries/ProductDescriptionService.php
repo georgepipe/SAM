@@ -12,140 +12,192 @@ class ProductDescriptionService{
         $this->moModel = $moModel;
         $this->woModel = $woModel;
         $this->poModel = $poModel;
+
     }
 
 
     public function createProductDescription(object $workorder) {
-            $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-            $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-            // dumpAndDie($workorder, $workorder->product->cab_model_id);
-            $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
-            $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
-            $workorder->waveguide_finish_id = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0);
-        //name, colour abbreviation, series, drive units, amping, connectors, cabinet colour, grille, fixings, features
-            $name = $workorder->model->name ?? 'No name';
+        
+        $descArr = $this->initDescArr();
 
-            // $sh = preg_match('/(SH)/',$workorder->model->name);
-            if(!is_bool($workorder->cab_finish)){
-                $scolour = match($workorder->cab_finish->type) {
-                    'Standard' => $workorder->cab_finish->name[0],
-                    'Weather Resistant' => 'PU-'.$workorder->cab_finish->name[9],
-                    'Custom Weather Resistant' => 'PU-X',
-                    'Custom' => 'X',
-                    'Wood' => 'UN',
-                    default => '',
-                };
-                $cabFinishName = $workorder->cab_finish->name.' cabinet, ';
-            } else {
-                $cabFinishName = '';
-            };
-            $waveguide = $workorder->waveguide->name ?? '';
-            $scolour = empty($scolour) ? $waveguide : $scolour;
-
-            $xover = empty($workorder->model->x_over) ? '' : '('.$workorder->model->x_over.') ';
-            $connectors = match($workorder->model->mid) {
-                39,44,46,48,50,53,55,57 => 'NL4',
-                default => $workorder->product->connectors,
-            };
-
-            $grille = '';
-            if(!empty($workorder->grille_finish)){
-                if(!is_bool($workorder->grille_finish)) {
-                    if(!is_bool($workorder->grille_finish->type)) {
-                        $grille = match($workorder->grille_finish->type) {
-                            'Standard' => "M/Steel ".$workorder->grille_finish->name." grille, ",
-                            'Weather Resitant' => "S/Steel ".$workorder->grille_finish->name." grille, ",
-                            'Custom Weather Resistant' => "S/Steel ".$workorder->grille_finish->name." grille, ",
-                            default => '',
-                        };
-                    };
-                };
-            };
-            if($grille == '') {$grille = 'no grille, ';}
-        //final string construction
-            $workorder->pdesc = $name.' '.$scolour.' ('.$workorder->model->type.') '.$workorder->model->drive_units.': '.$workorder->model->amping.' '.
-                $xover.$connectors.' connectors, '.$cabFinishName.$grille.$workorder->product->fixings.' fixings, '.$workorder->model->features;    
-            
-            unset($workorder->product);
-            unset($workorder->model);
-            unset($workorder->cab_finish);
-            unset($workorder->waveguide_finish_id);
-            unset($workorder->grille_finish);
-            return $workorder;
-    }
-
-    public function createShortProductDescription(object $workorder) {
-        $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-        $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
-        $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
-        $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0); 
-    
-        $descArr = (object) [];
+        $this->getWorkorderInfo($workorder);
+        // $descArr = (object) [];
         //speaker model name
         $descArr->name = $workorder->model->name ?? 'No name';
-
         //Cabinet colour abbreviation
         if($workorder->cab_finish){
-            $descArr->scolour = match($workorder->cab_finish->type) {
-                'Standard' => $workorder->cab_finish->name[0],
-                'Weather Resistant' => 'PU-'.$workorder->cab_finish->name[9],
-                'Custom Weather Resistant' => 'PU-X',
-                'Custom' => 'X',
-                'Wood' => 'UN',
-                default => null,
-            };
+            $descArr->scolour = $this->getColourAbreviation($workorder->cab_finish);
         };
-
+        //Drive units
+        $descArr->driveUnits = $workorder->model->drive_units;
+        //Amping
+        $descArr->amping = $workorder->model->amping;
+        //X-over
+        $descArr->xover = $workorder->model->x_over ? "(".$workorder->model->x_over.")" : null;
+        //Connectors
+        $descArr->connectors = $this->getConnectors($workorder->product); 
+        //Cabinet colour
+        if(!is_bool($workorder->cab_finish)) {
+            $descArr->colour = $this->getColour($workorder->cab_finish->name, $workorder->cab_finish->type, $workorder->cab_finish->ral_code);
+        } else {
+            $descArr->scolour = '';
+        };
         //waveguide colour
         $descArr->waveguide = $workorder->waveguide->name ?? null;
         if ($descArr->waveguide) {
             $descArr->waveguide .= ' waveguide';
         }
-        
         //grille colour
-        $descArr->grille = null;
-        if($workorder->grille_finish){
-            $descArr->grille = match($workorder->product->fixings) {
-                'BZP Steel','Black p/Steel' => $workorder->grille_finish->name." m/steel grille",
-                'S/Steel','Black S/Steel' => $workorder->grille_finish->name." s/steel grille",
-                default => null,
-            };
-        };
-        if(!$descArr->grille && $workorder->cab_finish) {
-            $descArr->grille = 'no grille';
-        }
-
+        $descArr->grille = $this->getGrille($workorder);
+        //Fixings
+        $descArr->fixings = $workorder->product->fixings;
+        //Features
+        $descArr->features = $workorder->model->features;
+        //WR?
+        $descArr->weatherResistant = $workorder->cab_finish->type === 'Weather Resistant' ? 'Weather resistant' : null;
         //construct description
-        $desc = $descArr->name;
-        if($descArr->scolour) {
-            $desc .= " ($descArr->scolour)";
-        }
-        $parts = array_filter([
-            $descArr->waveguide,
-            $descArr->grille,
-        ]);
-        if($parts) {
-            $desc .= ', '.implode(', ',$parts);
-        }
+        $desc = $this->constructDescription($descArr);
+        // //set description
+        $workorder->pdesc = $desc;
+        // //remove objects that are no longer needed in workorder
+        $this->unsetObjects($workorder);
+        return $workorder;
+    }
 
+    private function initDescArr() {
+        $descArr = (object) [
+            'name' => '',
+            'scolour' => '',
+            'driveUnits' => '',
+            'amping' => '',
+            'xover' => '',
+            'connectors' => '',
+            'colour' => '',
+            'waveguide' => '',
+            'grille' => '',
+            'fixings' => '',
+            'features' => '',
+            'weatherResistant' => ''
+        ];
+
+        return $descArr;
+    }
+
+    public function createShortProductDescription(object $workorder) {
+    
+        $this->getWorkorderInfo($workorder);
+        $descArr = (object) [];
+        //speaker model name
+        $descArr->name = $workorder->model->name ?? 'No name';
+        //Cabinet colour abbreviation
+        if($workorder->cab_finish){
+            $descArr->scolour = $this->getColourAbreviation($workorder->cab_finish);
+        };
+        //waveguide colour
+        $descArr->waveguide = $workorder->waveguide->name ?? null;
+        if ($descArr->waveguide) {
+            $descArr->waveguide .= ' waveguide';
+        }
+        //grille colour
+        $descArr->grille = $this->getGrille($workorder);
+        //construct description
+        $desc = $this->constructDescription($descArr);
         //set description
         $workorder->pdesc = $desc;
-
-        // dumpAndDie($desc, $descArr);
-        
         //remove objects that are no longer needed in workorder
-        unset($workorder->product);
-        unset($workorder->model);
-        unset($workorder->cab_finish);
-        unset($workorder->grille_finish);
-        unset($workorder->waveguide);
-
+        $this->unsetObjects($workorder);
         return $workorder;
 
         
     }
 
+    private function getWorkorderInfo(object $workorder):object {
+        $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
+        $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
+        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
+        $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
+        $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0); 
+        return $workorder;
+    }
+
+    private function getColour($colourName, $type, $ral) {
+        $colour = '';
+        // if($type === 'Weather Resistant') $colour = 'Polyurea';
+        $colour .= $colourName;
+        if(!$ral ==='RAL 9005' && !$ral === 'RAL 9003') $colour .= '('.$ral.')';
+        return $colour.' cabinet';
+    }
+
+    private function getColourAbreviation(object $cabFinish): string{
+            $abreiviatedColour = match($cabFinish->type) {
+                'Standard' => $cabFinish->name[0],
+                'Weather Resistant' => 'PU-'.$cabFinish->name[9],
+                'Custom Weather Resistant' => 'PU-X',
+                'Custom' => 'X',
+                'Wood' => 'UN',
+                default => null,
+            };
+            return $abreiviatedColour;
+    }
+
+    private function getGrille(object $workorder) {
+        $grille = null;
+        if($workorder->grille_finish){
+            $grille = match($workorder->product->fixings) {
+                'BZP Steel','Black p/Steel' => $workorder->grille_finish->name." m/steel grille",
+                'S/Steel','Black S/Steel' => $workorder->grille_finish->name." s/steel grille",
+                default => null,
+            };
+        };
+        if(!$grille && $workorder->cab_finish) {
+            $grille = 'no grille';
+        }
+        return $grille;
+    }
+
+    private function getConnectors(object $product) {
+        $connectorMap = [
+            'PHX' => 'Phoenix connectors',
+            'NL4' => 'NL4 connectors',
+            'NL8' => 'NL8 connectors',
+            'NL4 & PHX' => 'NL4 & Pheonix connectors'
+        ];
+        return $connectorMap[$product->connectors];
+    }
+
+    private function constructDescription($descArr) {
+        $desc = $descArr->name;
+        if($descArr->scolour) {
+            $desc .= " ($descArr->scolour)";
+        } else {
+            $desc .= " ".explode(' ',$descArr->waveguide)[0];
+        };
+        $parts = array_filter([
+            $descArr->driveUnits,
+            $descArr->amping,
+            $descArr->xover,
+            $descArr->connectors,
+            $descArr->colour,
+            $descArr->waveguide,
+            $descArr->grille,
+            $descArr->fixings,
+            $descArr->features,
+            $descArr->weatherResistant
+        ]);
+        if($parts) {
+            $desc .= ', '.implode(', ',$parts);
+        }
+        return $desc;
+    }
+
+    private function unsetObjects(object $workorder):object {
+        unset($workorder->product);
+        unset($workorder->model);
+        unset($workorder->cab_finish);
+        unset($workorder->grille_finish);
+        unset($workorder->waveguide);
+        return $workorder;
+    }
 }
 
 

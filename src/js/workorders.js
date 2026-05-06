@@ -223,7 +223,7 @@ function initWorkOrders () {
                 const end = start + length -1;
                 const total = tag === 'com' ? totalCResults : totalAResults;
                 const el = tag === 'com' ? pageNumberInfoB : pageNumberInfoA;
-
+                //this could be refactored to not use innerHTML
                 el.innerHTML = `
                 Showing <span class="font-medium"> ${start} </span> 
                 to <span class="font-medium">${end}</span> 
