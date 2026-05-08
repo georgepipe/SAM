@@ -22,6 +22,7 @@
             $this->applyGrilleRules($data);
             $this->applyConnectorRules($data);
             $this->applySerialRules($data);
+            $this->applyWheelRules($data);
 
             return $data;
         }
@@ -53,6 +54,18 @@
             if(empty($data->form->serials) | $data->form->serials == 'TBC') {
                 $data->form->serials = 'To Be Confirmed';
             }
+            //5 digits per number!
+            $data->form->serials = $this->padSerials($data->form->serials);
+        }
+
+        private function padSerials(string $input): string {
+            return preg_replace_callback('/\d+/', function($match) {
+                return str_pad($match[0], 5, '0', STR_PAD_LEFT);
+            }, $input);
+        }
+
+        private function applyWheelRules(object $data):void {
+            if(!$data->form->wheels) $data->form->wheels = 0;
         }
 
         private function getCabFinishIdFromString(object $data): void {
@@ -97,7 +110,7 @@
             return in_array((string) $cabModelID, WorkorderRuleConfig::REQUIRE_CONNECTOR_SELECTION, TRUE);
         }
 
-        public function defaultConnectors($cabModelID): string {
+        public function defaultConnectors($cabModelID) {
             foreach(WorkorderRuleConfig::DEFAULT_CONNECTORS as $connector => $values) {
                 if(in_array($cabModelID, $values, TRUE)) {
                     return $connector;

@@ -6,129 +6,7 @@
 </div>
 <?php 
 
-require '../vendor/autoload.php';
-use Smalot\PdfParser\Parser;
 
-$pdfdata = null;
-$error = null;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
-    if($_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
-        $pdf = true;
-
-        function extractData($pattern, $text) {
-            preg_match($pattern, $text, $matches);
-            return isset($matches[1]) ? trim($matches[1]) : null;
-        }
-
-        $parser = new Parser();
-        $pdf = $parser->parseFile($_FILES['pdf']['tmp_name']);
-        $text = $pdf->getText();
-        $avn = extractData('/AVN_(\d{5})/', $_FILES['pdf']['name']);
-        $targetFile = TEMPDIR.basename('AVN_'.$avn.'.pdf');
-        $upload_file = move_uploaded_file($_FILES['pdf']['tmp_name'], $targetFile);
-        if($upload_file) {
-        } else {
-            throwErr(107,'Pdf upload error!');
-        };
-        unset($_FILES['pdf']); 
-
-       
-
-        function cleanSerials($serial) {
-            $serialString = str_replace("&","-",$serial);
-            preg_match('/([A-z])/',$serialString, $hasChar);
-            if ($hasChar) {
-                preg_match('/\/(\d{5}).*?\/(\d{5})/', $serialString, $matches);
-                if($matches){
-                $serialString = ltrim($matches[1],'0').' - '.ltrim($matches[2],'0');
-                ($serialString === ' - ') ? $serialString = '' : '' ;}
-            } else {
-                preg_match('/(\d{5})\s-\s(\d{5})/', $serialString, $matches);
-                if($matches) {
-                $serialString = ltrim($matches[1],'0').' - '.ltrim($matches[2],'0');
-                ($serialString === ' - ') ? $serialString = '' : '' ; }
-            }
-            $serialString === '' ? $serialString = $serial : '';
-            //remove any model name from start if present
-            preg_match('/(.*)\/\d{5}/',$serialString, $hasPrefix);
-            // print_r($hasPrefix);
-            if(isset($hasPrefix[1])) {
-                $serialString = substr($serialString, strlen($hasPrefix[1])+1);
-            }
-            return $serialString;
-        }
-
-    
-        $pdfdata = [
-            'AVN' => ltrim(extractData('/AVN\/(\d{5})/', $text),'0'),
-            'WKO' => ltrim(extractData('/WKO\/(\d{5}\/[A-Z]-\d{2})/', $text),'0'),
-            'desc' => trim(preg_replace('/\s+/', ' ', extractData('/Description:\s*(.*?)\s*Serial Numbers:/s', $text))),
-            'serials' => extractData('/Serial Nos:\s*(.*?)\nCharge and Quantity/s', $text) ?? extractData('/Serial Numbers:(.*?)\sCharge/', $text),
-            'quantity' => extractData('/Qty Required:\s*(\d+)/', $text),
-            'model' => extractData('/Description:(.*?)\s/',$text) ?? extractData('/(.*?)\s/',$text),
-            'colour' => ucwords(extractData('/s, (.*?)\scabinet/', $text) ?? extractData('/s,(.*?)\swaveguide/', $text)," "),
-            'grille' => ucwords(extractData('/t, (.*?)\sgrille/',$text)," \t\r\n\f\v'"),
-            'connectors' => extractData('/d,(.*?)\sconnectors/',$text) ?? extractData('/\),(.*?)\sconnectors/',$text),
-            'fixings' => ucwords(extractData('/\s([sm][\W]steel)\s[\s\S]?f/',$text),"'"),
-            'waveguide' => extractData('/t,\s(.*?)\swaveguide,/',$text),
-            'transport' => (extractData('/(Deliver\sto\sF1)/',$text) ?? extractData('/(To\sstorage)/',$text)) ?? 'TBC',
-            'wheels' => (extractData('/WK-4IN\sto\sbe\sfitted/',$text)) ? true : false,
-            'part_no' => extractData('/(F1-\d{3}-\d{3})/', $text),
-            'status' => 'To Be Built'// -- eventually this should set to either 'to be built' or 'waiting for parts' depending on stock levels
-        ]; 
-
-        $i = 0;
-        $grille = explode(" ",$pdfdata['grille']);
-        $countG = count($grille);
-        if ($countG < 1) {
-            for ($i = 0; $i <= $countG; $i++) {
-                ucfirst($grille[$i]) === "S'Steel" ? $grille[$i] = "S/Steel" : '';
-                ucfirst($grille[$i]) === "M'Steel" ? $grille[$i] = "M/Steel" : '';
-                ucfirst($grille[$i]) === 'No' ? $grille = [] : '';
-            }
-        }
-        $pdfdata['grille'] = implode(' ',$grille);
-        if (str_contains($pdfdata['grille'],', No')) {
-            $pdfdata['grille'] = '';
-        }
-
-        empty($pdfdata['serials']) ? $pdfdata['serials'] = extractData('/(\d{5}\s-\s\d{5})/', $text): '';
-        $pdfdata['serials'] = cleanSerials($pdfdata['serials']);
-
-        $modelCheck = extractData('/(mkII)/',$text);
-        if($modelCheck) {
-            $pdfdata['model'] = substr($pdfdata['model'],0,strlen($pdfdata['model'])-4).' MkII';
-        }
-        $modelCheck = strtoupper(substr($pdfdata['model'],0,3));
-        if($modelCheck === 'EVO' | $modelCheck === 'RES') {
-            $pdfdata['model'] = strtoupper($pdfdata['model']);
-            $pdfdata['model'] = substr($pdfdata['model'],0,3).' '.substr($pdfdata['model'],3);
-            unset($modelCheck);
-            $modelCheck = extractData('/(SH)/',$pdfdata['model']);
-            if($modelCheck) {
-                $pdfdata['waveguide'] = $pdfdata['colour'];
-                unset($pdfdata['colour']);
-            }
-        }
-        if($pdfdata['model']==='F121') {$pdfdata['model']='F121 MkII';}
-
-        if($pdfdata['grille']==='No'|$pdfdata['grille']==='No Throat') {
-            $pdfdata['grille'] = '';
-        }
-        preg_match('/(Throat)/',$pdfdata['grille'],$matches);
-        if(isset($matches[0])) {
-            $grilleLen = strlen($pdfdata['grille']);
-            $pdfdata['grille'] = substr($pdfdata['grille'],0,$grilleLen-7);
-            // if($pdfdata['grille'] === "Brushed S'Steel") {$pdfdata['grille'] = "Brushed S/Steel";
-            // }
-            // if($pdfdata['grille'] === "Black S'Steel") {$pdfdata['grille'] = "Black S/Steel";
-            // }
-        } 
-        $names = array_column($data->models,"name");
-        $pdfdata['model_id'] = array_search($pdfdata['model'], $names)+1;
-    }
-} else {$pdf = false;}
 
 // if (!(is_bool($data->data->cab_model_id))) {
 //     echo '<pre>';
@@ -150,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
             <h1 >Add Work Order</h1>
             <p>Add/Upload a AVN to the database using the form or button below</p>
             <br>
-
             <div class="border-4" style="display: flex; justify-content: center;">
                 <form id="addForm" action="" onsubmit="" method="post" enctype="multipart/form-data">
                     <input style="padding-left:250px; color:transparent;" type="file" name="pdf" title=" " accept="application/pdf" required onchange="this.form.submit();">
@@ -164,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             name="wko" 
                             id="wko"
                             class= "<?php echo (!empty($data->errors->err_wko))? 'is-invalid' : '';?>" 
-                            value="<?php echo $pdfdata['WKO'] ?? ($data->data->wko ?? '') ;?>">
+                            value="<?php echo $data->pdfData->wko ?? ($data->data->wko ?? '') ;?>">
                         <span class="invalid-feedback"><?php echo $data->errors->err_wko ?? '';?></span>
                     </div>
                     <div class="form-group">
@@ -173,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             name="avn" 
                             id="avn"
                             class= "<?php echo (!empty($data->errors->err_avn))? 'is-invalid' : '';?>" 
-                            value="<?php echo $pdfdata['AVN'] ?? ($data->data->avn ?? '');?>">
+                            value="<?php echo $data->pdfData->avn ?? ($data->data->avn ?? '');?>">
                         </input>
                         <span class="invalid-feedback"><?php echo $data->errors->err_avn ?? '';?></span>
                     </div>
@@ -188,12 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                                 value="
                                     <?php if(isset($data->data->cab_model_id)) {echo $data->data->cab_model_id;} 
                                         else 
-                                            {if(isset($pdfdata['model_id'])){echo $pdfdata['model_id'];} 
+                                            {if(isset($data->pdfData->cab_model)){echo $data->pdfData->cab_model;} 
                                                 else {;};}
                                     ?>">
                                     <?php if(isset($data->data->cab_model_id) && !empty($data->data->cab_model_id)) {echo $data->models[$data->data->cab_model_id-1]->name;} 
                                         else 
-                                            {if(isset($pdfdata['model'])){echo $pdfdata['model'];} 
+                                            {if(isset($data->pdfData->cab_model)){echo $data->pdfData->cab_model;} 
                                                 else {echo '- -';};} ?>
                             </option>
 
@@ -203,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         </select>
                         <span class="invalid-feedback"><?php echo $data->errors->err_cab_model_id ?? '';?></span>
                     </div>
-                    <div class="ccDiv <?php if($pdf){if(!empty($pdfdata['colour']) | !empty($data->data->cab_finish_id)){echo 'form-group';} else {echo 'hidden';}} else {echo 'form-group';} ?>">
+                    <div class="ccDiv <?php if($pdf){if(!empty($data->pdfData->colour) | !empty($data->data->cab_finish_id)){echo 'form-group';} else {echo 'hidden';}} else {echo 'form-group';} ?>">
                         <label for="cab_finish_id">Speaker Colour: <sup>*</label>
                         <select
                             name="cab_finish_id" 
@@ -214,12 +91,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                                 value="
                                     <?php if(isset($data->data->cab_finish_id)) {echo $data->data->cab_finish_id;} 
                                         else 
-                                            {if(isset($pdfdata['colour'])){echo $pdfdata['colour'];} 
+                                            {if(isset($data->pdfData->cab_finish)){echo $data->pdfData->cab_finish;} 
                                                 else 
                                                     {echo '';};}?>">
                                     <?php if(isset($data->data->cab_finish_id) && !empty($data->data->cab_finish_id)) {echo $data->finishes[$data->data->cab_finish_id-1]->name;} 
                                         else 
-                                            {if(isset($pdfdata['colour'])){echo $pdfdata['colour'];} 
+                                            {if(isset($data->pdfData->cab_finish)){echo $data->pdfData->cab_finish;} 
                                                 else 
                                                     {echo '- -';};}?>
                             </option>
@@ -231,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         </select>
                         <span class="invalid-feedback"><?php echo $data->errors->err_cab_finish_id ?? '';?></span>
                     </div>
-                    <div class="gDiv <?php if(!empty($pdfdata['grille']) || !empty($data->data->grille_finish_id) || !empty($data->errors->err_grille_colour)){echo 'form-group';} else {echo 'hidden';} ?>">
+                    <div class="gDiv <?php if(!empty($data->pdfData->grille_finish) || !empty($data->data->grille_finish_id) || !empty($data->errors->err_grille_colour)){echo 'form-group';} else {echo 'hidden';} ?>">
                         <label for="grille_finish_id">Speaker Grille: </label>
                         <select 
                             name="grille_finish_id" 
@@ -242,13 +119,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                                 if(isset($data->data->grille_finish_id)) 
                                     {echo $data->data->grille_finish_id;} 
                                 else 
-                                    {if(isset($pdfdata['grille']))
-                                        {echo $pdfdata['grille'];} 
+                                    {if(isset($data->pdfData->grille_finish))
+                                        {echo $data->pdfData->grille_finish;} 
                                             else {echo '';};}?>">
                                 <?php if(!empty($data->data->grille_finish_id)) 
                                     {echo $data->finishes[$data->data->grille_finish_id-1]->name;} 
-                                        else {if(isset($pdfdata['grille']))
-                                            {echo $pdfdata['grille'];} else {echo '- -';};}?>
+                                        else {if(isset($data->pdfData->grille_finish))
+                                            {echo $data->pdfData->grille_finish;} else {echo '- -';};}?>
                             </option>
 
                             <?php foreach($data->finishes as $finish) : ?>
@@ -259,14 +136,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         </select>
                         <span class="invalid-feedback"><?php echo $data->errors->err_grille_colour ?? '';?></span>
                     </div>
-                    <div class="wDiv <?php if(!empty($pdfdata['waveguide']) || !empty($data->data->waveguide_finish_id) || !empty($data->errors->err_waveguide_finish_id)) {echo 'form-group';} else {echo 'hidden';} ?> ">
+                    <div class="wDiv <?php if(!empty($data->pdfData->waveguide_finish) || !empty($data->data->waveguide_finish_id) || !empty($data->errors->err_waveguide_finish_id)) {echo 'form-group';} else {echo 'hidden';} ?> ">
                         <label for="waveguide_finish_id">Waveguide Colour: </label>
                         <select 
                             name="waveguide_finish_id" 
                             id="waveguide_finish_id" 
                             class="waveguideSel <?php echo (!empty($data->errors->err_waveguide_finish_id))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->waveguide_finish_id ?? '';?>">
-                            <option value="<?php echo $data->data->waveguide_finish_id ?? ($pdfdata['waveguide'] ?? '') ?>"><?php echo ($data->data->waveguide_finish_id ?? ($pdfdata['waveguide'] ?? '')) ?? '- -' ?></option>
+                            <option value="<?php echo $data->data->waveguide_finish_id ?? ($data->pdfData->waveguide_finish ?? '') ?>"><?php echo ($data->data->waveguide_finish_id ?? ($data->pdfData->waveguide_finish ?? '')) ?? '- -' ?></option>
                             <?php foreach($data->finishes as $finish) : ?>
                                 <?php if($finish->type === 'Polyurethane') :?>
                                     <option value="<?php echo $finish->id;?>"><?php echo $finish->name;?></option> 
@@ -275,20 +152,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         </select>
                         <span class="invalid-feedback"><?php echo $data->errors->err_waveguide_finish_id ?? '';?></span>
                     </div>
-                    <div class="whDiv <?php if(!empty($pdfdata['wheels']) | !empty($data->data->wheels)){echo 'form-group';} else {echo 'hidden';} ?>">
+                    <div class="whDiv <?php if(!empty($data->pdfData->wheels) | !empty($data->data->wheels)){echo 'form-group';} else {echo 'hidden';} ?>">
                         <label for="wheels">Wheels:</label>
                         <input name="wheels" 
                                 type="checkbox"
                                 id="wheels"
                                 class= "" 
-                            value="<?php echo $data->data->wheels ?? ($pdfdata['wheels'] ?? '');?>"></input>
+                            value="<?php echo $data->data->wheels ?? ($data->pdfData->wheels ?? '');?>"></input>
                     </div>
                     <div class="form-group">
                         <label for="quantity">Quantity: <sup>*</label>
                         <input name="quantity" 
                             class= "<?php echo (!empty($data->errors->err_quantity))? 'is-invalid' : '';?>" 
                             id="quantity"
-                            value="<?php echo $data->data->quantity ?? ($pdfdata['quantity'] ?? '');?>"></input>
+                            value="<?php echo $data->data->quantity ?? ($data->pdfData->quantity ?? '');?>"></input>
                         <span class="invalid-feedback"><?php echo $data->errors->err_quantity ?? '';?></span>
                     </div>
                     <div class="form-group">
@@ -296,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         <input name="serials" 
                             class= "<?php echo (!empty($data->errors->err_serials))? 'is-invalid' : '';?>" 
                             id="serials"
-                            value="<?php echo $data->data->serials ?? ($pdfdata['serials'] ?? '');?>"></input>
+                            value="<?php echo $data->data->serials ?? ($data->pdfData->serials ?? '');?>"></input>
                         <span class="invalid-feedback"><?php echo $data->errors->err_serials ?? '';?></span>
                     </div>
                     <div class="form-group">
@@ -305,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                             class= "<?php echo (!empty($data->errors->err_wko_status))? 'is-invalid' : '';?>" 
                             id="wko_status"
                             value="">
-                            <option value="<?php echo $pdfdata['status'] ?? '';?>"><?php echo $pdfdata['status'] ?? '';?></option>
+                            <option value="<?php echo $data->pdfData->status ?? 'Upcoming';?>"><?php echo $data->pdfData->status ?? 'Upcoming';?></option>
                             <option value="In Progress">In Progress</option>
                             <option value="On Hold">On Hold</option>
                             <option value="To Be Built">To Be Built</option>
@@ -319,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         <input name="wko_delivery" 
                             class= "<?php echo (!empty($data->errors->err_wko_delivery))? 'is-invalid' : '';?>" 
                             id="wko_delivery"
-                            value="<?php echo $data->data->wko_delivery ?? ($pdfdata['transport'] ?? '');?>"></input>
+                            value="<?php echo $data->data->wko_delivery ?? ($data->pdfData->transport ?? '');?>"></input>
                         <span class="invalid-feedback"><?php echo $data->errors->err_wko_delivery ?? '';?></span>
                     </div>
                     <div class="form-group">
@@ -327,13 +204,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
                         <textarea name="wko_notes" 
                             class= "<?php echo (!empty($data->errors->err_wko_notes))? 'is-invalid' : '';?>" 
                             id="wko_notes"
-                            value="<?php echo $data->data->wko_notes ?? ''; ?>"><?php echo $data->data->wko_notes ?? ''; ?></textarea>
+                            value="<?php echo $data->data->wko_notes ?? ($data->pdfData->notes ?? ''); ?>"><?php echo $data->data->wko_notes ?? ($data->pdfData->notes ?? ''); ?></textarea>
                         <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes ?? '';?></span>
                     </div>
                     <div class="hidden">
                                     <input name="fixings"
                                         id="fixings"
-                                        value="<?= $pdfdata['fixings'] ?>"></input>
+                                        value="<?= $data->pdfData->fixings ?>"></input>
                     </div>
                     <div class="form-group">
                         <label for="addAnother">Add Another:</label>
@@ -357,9 +234,9 @@ echo $data->data->waveguide_finish_id ?? '';
 
 ?>
 
-<?php echo '<PRE>data->errs:'; print_r($data->errors ?? '');?>
-<?php echo 'data->data:'; print_r($data->data??'');?>
-<?php echo 'pdfData:'; print_r($pdfdata??'');?>
-<?php echo 'data->models:'; print_r($data->models??'');?>
+<?php echo '<PRE>data->errs:'; print_r($data->errors ?? '');?><br>
+<?php echo 'data->data:'; print_r($data->data??'');?><br>
+<?php echo 'pdfData:'; print_r($data->pdfData??'');?><br>
+<?php echo 'data->models:'; print_r($data->models??'');?><br>
 
 <?php require APPROOT . '/views/inc/footer.php'; ?>

@@ -15,55 +15,6 @@ class ProductDescriptionService{
 
     }
 
-
-    public function createProductDescription(object $workorder) {
-        
-        $descArr = $this->initDescArr();
-
-        $this->getWorkorderInfo($workorder);
-        // $descArr = (object) [];
-        //speaker model name
-        $descArr->name = $workorder->model->name ?? 'No name';
-        //Cabinet colour abbreviation
-        if($workorder->cab_finish){
-            $descArr->scolour = $this->getColourAbreviation($workorder->cab_finish);
-        };
-        //Drive units
-        $descArr->driveUnits = $workorder->model->drive_units;
-        //Amping
-        $descArr->amping = $workorder->model->amping;
-        //X-over
-        $descArr->xover = $workorder->model->x_over ? "(".$workorder->model->x_over.")" : null;
-        //Connectors
-        $descArr->connectors = $this->getConnectors($workorder->product); 
-        //Cabinet colour
-        if(!is_bool($workorder->cab_finish)) {
-            $descArr->colour = $this->getColour($workorder->cab_finish->name, $workorder->cab_finish->type, $workorder->cab_finish->ral_code);
-        } else {
-            $descArr->scolour = '';
-        };
-        //waveguide colour
-        $descArr->waveguide = $workorder->waveguide->name ?? null;
-        if ($descArr->waveguide) {
-            $descArr->waveguide .= ' waveguide';
-        }
-        //grille colour
-        $descArr->grille = $this->getGrille($workorder);
-        //Fixings
-        $descArr->fixings = $workorder->product->fixings;
-        //Features
-        $descArr->features = $workorder->model->features;
-        //WR?
-        $descArr->weatherResistant = $workorder->cab_finish->type === 'Weather Resistant' ? 'Weather resistant' : null;
-        //construct description
-        $desc = $this->constructDescription($descArr);
-        // //set description
-        $workorder->pdesc = $desc;
-        // //remove objects that are no longer needed in workorder
-        $this->unsetObjects($workorder);
-        return $workorder;
-    }
-
     private function initDescArr() {
         $descArr = (object) [
             'name' => '',
@@ -83,9 +34,57 @@ class ProductDescriptionService{
         return $descArr;
     }
 
+    public function createProductDescription(object $workorder) {
+        
+        $descArr = $this->initDescArr();
+
+        $this->hydrateWorkorder($workorder);
+        // $descArr = (object) [];
+        //speaker model name
+        $descArr->name = $workorder->model->name ?? 'No name';
+        //Cabinet colour abbreviation
+        if($workorder->cab_finish){
+            $descArr->scolour = $this->getColourAbreviation($workorder->cab_finish);
+        };
+        //Drive units
+        $descArr->driveUnits = $workorder->model->drive_units ?? null;
+        //Amping
+        $descArr->amping = $workorder->model->amping ?? null;
+        //X-over
+        $descArr->xover = $workorder->model->x_over ? "(".$workorder->model->x_over.")" : null;
+        //Connectors
+        $descArr->connectors = $this->getConnectors($workorder->product) ?? null; 
+        //Cabinet colour
+        if(!is_null($workorder->cab_finish)) {
+            $descArr->colour = $this->getColour($workorder->cab_finish->name, $workorder->cab_finish->type, $workorder->cab_finish->ral_code);
+        } else {
+            // $descArr->scolour = '';
+        };
+        //waveguide colour
+        $descArr->waveguide = $workorder->waveguide->name ?? null;
+        if ($descArr->waveguide) {
+            $descArr->waveguide .= ' waveguide';
+        }
+        //grille colour
+        $descArr->grille = $this->getGrille($workorder) ?? null;
+        //Fixings
+        $descArr->fixings = $workorder->product->fixings ?? null;
+        //Features
+        $descArr->features = $workorder->model->features ?? null;
+        //WR?
+        $descArr->weatherResistant = $workorder->cab_finish->type === 'Weather Resistant' ? 'Weather resistant' : null;
+        //construct description
+        $desc = $this->constructDescription($descArr);
+        // //set description
+        $workorder->pdesc = $desc;
+        // //remove objects that are no longer needed in workorder
+        $this->unsetObjects($workorder);
+        return $workorder;
+    }
+
     public function createShortProductDescription(object $workorder) {
     
-        $this->getWorkorderInfo($workorder);
+        $this->hydrateWorkorder($workorder);
         $descArr = (object) [];
         //speaker model name
         $descArr->name = $workorder->model->name ?? 'No name';
@@ -111,10 +110,10 @@ class ProductDescriptionService{
         
     }
 
-    private function getWorkorderInfo(object $workorder):object {
+    private function hydrateWorkorder(object $workorder):object {
         $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
         $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
+        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0) ?? null;
         $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
         $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0); 
         return $workorder;
@@ -124,8 +123,8 @@ class ProductDescriptionService{
         $colour = '';
         // if($type === 'Weather Resistant') $colour = 'Polyurea';
         $colour .= $colourName;
-        if(!$ral ==='RAL 9005' && !$ral === 'RAL 9003') $colour .= '('.$ral.')';
-        return $colour.' cabinet';
+        if($ral !=='RAL 9005' && $ral !== 'RAL 9003' && $ral !== null) $colour .= ' ('.$ral.')';
+        if($colourName) return $colour.' cabinet';
     }
 
     private function getColourAbreviation(object $cabFinish): string{
@@ -162,7 +161,7 @@ class ProductDescriptionService{
             'NL8' => 'NL8 connectors',
             'NL4 & PHX' => 'NL4 & Pheonix connectors'
         ];
-        return $connectorMap[$product->connectors];
+        return $connectorMap[$product->connectors] ?? null;
     }
 
     private function constructDescription($descArr) {
@@ -170,7 +169,7 @@ class ProductDescriptionService{
         if($descArr->scolour) {
             $desc .= " ($descArr->scolour)";
         } else {
-            $desc .= " ".explode(' ',$descArr->waveguide)[0];
+            $desc .= " (".strtoupper($descArr->waveguide[0]).")";
         };
         $parts = array_filter([
             $descArr->driveUnits,
@@ -185,7 +184,7 @@ class ProductDescriptionService{
             $descArr->weatherResistant
         ]);
         if($parts) {
-            $desc .= ', '.implode(', ',$parts);
+            $desc .= ' '.implode(', ',$parts);
         }
         return $desc;
     }

@@ -3,12 +3,18 @@
  * Controls the front end php functions required by the work orders to get,
  * add, edit and delete orders as well as directing the browser to the relavent views
  */
+
+
+// use \Smalot\PdfParser\parser;
+
 class Workorders extends Controller {
     private $woModel;
     private $moModel;
     private $poModel;
     private $userModel;
     private $seModel;
+    // private PDFWorkorderParserService $parserService;
+    // private PDFWorkorderValidationService $validationService;
     
     public function __construct() {
         if(!isLoggedIn()) {
@@ -88,7 +94,33 @@ class Workorders extends Controller {
 
  
     public function add() {
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && !isset(($_FILES['pdf']))) {
+
+        
+
+        $pdfdata = [];
+        $error = null;
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset(($_FILES['pdf']))) {
+
+            $parserService = new PDFWorkorderParserService; 
+            $pdfData = $parserService->parse($_FILES['pdf']);
+            $targetFile = TEMPDIR.basename('AVN_'.$avn.'.pdf');
+            $upload_file = move_uploaded_file($_FILES['pdf']['tmp_name'], $targetFile);
+            unset($_FILES['pdf']);
+
+            // dumpAndDie($data);
+            $models = $this->moModel->getModelNames();
+            $finishes = $this->woModel->getFinishes();
+            $data = (object) [
+                'models' => $models,
+                'finishes' => $finishes,
+                'pdfData' => $pdfData->extracted
+            ];
+            $this->view('workorders/add', $data);
+
+
+        } elseif($_SERVER['REQUEST_METHOD'] == 'POST' && !isset(($_FILES['pdf']))) {
+
             $data = (object) [
                 'form' => $this->getPostedWorkorderData(),
                 'errors' => $this->initialiseErrors()
@@ -310,4 +342,5 @@ class Workorders extends Controller {
         redirect('workorders/index');
     }
 
-}
+   
+} ?>

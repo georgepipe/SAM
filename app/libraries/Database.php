@@ -77,7 +77,12 @@
      * @return bool or last index
      */
     public function execute(){
-        $exe = $this->stmt->execute();
+        try {
+            $exe = $this->stmt->execute();
+        } catch (PDOexception $e) {
+            throwErr(7,'Database execute error!', $e);
+        }
+        
         if ($exe) {
             if($this->dbhandler->lastInsertId()>0) {
                 return $this->dbhandler->lastInsertId();
