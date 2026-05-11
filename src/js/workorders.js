@@ -362,7 +362,7 @@ function initWorkOrders () {
             document.addEventListener('click', function (e) {
                 const row = e.target.closest('.worow');
                 let woid; 
-                if(row) row.dataset.id;
+                if(row) woid = row.dataset.id;
                 if(e.target.closest('.dltBtn')){
                     if(confirm("Are you sure you want to delete this workorder?")) {
                         window.location.href = `${URLROOT}workorders/delete/${woid}`;

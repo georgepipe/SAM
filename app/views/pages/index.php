@@ -23,8 +23,7 @@
 
         <BR>
         <strong class="border-b-2">Transport Page:</strong><BR>
-            - Calculate total weight for delivery<BR>  
-            - Add search bar to filter results
+            - Add search bar to filter results <BR>
             - categorise avliable complete wkos into: -to funktion one, -to storage & unassigned<br>
         <BR><BR>
         <strong class="border-b-2">Inventory Page:</strong><BR>

@@ -68,7 +68,7 @@ class ProductDescriptionService{
         //grille colour
         $descArr->grille = $this->getGrille($workorder) ?? null;
         //Fixings
-        $descArr->fixings = $workorder->product->fixings ?? null;
+        $descArr->fixings = $workorder->product->fixings." fixings" ?? null;
         //Features
         $descArr->features = $workorder->model->features ?? null;
         //WR?
@@ -77,7 +77,7 @@ class ProductDescriptionService{
         $desc = $this->constructDescription($descArr);
         // //set description
         $workorder->pdesc = $desc;
-        // //remove objects that are no longer needed in workorder
+        // //remove objects that are no longer needed in workorder before returning it
         $this->unsetObjects($workorder);
         return $workorder;
     }

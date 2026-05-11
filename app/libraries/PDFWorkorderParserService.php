@@ -68,7 +68,7 @@ use App\DTOs\ExtractedFields;
             $extracted = new ExtractedFields (
                 avn: $this->extractionHelper('/AVN\/(\d{5})/',$text),
                 wko: $this->extractionHelper('/WKO\/(\d{5}\/[A-Z]-\d{2})/',$text),
-                cab_model: $this->formatModel($this->extractionHelper('/Description:([A-z]{1,4}[0-9]{1,3})/',$text)),
+                cab_model: $this->extractModel($text),
                 cab_finish: $this->extractCabColour($text),
                 // cab_finish_ral: $this->extractCabRal($text),
                 waveguide_finish: $this->extractionHelper('/s, (.*?)\swaveguide/',$text),
@@ -83,6 +83,12 @@ use App\DTOs\ExtractedFields;
             
             );
             return $extracted;
+        }
+
+        private function extractModel($text) {
+            //needs help detecting SH models i.e RES 2SH, EVO 2SH...
+            $model = $this->formatModel($this->extractionHelper('/Description:([A-z]{1,4}[0-9]{1,3}.?\d{1,2}?)/',$text));
+            return $model;
         }
 
         private function formatModel(string $model) {
@@ -164,7 +170,7 @@ use App\DTOs\ExtractedFields;
         }
 
         private function extractGrilleColour($text) {
-            //
+            //need to account for 'throat grille' variations
             $colour = ucwords($this->extractionHelper('/t, (.*?)\sgrille/',$text)," \t\r\n\f\v'");
             if($colour[1] === "'" | $grille[1] === '/') {
                 //find other reference

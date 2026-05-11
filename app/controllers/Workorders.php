@@ -125,7 +125,7 @@ class Workorders extends Controller {
                 'form' => $this->getPostedWorkorderData(),
                 'errors' => $this->initialiseErrors()
             ];
-            $ruleService= new WorkorderRuleService($this->woModel, $this->moModel);
+            $ruleService = new WorkorderRuleService($this->woModel, $this->moModel);
             $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
             $data = $ruleService->apply($data);
             $data = $validationService->validate($data);
@@ -266,11 +266,15 @@ class Workorders extends Controller {
     }
 
 
-    public function delete($id) {
-        if($this->woModel->deleteOrder($id)) {
-            return true;
+    public function delete(int $id) {
+        if($id && is_int($id)) {
+            if($this->woModel->deleteOrder($id)) {
+                return true;
+            } else {
+                throwErr(607,'Error! Delete order failed.');
+            }
         } else {
-            return false;
+            throwErr(607,'Error! No workorder ID was given.');
         }
     }
 
@@ -278,7 +282,6 @@ class Workorders extends Controller {
         $descriptionService = new ProductDescriptionService($this->moModel, $this->poModel, $this->woModel);
         $workorder = $descriptionService->createProductDescription($this->woModel->getWorkorderById($id));
         $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
-        dumpAndDie($id,$workorder);
         $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
         if(!empty($workorder->product->cab_finish_id)) {$workorder->product->cab_finish = $this->woModel->getFinishFromId($workorder->product->cab_finish_id); unset($workorder->product->cab_finish_id);}
         if(!empty($workorder->product->grille_finish_id)) {$workorder->product->grille_finish_id = $this->woModel->getFinishFromId($workorder->product->grille_finish_id);}

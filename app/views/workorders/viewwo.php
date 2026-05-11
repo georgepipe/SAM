@@ -131,8 +131,8 @@
 $model = $data->workorder->model->name ?? '';
 
 // finish
-$ral = $data->workorder->cab_finish->ral_code ?? '';
-$finish = $data->workorder->cab_finish->name ?? '';
+$ral = $data->workorder->product->cab_finish->ral_code ?? '';
+$finish = $data->workorder->product->cab_finish->name ?? '';
 if ($finish !== '') {
     $finish .= $ral !== '' ? ' (' . $ral . ')' : '';
 }
@@ -215,7 +215,7 @@ $avnUrl = URLROOT . 'advice_notes/AVN_' . $avnNumber . '.pdf';
 
                 <div class="spec-row">
                     <span class="spec-label">Notes</span>
-                    <span class="spec-value"><?php echo nl2br(htmlspecialchars($data->workorder->wko_notes)); ?></span>
+                    <span class="spec-value"><?= nl2br(htmlspecialchars($data->workorder->wko_notes)); ?></span>
                 </div>
 
                 <div class="spec-row">
@@ -241,10 +241,10 @@ $avnUrl = URLROOT . 'advice_notes/AVN_' . $avnNumber . '.pdf';
                     </span>
                 </div>
 
-                <?php if ($finish !== ''): ?>
+                <?php if (1===1): ?>
                     <div class="spec-row">
                         <span class="spec-label">Cab Finish</span>
-                        <span class="spec-value"><?php echo htmlspecialchars($finish); ?></span>
+                        <span class="spec-value"><?= htmlspecialchars($finish); ?></span>
                     </div>
                 <?php endif; ?>
 
