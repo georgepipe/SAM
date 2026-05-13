@@ -1,6 +1,7 @@
 <?php   
 //FILLS IN DEFAULT DATA TO MEET PRODUCT RULESETS AND SETS DEFAULTS IS APPLICABLE
 //CONVERTS STRING FORM ENTRIES INTO THEIR RESPECTIVE DB IDs
+//CONVERT LONG STRINGS TO ABBREVIATED STRINGS WHERE APPLICABLE TO MATCH DB FORMAT
 
     class WorkorderRuleService {
 
@@ -14,7 +15,6 @@
         public function apply(object $data): object {
             $this->applyDefaults($data);
             $this->getIdsFromStrings($data);
-
             return $data;
         }
 
@@ -23,6 +23,7 @@
             $this->applyConnectorRules($data);
             $this->applySerialRules($data);
             $this->applyWheelRules($data);
+            $this->applyFixingRules($data);
 
             return $data;
         }
@@ -44,9 +45,14 @@
         }
 
         private function applyConnectorRules(object $data): void {
-            $defaultConnectors = $this->defaultConnectors($data->form->cab_model_id);
+
+            $defaultConnectors = $this->defaultConnectors($data->form->cab_model_id); //find default connectors for a given cab model
             if(empty($data->form->connectors) && $defaultConnectors != null) {
                 $data->form->connectors = $defaultConnectors;
+            } else {
+                if($data->form->connectors === 'NL4 & Phoenix') {
+                    $data->form->connectors = 'NL4 & PHX';
+                }
             }
         }
 
@@ -68,6 +74,15 @@
             if(!$data->form->wheels) $data->form->wheels = 0;
         }
 
+        private function applyFixingRules(object $data) {
+            //replace apostrophes with slashes
+            //capitalise fixings names p'steel => p/Steel
+            $data->form->fixings = preg_replace('/\'/','/',$data->form->fixings);
+            $data->form->fixings = preg_replace('/s/','S',$data->form->fixings);
+            $data->form->fixings = preg_replace('/b/i','B',$data->form->fixings);
+            $data->form->fixings = preg_replace('/bzp/i','BZP',$data->form->fixings);
+        }
+
         private function getCabFinishIdFromString(object $data): void {
             if(!is_numeric($data->form->cab_finish_id) && !empty($data->form->cab_finish_id)) {
                 $sh = preg_match('/(SH)/',$data->form->cab_model_id);
@@ -82,10 +97,11 @@
         }
 
         private function getGrilleFinishIdFromString(object $data): void {
-            //  get grille colour from pdf grille input
+            //  get grille colour from form grille input
             $decoded = html_entity_decode($data->form->grille_finish_id);
             $regex = "/\s*.'steel/i";
             $data->form->grille_finish_id = preg_replace($regex,'',$decoded);
+
             if (!is_numeric($data->form->grille_finish_id) && !empty($data->form->grille_finish_id)) {
                 $data->form->grille_finish_id = $this->woModel->getFidFromName($data->form->grille_finish_id, 0); 
             }
@@ -126,6 +142,8 @@
         public function requiresCabinetFinish($cabModelID): bool {
             return in_array((string) $cabModelID, WorkorderRuleConfig::REQUIRE_CABINET_FINISH, TRUE);
         }
+
+
 
 
     }

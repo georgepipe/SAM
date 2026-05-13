@@ -5,7 +5,6 @@
  */
 
 
-// use \Smalot\PdfParser\parser;
 
 class Workorders extends Controller {
     private $woModel;
@@ -13,8 +12,6 @@ class Workorders extends Controller {
     private $poModel;
     private $userModel;
     private $seModel;
-    // private PDFWorkorderParserService $parserService;
-    // private PDFWorkorderValidationService $validationService;
     
     public function __construct() {
         if(!isLoggedIn()) {
@@ -95,8 +92,6 @@ class Workorders extends Controller {
  
     public function add() {
 
-        
-
         $pdfdata = [];
         $error = null;
 
@@ -104,11 +99,13 @@ class Workorders extends Controller {
 
             $parserService = new PDFWorkorderParserService; 
             $pdfData = $parserService->parse($_FILES['pdf']);
-            $targetFile = TEMPDIR.basename('AVN_'.$avn.'.pdf');
+            $targetFile = TEMPDIR.basename('AVN_'.str_pad($pdfData->extracted->avn,5,"0",STR_PAD_LEFT).'.pdf');
             $upload_file = move_uploaded_file($_FILES['pdf']['tmp_name'], $targetFile);
+            // dumpAndDie($pdfData, $targetFile,"<BR>", $upload_file);
             unset($_FILES['pdf']);
+            
 
-            // dumpAndDie($data);
+            // dumpAndDie($pdfData);
             $models = $this->moModel->getModelNames();
             $finishes = $this->woModel->getFinishes();
             $data = (object) [
@@ -127,8 +124,11 @@ class Workorders extends Controller {
             ];
             $ruleService = new WorkorderRuleService($this->woModel, $this->moModel);
             $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
+            // dumpAndDie('POST and pdf not set: ',$data);
             $data = $ruleService->apply($data);
+            // dumpAndDie('Data after rules applied: ',$data);
             $data = $validationService->validate($data);
+            // dumpAndDie('Data after validation: ',$data);
             $errors = $validationService->hasErrors($data->errors);
             
             if (!$errors) {

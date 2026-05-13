@@ -4,23 +4,6 @@
 <div class="">
     <a class="" href="javascript:history.go(-1)"><?php include APPROOT.'/views/components/icons/backicon.php'; ?>Back</a>
 </div>
-<?php 
-
-
-
-// if (!(is_bool($data->data->cab_model_id))) {
-//     echo '<pre>';
-//         print_r($data->models[$data->data->cab_model_id-1]->name);
-//         echo '<BR>';
-//         // if($data->data->cab_finish_id ==''){ echo 'cab finish id == '.is_empty($data->data->cab_finish_id);}
-//         echo '<BR>';
-//         // print_r($data->finishes[$data->data->waveguide_finish_id-1]->name);
-//     echo '</PRE>';
-// }
-// echo "<PRE>";
-// print_r( $data->data);
-// echo "</PRE>";
-?>
 
 <section>
     <div class="fade-in addform">
@@ -208,9 +191,15 @@
                         <span class="invalid-feedback"><?php echo $data->errors->err_wko_notes ?? '';?></span>
                     </div>
                     <div class="hidden">
-                                    <input name="fixings"
-                                        id="fixings"
-                                        value="<?= $data->pdfData->fixings ?>"></input>
+                        <input name="fixings"
+                                id="fixings"
+                                value="<?= $data->pdfData->fixings ?>"></input>
+                    </div>
+                    <div class="hidden">
+                        <input name="connectors"
+                                id="connectors"
+                                value="<?= $data->pdfData->connectors ?>">
+                        </input>
                     </div>
                     <div class="form-group">
                         <label for="addAnother">Add Another:</label>

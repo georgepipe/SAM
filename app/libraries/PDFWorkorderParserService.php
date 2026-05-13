@@ -64,44 +64,45 @@ use App\DTOs\ExtractedFields;
             return $text;
         }
 
-        private function extractData($text){
+        private function extractData(string $text): ExtractedFields{
             $extracted = new ExtractedFields (
-                avn: $this->extractionHelper('/AVN\/(\d{5})/',$text),
-                wko: $this->extractionHelper('/WKO\/(\d{5}\/[A-Z]-\d{2})/',$text),
+                avn: ltrim($this->extractionHelper('/AVN\/(\d{5})/i',$text),"0"),
+                wko: $this->extractionHelper('/WKO\/(\d{5}\/[A-Z]-\d{2})/i',$text),
                 cab_model: $this->extractModel($text),
                 cab_finish: $this->extractCabColour($text),
                 // cab_finish_ral: $this->extractCabRal($text),
-                waveguide_finish: $this->extractionHelper('/s, (.*?)\swaveguide/',$text),
+                waveguide_finish: $this->extractionHelper('/s, (.*?)\swaveguide/i',$text),
                 grille_finish: $this->extractGrilleColour($text),
                 // grille_finish_ral: $this->extractGrilleRal($text),
-                quantity: $this->extractionHelper('/Required:\s(\d*)/',$text),
+                quantity: $this->extractionHelper('/Required:\s(\d*)/i',$text),
                 serials: $this->extractSerials($text),
-                connectors: $this->extractionHelper('/(\w{3}\s&\s\w{2}\d)\sconnectors/',$text) ?? $this->extractionHelper('/(\w{2}\d)\sconnectors/',$text),
-                wheels: ($this->extractionHelper('/WK-4IN\sto\sbe\sfitted/',$text)) ? true : false,
-                transport: $this->extractionHelper('/(Deliver\sto\sF1)/',$text) ?? $this->extractionHelper('/(To\sstorage)/',$text),
+                connectors: $this->extractConnector($text),
+                fixings: $this->extractFixings($text),
+                wheels: ($this->extractionHelper('/WK-4IN\sto\sbe\sfitted/i',$text)) ? true : false,
+                transport: $this->extractionHelper('/(Deliver\sto\sF1)/i',$text) ?? $this->extractionHelper('/(To\sstorage)/i',$text),
                 notes: $this->extractionHelper('/Additional Instructions\s(.*)\sRegistered\sAddress/i',$text)
             
             );
             return $extracted;
         }
 
-        private function extractModel($text) {
+        private function extractModel(string $text): string {
             //needs help detecting SH models i.e RES 2SH, EVO 2SH...
             $model = $this->formatModel($this->extractionHelper('/Description:([A-z]{1,4}[0-9]{1,3}.?\d{1,2}?)/',$text));
             return $model;
         }
 
-        private function formatModel(string $model) {
+        private function formatModel(string $model): string { //turn EVO2 into EVO 2 
             $model = strtoupper($model);
             return preg_replace('/\b(EVO|RES)(\d+)\b/', '$1 $2', $model);
         }
 
-        private function extractionHelper(string $pattern, string $text):?string {
+        private function extractionHelper(string $pattern, string $text): ?string {
             preg_match($pattern, $text, $matches);
             return isset($matches[1]) ? trim($matches[1]) : null;
         }
 
-        private function extractSerials(string $text):string|null {
+        private function extractSerials(string $text): ?string {
 
             $results = [];
 
@@ -159,7 +160,7 @@ use App\DTOs\ExtractedFields;
             return $unique[0] ?? null;
         }
 
-        private function extractCabColour(string $text) {
+        private function extractCabColour(string $text): ?string {
 
             //pull colour from text
             $colour = $this->extractionHelper('/s, (.*?)\scabinet/',$text);
@@ -169,8 +170,9 @@ use App\DTOs\ExtractedFields;
             return $colour;
         }
 
-        private function extractGrilleColour($text) {
+        private function extractGrilleColour(string $text): ?string {
             //need to account for 'throat grille' variations
+            //need to remove 'S/Steel' or 'm/Steel' from final colour
             $colour = ucwords($this->extractionHelper('/t, (.*?)\sgrille/',$text)," \t\r\n\f\v'");
             if($colour[1] === "'" | $grille[1] === '/') {
                 //find other reference
@@ -179,13 +181,25 @@ use App\DTOs\ExtractedFields;
             return $colour;
         }
 
-        private function extractGrilleRal($text) {
-            //
+        private function extractConnector(string $text): ?string {
+            $connector = $this->extractionHelper('/(\w{3}\s&\s\w{2}\d)\sconnectors/',$text);
+            if (!$connector) $connector = $this->extractionHelper('/(\w{2}\d)\sconnectors/',$text);
+            if (!$connector) $connector = $this->extractionHelper('/(NL4\s&\sPhoenix)\sconnectors/',$text);
+            return $connector;
         }
 
-        private function extractCabRal(string $text):? string {
+        private function extractCabRal(string $text): ?string {
             $ral = $this->extractionHelper('/s, (RAL\s\d{2,5})/',$text);
             return $ral;
+        }
+
+        private function extractFixings(string $text): string {
+            $fixings = $this->extractionHelper('/\s(\w{1}.{1}steel)\sfixings/i',$text);
+            // dumpAndDie($text, $fixings);
+            if (!$fixings) { 
+                $this->extractionHelper('/\s(black\s\w{1}.{1}steel)\sfixings/i', $text); //fallback for black plated steel fixings
+            }
+            return $fixings;
         }
     };
 

@@ -40,6 +40,7 @@
             public readonly int $quantity,
             public readonly ?string $serials,
             public readonly ?string $connectors,
+            public readonly ?string $fixings,
             public readonly ?bool $wheels,
             public readonly ?string $transport,
             public readonly ?string $notes
