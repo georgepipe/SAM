@@ -264,26 +264,27 @@ function initUpdateStatus() {
 
   document.addEventListener('click', /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {
-      var cell, workorderId, workorderStatus, select, restoreText;
+      var cell, workorderId, workorderStatus, isSaving, select, restoreText;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
           case 0:
-            e.stopPropagation();
+            // e.stopPropagation();
             cell = e.target.closest('.wko-status-cell'); //<--- this sets the cell to be the closest wko status cell
             if (cell) {
-              _context2.next = 4;
+              _context2.next = 3;
               break;
             }
             return _context2.abrupt("return");
-          case 4:
+          case 3:
             if (!cell.querySelector('select')) {
-              _context2.next = 6;
+              _context2.next = 5;
               break;
             }
             return _context2.abrupt("return");
-          case 6:
+          case 5:
             workorderId = cell.dataset.wkoId;
             workorderStatus = cell.dataset.wkoStatus;
+            isSaving = false;
             select = document.createElement('select');
             select.className = 'wko-status-select text-black';
             WORKORDER_STATUSES.forEach(function (status) {
@@ -303,6 +304,7 @@ function initUpdateStatus() {
               cell.innerHTML = "<span class=\"wko-status-text\">".concat(statusText, "</span>"); // ` <-- this is a back tick or grave accent, known in js as a template liberal
             };
             select.addEventListener("blur", function () {
+              if (isSaving) return;
               restoreText(workorderStatus);
             });
             select.addEventListener('change', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
@@ -312,8 +314,9 @@ function initUpdateStatus() {
                   case 0:
                     //now trigger the API
                     newStatus = select.value;
-                    _context.prev = 1;
-                    _context.next = 4;
+                    isSaving = true;
+                    _context.prev = 2;
+                    _context.next = 5;
                     return fetch("../apiworkorders/updateStatus", {
                       method: 'POST',
                       headers: {
@@ -324,36 +327,38 @@ function initUpdateStatus() {
                         status: newStatus
                       })
                     });
-                  case 4:
+                  case 5:
                     response = _context.sent;
-                    _context.next = 7;
+                    _context.next = 8;
                     return response.json();
-                  case 7:
+                  case 8:
                     results = _context.sent;
-                    if (!(!response.ok || !results.sucess)) {
-                      _context.next = 10;
+                    if (!(!response.ok || !results.success)) {
+                      _context.next = 11;
                       break;
                     }
                     throw new Error(results.message || 'Failed to update status.');
-                  case 10:
+                  case 11:
                     statusClass = getStatusClass(workorderStatus);
                     select.parentElement.parentElement.classList.remove(statusClass);
                     statusClass = getStatusClass(newStatus);
                     select.parentElement.parentElement.classList.add(statusClass);
                     restoreText(newStatus);
-                    _context.next = 22;
+                    _context.next = 23;
                     break;
-                  case 17:
-                    _context.prev = 17;
-                    _context.t0 = _context["catch"](1);
+                  case 18:
+                    _context.prev = 18;
+                    _context.t0 = _context["catch"](2);
                     console.error(_context.t0);
                     restoreText(workorderStatus);
                     alert('Could not update workorder status');
-                  case 22:
+                  case 23:
+                    isSaving = false;
+                  case 24:
                   case "end":
                     return _context.stop();
                 }
-              }, _callee, null, [[1, 17]]);
+              }, _callee, null, [[2, 18]]);
             })), {
               once: true
             });
@@ -535,6 +540,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   initWorkOrders: () => (/* binding */ initWorkOrders)
 /* harmony export */ });
+function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t["return"] || t["return"](); } finally { if (u) throw o; } } }; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
@@ -831,66 +837,136 @@ function initWorkOrders() {
 
   //event handler for marking workorders as complete when clicking the 'tick' SVG
   document.addEventListener('click', function (e) {
-    if (!e.target.closest('.compBtn')) return;
-    var row = e.target.closest('.worow');
-    var serials;
-    var woid;
-    var high;
-    var low;
-    // console.log(row);return;
-    if (row) {
-      woid = row.dataset.id;
-      serials = row.querySelector('.wkoSerials').textContent;
-    }
-    ;
-    if (serials === 'To Be Confirmed') {
-      var m;
-      var outputSerialRanges = [];
-      //get expected quantity
-      var rowQty = +row.querySelector('#qty').textContent;
-      var inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete", "");
-      if (inputSerialRanges) {
-        inputSerialRanges = inputSerialRanges.split(",");
-      } else return;
-      if (inputSerialRanges[0] === 'Sent without serials') {
-        //add note to wko without serials
+    //PARSE USER INPUT
+    //VALIDATE SERIALS
+    //SUBMIT
+    /**
+     * input
+     * split ranges
+     * validate syntax
+     * expand ranged
+     * deduplicate
+     * validaye quantity
+     * post to backend
+     * re-validate at backend
+     * save serials
+     * mark as complete
+     */
+
+    var input = window.prompt("Please enter the serials for this work order to mark it as complete", "");
+    input = input.replace(/\s+/g, ''); //remove any spaces
+    input = input.replace(/\//g, ','); //swap forward slashes for commas
+
+    function getNumbersFromRange(range) {
+      //check for hyphen first to detect single serials
+      if (range.indexOf('-') === -1) {
+        return Number(range);
       }
-      //check range(s) and compare qty to expected
-      for (m = 0; m < inputSerialRanges.length; m++) {
-        var numbers = inputSerialRanges[m].split("-");
-        low = Number(numbers[0].trim());
-        if (numbers[1]) {
-          high = Number(numbers[1].trim());
-          for (var n = low; n <= high; n++) {
-            outputSerialRanges.push(n);
-          }
-          ;
+      var splitRange = range.split('-');
+      var first = Number(splitRange[0]);
+      var second = Number(splitRange[1]);
+      var rangeNumbers = [];
+      // console.log(first);
+      // console.log(second);
+      for (var n = first; n <= second; n++) {
+        console.log('inside for');
+        // console.log(n);
+        rangeNumbers.push(n);
+        // outputSerialRanges.push(n);
+      }
+      ;
+      return rangeNumbers;
+      console.log(rangeNumbers);
+    }
+    //split input into ranges
+    var inputRanges;
+    var rangeNumbers = [];
+    if (input.indexOf(',') > -1) {
+      //split ranges and count up all the serials in the range
+
+      inputRanges = input.split(','); //split input into ranges
+      var _iterator = _createForOfIteratorHelper(inputRanges),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var range = _step.value;
+          var numbers = getNumbersFromRange(range);
+          rangeNumbers.push(numbers);
+          console.log(rangeNumbers);
         }
-        ;
-        var totalSerials = high ? high - low : 1;
-        if (totalSerials == 1) {
-          if (rowQty === 1) {
-            window.location.href = "".concat(URLROOT, "workorders/complete/").concat(woid, "/").concat(inputSerialRanges[0]);
-          }
-          ;
-        }
-        ;
-        if (outputSerialRanges.length != rowQty) {
-          console.log(outputSerialRanges, outputSerialRanges.length, rowQty);
-          window.alert("Incorrect number of serials for this workorder! ".concat(rowQty, " are required and ").concat(totalSerials, " have been supplied."));
-          return;
-        } else {
-          window.location.href = "".concat(URLROOT, "Sworkorders/complete/").concat(woid, "/").concat(inputSerialRanges);
-        }
-        ;
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
       }
     } else {
-      window.location.href = "".concat(URLROOT, "workorders/complete/").concat(woid, "/").concat(serials.replace(/\s+/g, ''));
+      //only one range!
+      var _numbers = getNumbersFromRange(input);
+      console.log(_numbers);
     }
     ;
+
+    // if(!e.target.closest('.compBtn')) return;
+    // const row = e.target.closest('.worow'); 
+    // let serials;
+    // let woid;
+    // let high;
+    // let low;
+    // // console.log(row);return;
+    // if(row) {
+    //     woid = row.dataset.id
+    //     serials = row.querySelector('.wkoSerials').textContent;
+    // };
+    // if(serials === 'To Be Confirmed') {
+    //     let m;
+    //     let outputSerialRanges = [];
+    //     //get expected quantity
+    //     const rowQty = +row.querySelector('#qty').textContent;
+    //     //get serials from user input
+    //     let inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete","");
+    //     console.log(inputSerialRanges)
+
+    //     if(inputSerialRanges) {
+    //         inputSerialRanges = inputSerialRanges.split("/")
+    //         console.log(inputSerialRanges)
+    //     } else return;
+
+    //     if(inputSerialRanges[0] === 'Sent without serials'){
+    //         //add note to wko without serials
+    //     }
+
+    //     //check range(s) and compare qty to expected
+    //     for (m = 0; m < inputSerialRanges.length; m++) {
+    //         let numbers = inputSerialRanges[m].split("-");
+    //         low = Number(numbers[0].trim());
+    //         if(numbers[1]){
+    //             high = Number(numbers[1].trim())
+    //             for (let n = low; n <= high; n++) {
+    //                 outputSerialRanges.push(n);
+    //             };
+    //         };
+    //         let totalSerials = high ? high - low: 1;
+    //         if(totalSerials == 1) {
+    //             if(rowQty === 1){
+    //                 window.location.href = `${URLROOT}workorders/complete/${woid}/${inputSerialRanges[0]}`;
+    //             };
+    //         };
+    //         if(outputSerialRanges.length != rowQty) {
+    //             console.log(outputSerialRanges, outputSerialRanges.length, rowQty);
+    //             window.alert(`Incorrect number of serials for this workorder! ${rowQty} are required and ${totalSerials} have been supplied.`); 
+    //             return;
+    //         } else {
+    //             console.log($outputSerialRanges);
+    //             // window.location.href = `${URLROOT}workorders/complete/${woid}/${inputSerialRanges}`;
+    //         };
+    //     }
+    // } else {
+    //     window.location.href = `${URLROOT}workorders/complete/${woid}/${serials.replace(/\s+/g, '')}`;
+    // };
   });
 
   //event handler for splitting work orders when they are part complete by clicking the 'scissor' SVG
+  //NEEEEEEEED REFACTORING!!!!!!!!!!!!!!!!!!
   var splitBtns = document.querySelectorAll(".split-order");
   var splitPoint;
   var j;

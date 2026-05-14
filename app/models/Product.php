@@ -40,10 +40,11 @@
             $this->db->bind(':waveguide', $data->waveguide_finish_id);
             $this->db->bind(':fixings', $data->fixings);
             //$this->db->execute();
-
-            $this->db->query('SELECT LAST_INSERT_ID()');
+            // dumpAndDie($this,$data);
+            // $this->db->query('SELECT LAST_INSERT_ID()');
             $pid = $this->db->single();
-            $pid = $pid->{'LAST_INSERT_ID()'};
+            // $pid = $pid->{'LAST_INSERT_ID()'};
+            dumpAndDie('in:addPidFromOptions. Pid: ',$pid);
             return $pid;
             // try {return $row = $this->db->execute();} catch (PDOException $e) {echo'<pre>';print_r($e);}
             //return $this->db->execute() ? true : false;

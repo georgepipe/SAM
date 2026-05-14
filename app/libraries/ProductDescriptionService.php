@@ -143,11 +143,15 @@ class ProductDescriptionService{
         $grille = null;
         if($workorder->grille_finish){
             $grille = match($workorder->product->fixings) {
-                'BZP Steel','Black p/Steel' => $workorder->grille_finish->name." m/steel grille",
-                'S/Steel','Black S/Steel' => $workorder->grille_finish->name." s/steel grille",
+                'BZP Steel','Black p/Steel' => $workorder->grille_finish->name." M/Steel grille",
+                'S/Steel','Black S/Steel' => $workorder->grille_finish->name." S/Steel grille",
                 default => null,
             };
         };
+        if($workorder->product->cab_model_id === 19) {
+            $grille = 'Brushed S/Steel';
+        }
+
         if(!$grille && $workorder->cab_finish) {
             $grille = 'no grille';
         }

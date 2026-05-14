@@ -13,6 +13,14 @@ use App\DTOs\ExtractedFields;
 
         public function __construct(){}
 
+        public CONST MULTIPLE_VERSION_MODELS = [
+            'F5','F55', 'F115', 'F215', 'F118', 'F218', 'F121', 'EVO 2'
+        ];
+
+        public CONST MAY_HAVE_PX = [
+            'RES 1', 'EVO 6EH', 'EVO 6SH', 'EVO 7EH', 'EVO 7SH'
+        ];
+
         public function validatePDFFileUpload(array $file) {
 
             if($file['error' !== UPLOAD_ERR_OK]) {
@@ -88,13 +96,33 @@ use App\DTOs\ExtractedFields;
 
         private function extractModel(string $text): string {
             //needs help detecting SH models i.e RES 2SH, EVO 2SH...
-            $model = $this->formatModel($this->extractionHelper('/Description:([A-z]{1,4}[0-9]{1,3}.?\d{1,2}?)/',$text));
+            $model = $this->extractionHelper('/Description:([A-z]{1,4}[0-9]{1,3}.?\d{1,2}?)/',$text);
+            if(!$model) $model = $this->formatModel($this->extractionHelper('/Description:([A-z]{1,4}[0-9]{1,3}\w{2})/i', $text));
+            //check if it's a model that has multiple versions 
+            $versionCheck = in_array((string) $model, PDFWorkorderParserService::MULTIPLE_VERSION_MODELS, TRUE);
+            if($versionCheck) { //check for MkI or MkII
+                $model = $this->extractionHelper('/Description:([A-z]{1,4}[0-9]{1,3}.?\d{1,2}?\s?\w{3,4})/i',$text);
+                // dumpAndDie($model);
+                $model = $this->formatModel($model); 
+            }
             return $model;
         }
 
-        private function formatModel(string $model): string { //turn EVO2 into EVO 2 
-            $model = strtoupper($model);
-            return preg_replace('/\b(EVO|RES)(\d+)\b/', '$1 $2', $model);
+        private function formatModel(string $model): string { //turn EVO2 into EVO 2 and *mkii into * MkII
+            if($model[4] === 's' || $model[4] === 'S') {
+                $model = strtoupper($model);
+                $model = preg_replace('/(\w{3})(\dSH)/', '$1 $2', $model);
+            }
+            if($model[0] === 'E') {
+                $model = strtoupper($model);
+                $model = preg_replace('/\b(EVO|RES)(\d+)\b/', '$1 $2', $model);
+            }
+            if($model[0] === 'F') {
+                $model = preg_replace('/(F\d{3})mk(\s?.)/i', '$1 Mk$2',$model);
+            }
+             
+            
+            return $model;
         }
 
         private function extractionHelper(string $pattern, string $text): ?string {
@@ -197,7 +225,11 @@ use App\DTOs\ExtractedFields;
             $fixings = $this->extractionHelper('/\s(\w{1}.{1}steel)\sfixings/i',$text);
             // dumpAndDie($text, $fixings);
             if (!$fixings) { 
-                $this->extractionHelper('/\s(black\s\w{1}.{1}steel)\sfixings/i', $text); //fallback for black plated steel fixings
+                $fixings = $this->extractionHelper('/\s(black\s\w{1}.{1}steel)\sfixings/i', $text); //fallback for black plated steel fixings
+            }
+            if (!$fixings) {
+                $fixings = $this->extractionHelper('/(SS fixings)/i', $text);   
+                if($fixings) $fixings = 'S/Steel';
             }
             return $fixings;
         }

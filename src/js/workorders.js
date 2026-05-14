@@ -281,60 +281,130 @@ function initWorkOrders () {
 //event handler for marking workorders as complete when clicking the 'tick' SVG
     document.addEventListener('click', function (e) {
 
-        if(!e.target.closest('.compBtn')) return;
-        const row = e.target.closest('.worow'); 
-        let serials;
-        let woid;
-        let high;
-        let low;
-        // console.log(row);return;
-        if(row) {
-            woid = row.dataset.id
-            serials = row.querySelector('.wkoSerials').textContent;
-        };
-        if(serials === 'To Be Confirmed') {
-            let m;
-            let outputSerialRanges = [];
-            //get expected quantity
-            const rowQty = +row.querySelector('#qty').textContent;
-            let inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete","");
-            if(inputSerialRanges) {
-                inputSerialRanges = inputSerialRanges.split(",")
-            } else return;
-            if(inputSerialRanges[0] === 'Sent without serials'){
-                //add note to wko without serials
+        //PARSE USER INPUT
+        //VALIDATE SERIALS
+        //SUBMIT
+        /**
+         * input
+         * split ranges
+         * validate syntax
+         * expand ranged
+         * deduplicate
+         * validaye quantity
+         * post to backend
+         * re-validate at backend
+         * save serials
+         * mark as complete
+         */
+        
+        let input = window.prompt("Please enter the serials for this work order to mark it as complete","");
+        input = input.replace(/\s+/g,''); //remove any spaces
+        input = input.replace(/\//g, ','); //swap forward slashes for commas
+        
+        function getNumbersFromRange(range) {
+            //check for hyphen first to detect single serials
+            if(range.indexOf('-') === -1) {return Number(range)}
+            let splitRange = range.split('-');
+            let first = Number(splitRange[0]);
+            let second = Number(splitRange[1]);
+            let rangeNumbers = [];
+            // console.log(first);
+            // console.log(second);
+            for (let n = first; n <= second; n++) {
+                console.log('inside for');
+                // console.log(n);
+                rangeNumbers.push(n);
+                // outputSerialRanges.push(n);
+            };
+            return rangeNumbers;
+            console.log(rangeNumbers);
+        }
+        //split input into ranges
+        let inputRanges;
+        let rangeNumbers = [];
+        if(input.indexOf(',') > -1) {
+            //split ranges and count up all the serials in the range
+        
+            inputRanges = input.split(','); //split input into ranges
+            for(const range of inputRanges) {
+                let numbers = getNumbersFromRange(range);
+                rangeNumbers.push(numbers);
+                console.log(rangeNumbers);
+
             }
-            //check range(s) and compare qty to expected
-            for (m = 0; m < inputSerialRanges.length; m++) {
-                let numbers = inputSerialRanges[m].split("-");
-                low = Number(numbers[0].trim());
-                if(numbers[1]){
-                    high = Number(numbers[1].trim())
-                    for (let n = low; n <= high; n++) {
-                        outputSerialRanges.push(n);
-                    };
-                };
-                let totalSerials = high ? high - low: 1;
-                if(totalSerials == 1) {
-                    if(rowQty === 1){
-                        window.location.href = `${URLROOT}workorders/complete/${woid}/${inputSerialRanges[0]}`;
-                    };
-                };
-                if(outputSerialRanges.length != rowQty) {
-                    console.log(outputSerialRanges, outputSerialRanges.length, rowQty);
-                    window.alert(`Incorrect number of serials for this workorder! ${rowQty} are required and ${totalSerials} have been supplied.`); 
-                    return;
-                } else {
-                    window.location.href = `${URLROOT}Sworkorders/complete/${woid}/${inputSerialRanges}`;
-                };
-            }
-        } else {
-            window.location.href = `${URLROOT}workorders/complete/${woid}/${serials.replace(/\s+/g, '')}`;
+        } else { //only one range!
+            let numbers = getNumbersFromRange(input);
+            console.log(numbers);
+            
         };
+        
+        
+
+
+
+        // if(!e.target.closest('.compBtn')) return;
+        // const row = e.target.closest('.worow'); 
+        // let serials;
+        // let woid;
+        // let high;
+        // let low;
+        // // console.log(row);return;
+        // if(row) {
+        //     woid = row.dataset.id
+        //     serials = row.querySelector('.wkoSerials').textContent;
+        // };
+        // if(serials === 'To Be Confirmed') {
+        //     let m;
+        //     let outputSerialRanges = [];
+        //     //get expected quantity
+        //     const rowQty = +row.querySelector('#qty').textContent;
+        //     //get serials from user input
+        //     let inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete","");
+        //     console.log(inputSerialRanges)
+
+
+        //     if(inputSerialRanges) {
+        //         inputSerialRanges = inputSerialRanges.split("/")
+        //         console.log(inputSerialRanges)
+        //     } else return;
+
+        //     if(inputSerialRanges[0] === 'Sent without serials'){
+        //         //add note to wko without serials
+        //     }
+
+        //     //check range(s) and compare qty to expected
+        //     for (m = 0; m < inputSerialRanges.length; m++) {
+        //         let numbers = inputSerialRanges[m].split("-");
+        //         low = Number(numbers[0].trim());
+        //         if(numbers[1]){
+        //             high = Number(numbers[1].trim())
+        //             for (let n = low; n <= high; n++) {
+        //                 outputSerialRanges.push(n);
+        //             };
+        //         };
+        //         let totalSerials = high ? high - low: 1;
+        //         if(totalSerials == 1) {
+        //             if(rowQty === 1){
+        //                 window.location.href = `${URLROOT}workorders/complete/${woid}/${inputSerialRanges[0]}`;
+        //             };
+        //         };
+        //         if(outputSerialRanges.length != rowQty) {
+        //             console.log(outputSerialRanges, outputSerialRanges.length, rowQty);
+        //             window.alert(`Incorrect number of serials for this workorder! ${rowQty} are required and ${totalSerials} have been supplied.`); 
+        //             return;
+        //         } else {
+        //             console.log($outputSerialRanges);
+        //             // window.location.href = `${URLROOT}workorders/complete/${woid}/${inputSerialRanges}`;
+        //         };
+        //     }
+        // } else {
+        //     window.location.href = `${URLROOT}workorders/complete/${woid}/${serials.replace(/\s+/g, '')}`;
+        // };
     });
     
 
 //event handler for splitting work orders when they are part complete by clicking the 'scissor' SVG
+//NEEEEEEEED REFACTORING!!!!!!!!!!!!!!!!!!
     const splitBtns = document.querySelectorAll(".split-order");
     let splitPoint
     let j;

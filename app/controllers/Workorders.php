@@ -134,7 +134,7 @@ class Workorders extends Controller {
             if (!$errors) {
             // validated
                 if (empty($data->form->pid)) {
-                    
+                    // dumpAndDie($data->form);
                     $data->form->pid = $this->poModel->addPidFromOptions($data->form);
                     // empty($data->form->pid) ? throwErr(999,'PID ERROR: Contact system admin',$data->form): '';
                 }

@@ -59,7 +59,7 @@
             if(empty($workorderId || empty($status))) {
                 http_response_code(422); //unprocessable entity code
                 echo json_encode([
-                    'sucess' => false,
+                    'success' => false,
                     'message' => 'Missing workorder ID or Status'
                 ]);
                 return;
@@ -67,7 +67,7 @@
             if(!in_array($status, $allowedStatuses, true)) {
                 http_response_code(422);
                 echo json_encode([
-                    'sucess' => false,
+                    'success' => false,
                     'message' => 'Invalid workorder status'
                 ]);
                 return;
@@ -78,14 +78,14 @@
             if(!$updated) {
                 http_response_code(500);
                 echo json_encode([
-                    'sucess' => false,
+                    'success' => false,
                     'message' => 'Internal database error'
                 ]);
                 return;
             }
 
             echo json_encode([
-                'sucess' => true,
+                'success' => true,
                 'message' => 'Status updated sucessfully hee hee'
             ]);
             return;

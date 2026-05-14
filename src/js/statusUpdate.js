@@ -26,13 +26,14 @@ const URLROOT = "localhost/SAM/"
  */
 
 document.addEventListener('click', async function (e) {
-    e.stopPropagation();
+    // e.stopPropagation();
     const cell = e.target.closest('.wko-status-cell'); //<--- this sets the cell to be the closest wko status cell
     if(!cell) return;
     if(cell.querySelector('select')) return;
 
     let workorderId = cell.dataset.wkoId;
     let workorderStatus = cell.dataset.wkoStatus;
+    let isSaving = false;
     
 
     let select = document.createElement('select');
@@ -60,12 +61,16 @@ document.addEventListener('click', async function (e) {
     }
 
     select.addEventListener("blur", () => {
+        
+        if(isSaving) return;
+        
         restoreText(workorderStatus);
     })
 
     select.addEventListener('change', async () => {
         //now trigger the API
         let newStatus = select.value;
+        isSaving = true;
         
         try { //send this and `await` a response from the api endpoint
             let response = await fetch(`../apiworkorders/updateStatus`, {
@@ -81,7 +86,7 @@ document.addEventListener('click', async function (e) {
 
             let results = await response.json(); //results = the extracted response when it arrives back from the endpoint
 
-            if(!response.ok || !results.sucess) {
+            if(!response.ok || !results.success) {
                 throw new Error(results.message || 'Failed to update status.');
             }
             statusClass = getStatusClass(workorderStatus);
@@ -95,6 +100,8 @@ document.addEventListener('click', async function (e) {
             console.error(error);
             restoreText(workorderStatus);
             alert('Could not update workorder status');
+        } {
+            isSaving = false;
         }
     }, {once: true});
 
