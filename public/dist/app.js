@@ -853,31 +853,78 @@ function initWorkOrders() {
      * mark as complete
      */
 
+    if (!e.target.closest('.compBtn')) return;
+
+    //handle input
     var input = window.prompt("Please enter the serials for this work order to mark it as complete", "");
+    if (!input || input === null) return; //check for blank input
+
     input = input.replace(/\s+/g, ''); //remove any spaces
     input = input.replace(/\//g, ','); //swap forward slashes for commas
 
     function getNumbersFromRange(range) {
-      //check for hyphen first to detect single serials
-      if (range.indexOf('-') === -1) {
-        return Number(range);
-      }
+      //validate range inputs:
+      validateRange(range);
+      if (range.length === 1) return range;
+      //get start and end of the range
       var splitRange = range.split('-');
       var first = Number(splitRange[0]);
       var second = Number(splitRange[1]);
+
+      //create array of sequential numbers
       var rangeNumbers = [];
-      // console.log(first);
-      // console.log(second);
       for (var n = first; n <= second; n++) {
-        console.log('inside for');
-        // console.log(n);
         rangeNumbers.push(n);
-        // outputSerialRanges.push(n);
       }
       ;
       return rangeNumbers;
-      console.log(rangeNumbers);
     }
+    function validateRange(range) {
+      //detect invalid inputs
+      /**
+       * check for:
+       * NaN
+       * multiple hyphens
+       * missing first
+       * missing second
+       * reverse range
+       */
+      // console.log(`range: ${range}`)
+      if (range.indexOf('-') === -1) {
+        //single serial validation required
+        if (isNaN(range)) throw new Error('Invalid input: range may only contain numbers!');
+        return range;
+      }
+      var explodedRange = range.split('-');
+      if (explodedRange.length > 2) {
+        throw new Error('Malformed input: only use one hyphen per range.');
+      }
+      ;
+      explodedRange.forEach(function (input) {
+        if (input === 0 || input === null || input === '') {
+          //check for missing input or 0
+          throw new Error('Malformed input: range missing number. Serials cannot be 0');
+        }
+        if (isNaN(input)) {
+          //check for non-numbers
+          throw new Error('Invalid input: range may only contain numbers!');
+        }
+      });
+      var intRange = explodedRange.map(Number);
+      if (intRange[0] > intRange[1]) {
+        throw new Error('Inverted serial range detected!');
+      }
+      //VALIDATION PASS
+      return;
+    }
+    function checkForDuplicates(serials) {
+      var duplicates = serials.filter(function (item, index) {
+        return serials.indexOf(item) !== index;
+      });
+      console.log("duplicates: ".concat(duplicates));
+      if (duplicates.length > 0) throw new Error("Duplicate serials detected!");
+    }
+
     //split input into ranges
     var inputRanges;
     var rangeNumbers = [];
@@ -890,15 +937,18 @@ function initWorkOrders() {
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var range = _step.value;
+          //create array of sequential numbers from ranges one by one
           var numbers = getNumbersFromRange(range);
           rangeNumbers.push(numbers);
-          console.log(rangeNumbers);
         }
       } catch (err) {
         _iterator.e(err);
       } finally {
         _iterator.f();
       }
+      var spreadNumbers = rangeNumbers.flat(); //spread the arrays into one long array
+      checkForDuplicates(spreadNumbers);
+      console.log("spread range: ".concat(spreadNumbers));
     } else {
       //only one range!
       var _numbers = getNumbersFromRange(input);

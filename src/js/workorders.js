@@ -296,29 +296,77 @@ function initWorkOrders () {
          * save serials
          * mark as complete
          */
-        
+
+        if(!e.target.closest('.compBtn')) return; 
+
+        //handle input
         let input = window.prompt("Please enter the serials for this work order to mark it as complete","");
+        if(!input || input === null) return; //check for blank input
+        
         input = input.replace(/\s+/g,''); //remove any spaces
         input = input.replace(/\//g, ','); //swap forward slashes for commas
         
         function getNumbersFromRange(range) {
-            //check for hyphen first to detect single serials
-            if(range.indexOf('-') === -1) {return Number(range)}
+
+            //validate range inputs:
+            validateRange(range);
+            if(range.length === 1) return range;
+            //get start and end of the range
             let splitRange = range.split('-');
             let first = Number(splitRange[0]);
             let second = Number(splitRange[1]);
+
+            //create array of sequential numbers
             let rangeNumbers = [];
-            // console.log(first);
-            // console.log(second);
             for (let n = first; n <= second; n++) {
-                console.log('inside for');
-                // console.log(n);
                 rangeNumbers.push(n);
-                // outputSerialRanges.push(n);
             };
             return rangeNumbers;
-            console.log(rangeNumbers);
         }
+
+        function validateRange(range) {
+            //detect invalid inputs
+            /**
+             * check for:
+             * NaN
+             * multiple hyphens
+             * missing first
+             * missing second
+             * reverse range
+             */
+            // console.log(`range: ${range}`)
+            if(range.indexOf('-') === -1) {
+                //single serial validation required
+                if(isNaN(range)) throw new Error('Invalid input: range may only contain numbers!');
+                return range;
+            }
+
+            let explodedRange = range.split('-');
+            if(explodedRange.length > 2) {throw new Error('Malformed input: only use one hyphen per range.')};
+
+            explodedRange.forEach(input => {
+                if(input === 0 || input === null || input === '') { //check for missing input or 0
+                    throw new Error('Malformed input: range missing number. Serials cannot be 0');
+                }
+                if(isNaN(input)) { //check for non-numbers
+                    throw new Error('Invalid input: range may only contain numbers!')
+                }
+            })
+            let intRange = explodedRange.map(Number);
+
+            if (intRange[0] > intRange[1]) {
+                throw new Error('Inverted serial range detected!'); 
+            }
+            //VALIDATION PASS
+            return;
+        }
+
+        function checkForDuplicates(serials) {
+            const duplicates = serials.filter((item, index) => serials.indexOf(item) !== index);
+            console.log(`duplicates: ${duplicates}`)
+            if(duplicates.length > 0) throw new Error(`Duplicate serials detected!`);
+        }
+
         //split input into ranges
         let inputRanges;
         let rangeNumbers = [];
@@ -326,16 +374,17 @@ function initWorkOrders () {
             //split ranges and count up all the serials in the range
         
             inputRanges = input.split(','); //split input into ranges
-            for(const range of inputRanges) {
+            for(const range of inputRanges) { //create array of sequential numbers from ranges one by one
                 let numbers = getNumbersFromRange(range);
                 rangeNumbers.push(numbers);
-                console.log(rangeNumbers);
-
             }
+
+            let spreadNumbers = rangeNumbers.flat(); //spread the arrays into one long array
+            checkForDuplicates(spreadNumbers); 
+            console.log(`spread range: ${spreadNumbers}`);
         } else { //only one range!
             let numbers = getNumbersFromRange(input);
             console.log(numbers);
-            
         };
         
         
