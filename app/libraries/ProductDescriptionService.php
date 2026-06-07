@@ -90,8 +90,8 @@ class ProductDescriptionService{
         $descArr->name = $workorder->model->name ?? 'No name';
         //Cabinet colour abbreviation
         if($workorder->cab_finish){
-            $descArr->scolour = $this->getColourAbreviation($workorder->cab_finish);
-        };
+            $descArr->scolour = $this->getColourAbreviation($workorder->cab_finish) ?? null;
+        } else {$descArr->scolour = null;};
         //waveguide colour
         $descArr->waveguide = $workorder->waveguide->name ?? null;
         if ($descArr->waveguide) {
@@ -136,7 +136,7 @@ class ProductDescriptionService{
                 'Wood' => 'UN',
                 default => null,
             };
-            return $abreiviatedColour;
+            return $abreiviatedColour ?? null;
     }
 
     private function getGrille(object $workorder) {
@@ -170,22 +170,23 @@ class ProductDescriptionService{
 
     private function constructDescription($descArr) {
         $desc = $descArr->name;
+        // if(!$descArr->scolour) dumpAndDie($descArr);
         if($descArr->scolour) {
             $desc .= " ($descArr->scolour)";
         } else {
             $desc .= " (".strtoupper($descArr->waveguide[0]).")";
         };
         $parts = array_filter([
-            $descArr->driveUnits,
-            $descArr->amping,
-            $descArr->xover,
-            $descArr->connectors,
-            $descArr->colour,
-            $descArr->waveguide,
-            $descArr->grille,
-            $descArr->fixings,
-            $descArr->features,
-            $descArr->weatherResistant
+            $descArr->driveUnits ?? null,
+            $descArr->amping ?? null,
+            $descArr->xover ?? null,
+            $descArr->connectors ?? null,
+            $descArr->colour ?? null,
+            $descArr->waveguide ?? null,
+            $descArr->grille ?? null,
+            $descArr->fixings ?? null,
+            $descArr->features ?? null,
+            $descArr->weatherResistant ?? null
         ]);
         if($parts) {
             $desc .= ' '.implode(', ',$parts);

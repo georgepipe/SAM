@@ -18,16 +18,16 @@
                 </thead>
                     <?php foreach($data->avaliableworkorders as $workorder) : ?>
                         <tbody class="">
-                            <tr class="text-center items-center border-4 transrow" data-weight="<?php echo ($workorder->weight * $workorder->quantity)?>" >
-                                <?php if($transport->completed !=1) :?>
+                           
+                                <tr class="text-center items-center border-4 transrow" data-weight="<?php echo ($workorder->weight * $workorder->quantity)?>" >
 									<td data-id="<?php echo $workorder->work_order_id; ?>"><input type="checkbox" class="tCheck"></input></td>
 									<!-- <td class=""><?php echo $workorder->avn; ?></td> -->
                                     <td class=" text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
 									<td class=" text-[15px]"><?php echo $workorder->pdesc; ?></td>
 									<td class=""><?php echo $workorder->quantity; ?></td>
                                     <td class="" ><?php echo ($workorder->weight * $workorder->quantity)?></td>
-                                <?php endif ;?>
-                            </tr>
+                                </tr>
+                            
                         </tbody>
                     <?php endforeach; ?>
             </table>
@@ -131,9 +131,9 @@
 
 
 <?php 
-//     echo '<PRE>';
-// print_r($data);
-//     echo '</PRE>';
+    echo '<PRE>';
+print_r($data);
+    echo '</PRE>';
 
 ?> 
 
