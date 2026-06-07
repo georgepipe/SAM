@@ -18,7 +18,7 @@
                 </thead>
                     <?php foreach($data->avaliableworkorders as $workorder) : ?>
                         <tbody class="">
-                            <tr class="text-center items-center border-4 " data-weight="<?php echo ($workorder->weight * $workorder->quantity)?>" >
+                            <tr class="text-center items-center border-4 transrow" data-weight="<?php echo ($workorder->weight * $workorder->quantity)?>" >
                                 <?php if($transport->completed !=1) :?>
 									<td data-id="<?php echo $workorder->work_order_id; ?>"><input type="checkbox" class="tCheck"></input></td>
 									<!-- <td class=""><?php echo $workorder->avn; ?></td> -->

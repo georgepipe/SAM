@@ -1425,6 +1425,10 @@ td.wkoAvn a {
   border-radius: 4px;
 }
 
+tr.transrow:hover {
+  background-color:#cccccb
+}
+
 tr.checked {
   background-color: greenyellow;
 }

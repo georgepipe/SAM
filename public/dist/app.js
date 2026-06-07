@@ -510,19 +510,24 @@ __webpack_require__.r(__webpack_exports__);
 function initTransport() {
   function checkboxStyler() {
     var divTrans = document.querySelector(".divTrans");
-    if (divTrans) {
-      var checkBoxes = document.querySelectorAll(".tCheck");
-      checkBoxes.forEach(function (checkbox) {
-        checkbox.addEventListener('change', function () {
-          var row = checkbox.closest("tr");
-          if (checkbox.checked) {
-            row.classList.add("checked");
-          } else {
-            row.classList.remove("checked");
-          }
-        });
+    if (!divTrans) return;
+    var checkBoxes = document.querySelectorAll(".tCheck");
+    checkBoxes.forEach(function (checkbox) {
+      var row = checkbox.closest("tr");
+      checkbox.addEventListener('change', function () {
+        //there's a native toggle function avaliable for this .classList.toggle
+        if (checkbox.checked) {
+          row.classList.add("checked");
+        } else {
+          row.classList.remove("checked");
+        }
       });
-    }
+      row.addEventListener('click', function (e) {
+        if (e.target == checkbox) return;
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change'));
+      });
+    });
   }
   checkboxStyler();
 }
