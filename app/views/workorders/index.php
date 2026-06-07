@@ -91,7 +91,7 @@
                                     <td class="text-nowrap"><?php echo $workorder->wko ?></td>
                                     <td class="text-blue-500 wkoAvn"><a href="#" onclick="AVNwindow=window.open('<?php echo URLROOT?>advice_notes/AVN_<?php echo str_pad($workorder->avn, 5,'0', STR_PAD_LEFT).'.pdf'?>', 'AVNwindow', 'width=400, height=600');"><?php if($workorder->avn) {echo $workorder->avn;} else {echo 'N/A';} ?></a></td>
                                     <td class="text-[10px]"><?php echo $workorder->pdesc ?></td>
-                                    <td id="qty"><?php echo $workorder->quantity ?></td>
+                                    <td id="qty" data-qty=<?= $workorder->quantity ?>><?php echo $workorder->quantity ?></td>
                                     <td class="text-xs wkoSerials"><?= htmlspecialchars($workorder->serials) ?></td>
                                     <td class="wko-status-cell" data-wko-id="<?= htmlspecialchars($workorder->work_order_id) ?>" data-wko-status="<?= htmlspecialchars($workorder->wko_status) ?>"><?= htmlspecialchars($workorder->wko_status) ?></td>
                                     <td><?= htmlspecialchars($workorder->wko_delivery) ?></td>

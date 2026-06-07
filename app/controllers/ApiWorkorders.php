@@ -4,12 +4,14 @@
         private $woModel;
         private $poModel;
         private $moModel; 
+        private $seModel;
 
         public function __construct() {
             //API VALIDATION GOES HERE
             $this->moModel = $this->model('Model');
             $this->woModel = $this->model('Workorder');
             $this->poModel = $this->model('Product');
+            $this->seModel = $this->model('Serial');
         }
 
         public function paginate($type = '', $page = '') {
@@ -47,7 +49,7 @@
             $input = json_decode(file_get_contents('php://input'), true);
             
             $workorderId = $input['workorder_id'] ?? null;
-            $status = trim($input['status']) ?? '';
+            $status = trim($input['status'] ?? '');
 
             $allowedStatuses = [
                 'In Progress',
@@ -56,7 +58,7 @@
                 'Upcoming'
             ];
 
-            if(empty($workorderId || empty($status))) {
+            if(empty($workorderId) || empty($status)) {
                 http_response_code(422); //unprocessable entity code
                 echo json_encode([
                     'success' => false,
@@ -86,14 +88,167 @@
 
             echo json_encode([
                 'success' => true,
-                'message' => 'Status updated sucessfully hee hee'
+                'message' => 'Status updated successfully hee hee'
             ]);
             return;
 
         }
+        
+        public function setSerials() {
+            /*  
+            ✓ numeric validation - 
+            ✓ quantity validation
+            ✓ work order still open - 
+                ✓ range validation - 
+                ✓ duplicate validation - 
+                ✓ serials not already used - 
+            **/
+            header('Content-Type: application/json');
+            //GET INPUT
+            $input = json_decode(file_get_contents('php://input'), true); 
+            $workorderId = $input['workorder_id'] ?? null;
+            $serials = $input['numbers'] ?? null;
+            $model = $input['model'] ?? null;
 
-        public function setSerials($wkoID, $serials) {
-            //To be constructed
+            //validate input
+            if(!$workorderId) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid input, workorder id is missing'
+                ]);
+                return;
+            }
+            if(!$serials) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid input: serial(s) missing'
+                ]);
+                return;
+            }
+
+            //GET WORKORDER & MID
+            $workorder = $this->woModel->getWorkorderById($workorderId);
+
+            if(!$workorder) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid work order id, workoder does not exist in database.'
+                ]);
+                return;
+            }
+
+            $mid = $this->moModel->getMidFromPid($workorder->pid);
+
+            // $this->seModel->valdateSerials($workorder, $mid, $serials);
+            //validate workorder exists
+
+            //Validate quantity
+            if ($workorder->quantity !== count($serials)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Quantity of serial provided is '.count($serials).' but workorder requires '.$workorder->quantity
+                ]);
+                return;
+            }
+
+            //Validate WORKORDER IS NOT ALREADY COMPLETED
+            if($workorder->wko_status === 'Completed') {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'This workorder is already completed and cannot have serials added to it'
+                ]); 
+                return;
+            }
+
+            //VALIDATE SERIALS ARE NUMBERS
+            $current = null;
+            $previous = 0;
+            $usedSerials = [];
+            $flaggedAvns = [];
+
+            foreach ($serials as $serial) {
+                if(!is_numeric($serial)) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Serials may only contain numbers'
+                    ]);
+                    return;
+                }
+
+                //VALIDATE SERIALS ARE INCREMENTAL
+                $current = $serial;
+                if($current <= $previous) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Serials must be provided from smallest to largest'
+                    ]); 
+                    return;
+                } else {
+                    $previous = $serial;
+                }
+
+                //Check for used serials
+                $flaggedSerial = $this->seModel->validateNewSerial($mid, $serial);
+                if($flaggedSerial) {
+                    //serial is already in use, create a list of these and return at the end of validation checks
+                    $flaggedWorkorder = $this->woModel->getWorkorderById($flaggedSerial->work_order_id);
+                    // array_push($usedSerials, $serial);
+                    $usedSerials[] = $serial;
+                    // array_push($flaggedAvns, $flaggedWorkorder->avn);
+                    $flaggedAvns[] = $flaggedWorkorder->avn;
+                };
+            };
+            //Validate serials are all unused
+            if(count($usedSerials) > 0 ){
+                $usedSerials = implode(',', $usedSerials);
+                $flaggedAvns = implode(',', $flaggedAvns);
+
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'The serial(s) '.$usedSerials.' are/is used in AVN '.$flaggedAvns
+                ]); 
+                return;
+            }
+
+            //VALIDATE NO DUPLICATES EXIST
+            if(count($serials) !== count(array_unique($serials))) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Serials must all be unquie, duplicates detected'
+                ]);
+                return;
+            };
+            
+            //PASSED VALIDATION
+            //SAVE SERIAL TO WORKORDER
+            $serials = implode(',', $serials);
+            if(!$this->woModel->setSerials($workorderId,$serials)){
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error: Failed to save serials to workorder'
+                ]);
+                return;
+            };
+            
+            //MARK WORKORDER AS COMPLETE 
+            //I Will do this on the client side to keep the alert banner working the same as the other completed workorders that already have serials
+            if(!$this->woModel->completeOrder($workorder)) {
+                echo json_encode([
+                    'success' => 'false',
+                    'message' => 'Error: Failed to mark workorder as completed'
+                ]); 
+            }
+
+
+            //FINISHED
+            flash('post_message', 'Work Order marked as completed!');
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Successfully added serial(s) and marked workorder as complete'
+            ]);
+            return;
+
         }
 
 

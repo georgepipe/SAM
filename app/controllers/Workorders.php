@@ -62,6 +62,9 @@ class Workorders extends Controller {
     
 
     public function index($arg = '') {
+        
+        // dumpAndDie($this->woModel->getWorkorderById(107));
+
         $activeWorkorders = $this->woModel->getActiveOrders();
         $completedWorkorders = $this->woModel->getCompletedOrders();
         $acWkoCount = $this->woModel->getActiveWorkorderCount();

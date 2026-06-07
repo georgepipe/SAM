@@ -52,7 +52,14 @@
             $this->db->query('SELECT weight FROM models WHERE mid = :mid');
             $this->db->bind(':mid', $mid);
             $weight = $this->db->single();
-            return $weight->weight;
+            return $weight->weight ?? null;
+        }
+
+        public function getMidFromPid(int $pid) :int {
+            $this->db->query('SELECT cab_model_id FROM finished_product WHERE pid = :pid');
+            $this->db->bind(':pid', $pid);
+            $mid = $this->db->single();
+            return $mid->cab_model_id;
         }
     }
 

@@ -21,7 +21,7 @@
             $this->validateGrilleSelection($data);
             $this->validateConnectorSelection($data);
             $this->validateQuantity($data);
-            $this->validateSerials($data);
+            $this->validateNewSerials($data);
             $this->validateWaveguideSelection($data);
             $this->setPID($data);
 
@@ -91,7 +91,7 @@
             }
         }
 
-        private function validateSerials(object $data): void {
+        private function validateNewSerials(object $data): void {
              //validate serial string
              if(preg_match('/([A-z])/',$data->form->serials) && $data->form->serials != 'To Be Confirmed') {
                 $data->errors->err_serials = "Serials cannot contain characters";

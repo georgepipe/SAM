@@ -32,7 +32,7 @@ class Serial {
                 $serialArr = range($first, $last, 1);
                 // print_r($serialArr);
                 foreach($serialArr as $serial) {
-                    $serial = $this->validateSerial($mid, $serial);
+                    $serial = $this->validateNewSerial($mid, $serial);
                     if(isset($serial->serial_num)) {
                         $duplicate = true;
                         array_push($duplicates,$serial);
@@ -65,7 +65,7 @@ class Serial {
         }
 
 
-        public function validateSerial($mid, $serial) {
+        public function validateNewSerial($mid, $serial) {
             //returns false if no serial is found
             $this->db->query('SELECT * FROM serials WHERE mid = :mid AND serial_num = :serial_num');
             $this->db->bind(':mid', $mid);
@@ -74,6 +74,10 @@ class Serial {
             return empty($row) ? false : $row ;
             
         }
+
+        // public function validateSerials(object $workorder, int $mid){
+
+        // }
 
 
         public function expandSerials($serials) {

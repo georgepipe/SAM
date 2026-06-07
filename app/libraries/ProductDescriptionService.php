@@ -56,7 +56,7 @@ class ProductDescriptionService{
         $descArr->connectors = $this->getConnectors($workorder->product) ?? null; 
         //Cabinet colour
         if(!is_null($workorder->cab_finish)) {
-            $descArr->colour = $this->getColour($workorder->cab_finish->name, $workorder->cab_finish->type, $workorder->cab_finish->ral_code);
+            $descArr->colour = $this->getColour($workorder->cab_finish->name ?? null, $workorder->cab_finish->type ?? null, $workorder->cab_finish->ral_code ?? null);
         } else {
             // $descArr->scolour = '';
         };
@@ -72,7 +72,7 @@ class ProductDescriptionService{
         //Features
         $descArr->features = $workorder->model->features ?? null;
         //WR?
-        $descArr->weatherResistant = $workorder->cab_finish->type === 'Weather Resistant' ? 'Weather resistant' : null;
+        $descArr->weatherResistant = $workorder->cab_finish?->type === 'Weather Resistant' ? 'Weather resistant' : null;
         //construct description
         $desc = $this->constructDescription($descArr);
         // //set description
@@ -113,7 +113,7 @@ class ProductDescriptionService{
     private function hydrateWorkorder(object $workorder):object {
         $workorder->product = $this->poModel->getProductFromPid($workorder->pid);
         $workorder->model = $this->moModel->getModelFromMid($workorder->product->cab_model_id);
-        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0) ?? null;
+        $workorder->cab_finish = $this->woModel->getFinishfromId($workorder->product->cab_finish_id ?? 0);
         $workorder->grille_finish = $this->woModel->getFinishfromId($workorder->product->grille_finish_id ?? 0);
         $workorder->waveguide = $this->woModel->getFinishfromId($workorder->product->waveguide ?? 0); 
         return $workorder;

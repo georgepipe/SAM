@@ -68,7 +68,11 @@ class Workorder {
             $this->db->query('select * from finishes WHERE id = :id');
             $this->db->bind(':id', $id);
             $results = $this->db->Single();
-            return $results;
+            if($results) {
+                return $results;
+            }
+            return null;
+            
         }
 
         public function getFidfromName(string $finish,bool $isSH){

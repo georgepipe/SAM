@@ -607,7 +607,7 @@ function initWorkOrders() {
               case 10:
                 _context.prev = 10;
                 _context.t0 = _context["catch"](4);
-                console.err("Pagination fetch failed: ", _context.t0);
+                console.error("Pagination fetch failed: ", _context.t0);
                 return _context.abrupt("return");
               case 14:
                 ;
@@ -631,7 +631,7 @@ function initWorkOrders() {
       var validatePageBounds = function validatePageBounds(localPage, tag) {
         var max = tag == 'com' ? cPageMax : aPageMax;
         return localPage >= 0 && localPage <= max;
-      }; //fetch logic
+      }; //fetch data logic
       var fetchWorkorders = /*#__PURE__*/function () {
         var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(url) {
           var response;
@@ -836,187 +836,244 @@ function initWorkOrders() {
   });
 
   //event handler for marking workorders as complete when clicking the 'tick' SVG
-  document.addEventListener('click', function (e) {
-    //PARSE USER INPUT
-    //VALIDATE SERIALS
-    //SUBMIT
-    /**
-     * input
-     * split ranges
-     * validate syntax
-     * expand ranged
-     * deduplicate
-     * validaye quantity
-     * post to backend
-     * re-validate at backend
-     * save serials
-     * mark as complete
-     */
-
-    if (!e.target.closest('.compBtn')) return;
-
-    //handle input
-    var input = window.prompt("Please enter the serials for this work order to mark it as complete", "");
-    if (!input || input === null) return; //check for blank input
-
-    input = input.replace(/\s+/g, ''); //remove any spaces
-    input = input.replace(/\//g, ','); //swap forward slashes for commas
-
-    function getNumbersFromRange(range) {
-      //validate range inputs:
-      validateRange(range);
-      if (range.length === 1) return range;
-      //get start and end of the range
-      var splitRange = range.split('-');
-      var first = Number(splitRange[0]);
-      var second = Number(splitRange[1]);
-
-      //create array of sequential numbers
-      var rangeNumbers = [];
-      for (var n = first; n <= second; n++) {
-        rangeNumbers.push(n);
-      }
-      ;
-      return rangeNumbers;
+  function handleSerials() {
+    function setSerials(_x3) {
+      return _setSerials.apply(this, arguments);
     }
-    function validateRange(range) {
-      //detect invalid inputs
-      /**
-       * check for:
-       * NaN
-       * multiple hyphens
-       * missing first
-       * missing second
-       * reverse range
-       */
-      // console.log(`range: ${range}`)
-      if (range.indexOf('-') === -1) {
-        //single serial validation required
-        if (isNaN(range)) throw new Error('Invalid input: range may only contain numbers!');
-        return range;
-      }
-      var explodedRange = range.split('-');
-      if (explodedRange.length > 2) {
-        throw new Error('Malformed input: only use one hyphen per range.');
-      }
-      ;
-      explodedRange.forEach(function (input) {
-        if (input === 0 || input === null || input === '') {
-          //check for missing input or 0
-          throw new Error('Malformed input: range missing number. Serials cannot be 0');
-        }
-        if (isNaN(input)) {
-          //check for non-numbers
-          throw new Error('Invalid input: range may only contain numbers!');
-        }
-      });
-      var intRange = explodedRange.map(Number);
-      if (intRange[0] > intRange[1]) {
-        throw new Error('Inverted serial range detected!');
-      }
-      //VALIDATION PASS
-      return;
+    function _setSerials() {
+      _setSerials = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(payload) {
+        var response;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.next = 2;
+              return fetch("../apiworkorders/setSerials/", {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+              });
+            case 2:
+              response = _context4.sent;
+              if (response.ok) {
+                _context4.next = 5;
+                break;
+              }
+              throw new Error("HTTP error ".concat(response.status));
+            case 5:
+              _context4.next = 7;
+              return response.json();
+            case 7:
+              return _context4.abrupt("return", _context4.sent);
+            case 8:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4);
+      }));
+      return _setSerials.apply(this, arguments);
     }
-    function checkForDuplicates(serials) {
-      var duplicates = serials.filter(function (item, index) {
-        return serials.indexOf(item) !== index;
-      });
-      console.log("duplicates: ".concat(duplicates));
-      if (duplicates.length > 0) throw new Error("Duplicate serials detected!");
-    }
+    document.addEventListener('click', /*#__PURE__*/function () {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(e) {
+        var row, serials, getNumbersFromRange, validateRange, checkForDuplicates, validateQty, input, inputRanges, rangeNumbers, numbers, _iterator, _step, range, spreadNumbers, workorder_id, data, payload;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              if (e.target.closest('.compBtn')) {
+                _context3.next = 2;
+                break;
+              }
+              return _context3.abrupt("return");
+            case 2:
+              row = e.target.closest('tr'); //check whether workorder has serials or not
+              serials = row.querySelector('.wkoSerials').textContent;
+              if (!(serials === 'To Be Confirmed')) {
+                _context3.next = 47;
+                break;
+              }
+              //swap forward slashes for commas
+              getNumbersFromRange = function getNumbersFromRange(range) {
+                //validate range inputs:
+                validateRange(range);
+                if (range.indexOf('-') === -1) return [Number(range)];
+                //get start and end of the range
+                var splitRange = range.split('-');
+                var first = Number(splitRange[0]);
+                var second = Number(splitRange[1]);
 
-    //split input into ranges
-    var inputRanges;
-    var rangeNumbers = [];
-    if (input.indexOf(',') > -1) {
-      //split ranges and count up all the serials in the range
+                //create array of sequential numbers
+                var rangeNumbers = [];
+                for (var n = first; n <= second; n++) {
+                  rangeNumbers.push(n);
+                }
+                ;
+                return rangeNumbers;
+              };
+              validateRange = function validateRange(range) {
+                //detect invalid inputs
+                /**
+                 * check for:
+                 * NaN
+                 * multiple hyphens
+                 * missing first
+                 * missing second
+                 * reverse range
+                 */
+                // console.log(`range: ${range}`)
+                if (range.indexOf('-') === -1) {
+                  //single serial validation required
+                  if (isNaN(range)) throw new Error('Invalid input: range may only contain numbers!');
+                  console.log("returning range ".concat(range));
+                  return [Number(range)];
+                }
+                var explodedRange = range.split('-');
+                if (explodedRange.length > 2) {
+                  throw new Error('Malformed input: only use one hyphen per range.');
+                }
+                ;
+                explodedRange.forEach(function (input) {
+                  if (Number(input) === 0 || input === null || input === '') {
+                    //check for missing input or 0
+                    throw new Error('Malformed input: range missing number. Serials cannot be 0');
+                  }
+                  if (isNaN(input)) {
+                    //check for non-numbers
+                    throw new Error('Invalid input: range may only contain numbers!');
+                  }
+                });
+                var intRange = explodedRange.map(Number);
+                if (intRange[0] > intRange[1]) {
+                  throw new Error('Inverted serial range detected!');
+                }
+                //VALIDATION PASS
+                return;
+              };
+              checkForDuplicates = function checkForDuplicates(serials) {
+                var duplicates = serials.filter(function (item, index) {
+                  return serials.indexOf(item) !== index;
+                });
+                console.log("duplicates: ".concat(duplicates));
+                if (duplicates.length > 0) throw new Error("Duplicate serials detected!");
+              };
+              validateQty = function validateQty(numbers) {
+                var _numbers$length;
+                var expectedQty = Number(row.querySelector('#qty').dataset.qty);
+                console.log(expectedQty);
+                var actualQty = (_numbers$length = numbers.length) !== null && _numbers$length !== void 0 ? _numbers$length : 1;
+                if (expectedQty === actualQty) {
+                  //VALIDATION PASSED
+                  return;
+                } else {
+                  throw new Error("Number of serials provided does not match the required quantity of serials. Provided: ".concat(actualQty, " Expected: ").concat(expectedQty));
+                }
+              };
+              console.log(serials);
 
-      inputRanges = input.split(','); //split input into ranges
-      var _iterator = _createForOfIteratorHelper(inputRanges),
-        _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var range = _step.value;
-          //create array of sequential numbers from ranges one by one
-          var numbers = getNumbersFromRange(range);
-          rangeNumbers.push(numbers);
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-      var spreadNumbers = rangeNumbers.flat(); //spread the arrays into one long array
-      checkForDuplicates(spreadNumbers);
-      console.log("spread range: ".concat(spreadNumbers));
-    } else {
-      //only one range!
-      var _numbers = getNumbersFromRange(input);
-      console.log(_numbers);
-    }
-    ;
+              //handle input
+              input = window.prompt("Please enter the serials for this work order to mark it as complete", "");
+              if (input) {
+                _context3.next = 13;
+                break;
+              }
+              return _context3.abrupt("return");
+            case 13:
+              //check for blank input
 
-    // if(!e.target.closest('.compBtn')) return;
-    // const row = e.target.closest('.worow'); 
-    // let serials;
-    // let woid;
-    // let high;
-    // let low;
-    // // console.log(row);return;
-    // if(row) {
-    //     woid = row.dataset.id
-    //     serials = row.querySelector('.wkoSerials').textContent;
-    // };
-    // if(serials === 'To Be Confirmed') {
-    //     let m;
-    //     let outputSerialRanges = [];
-    //     //get expected quantity
-    //     const rowQty = +row.querySelector('#qty').textContent;
-    //     //get serials from user input
-    //     let inputSerialRanges = window.prompt("Please enter the serials for this work order to mark it as complete","");
-    //     console.log(inputSerialRanges)
+              input = input.replace(/\s+/g, ''); //remove any spaces
+              input = input.replace(/\//g, ',');
+              ;
 
-    //     if(inputSerialRanges) {
-    //         inputSerialRanges = inputSerialRanges.split("/")
-    //         console.log(inputSerialRanges)
-    //     } else return;
+              //split input into ranges
+              rangeNumbers = [];
+              _context3.prev = 17;
+              if (input.indexOf(',') > -1) {
+                //split ranges and count up all the serials in the range
 
-    //     if(inputSerialRanges[0] === 'Sent without serials'){
-    //         //add note to wko without serials
-    //     }
-
-    //     //check range(s) and compare qty to expected
-    //     for (m = 0; m < inputSerialRanges.length; m++) {
-    //         let numbers = inputSerialRanges[m].split("-");
-    //         low = Number(numbers[0].trim());
-    //         if(numbers[1]){
-    //             high = Number(numbers[1].trim())
-    //             for (let n = low; n <= high; n++) {
-    //                 outputSerialRanges.push(n);
-    //             };
-    //         };
-    //         let totalSerials = high ? high - low: 1;
-    //         if(totalSerials == 1) {
-    //             if(rowQty === 1){
-    //                 window.location.href = `${URLROOT}workorders/complete/${woid}/${inputSerialRanges[0]}`;
-    //             };
-    //         };
-    //         if(outputSerialRanges.length != rowQty) {
-    //             console.log(outputSerialRanges, outputSerialRanges.length, rowQty);
-    //             window.alert(`Incorrect number of serials for this workorder! ${rowQty} are required and ${totalSerials} have been supplied.`); 
-    //             return;
-    //         } else {
-    //             console.log($outputSerialRanges);
-    //             // window.location.href = `${URLROOT}workorders/complete/${woid}/${inputSerialRanges}`;
-    //         };
-    //     }
-    // } else {
-    //     window.location.href = `${URLROOT}workorders/complete/${woid}/${serials.replace(/\s+/g, '')}`;
-    // };
-  });
+                inputRanges = input.split(','); //split input into ranges
+                _iterator = _createForOfIteratorHelper(inputRanges);
+                try {
+                  for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                    range = _step.value;
+                    //create array of sequential numbers from ranges one by one
+                    numbers = getNumbersFromRange(range);
+                    rangeNumbers.push(numbers);
+                  }
+                } catch (err) {
+                  _iterator.e(err);
+                } finally {
+                  _iterator.f();
+                }
+                spreadNumbers = rangeNumbers.flat(); //spread the arrays into one long array
+                checkForDuplicates(spreadNumbers);
+                console.log("spread range: ".concat(spreadNumbers));
+                numbers = spreadNumbers;
+              } else {
+                //only one range!
+                console.log("input: ".concat(input));
+                numbers = getNumbersFromRange(input);
+                console.log(numbers);
+              }
+              ;
+              //check quantity of serials against expected quantity
+              validateQty(numbers);
+              //send to the backend API!
+              workorder_id = row.dataset.id;
+              console.log('fetching!');
+              payload = {
+                workorder_id: workorder_id,
+                numbers: numbers
+              };
+              _context3.prev = 24;
+              _context3.next = 27;
+              return setSerials(payload);
+            case 27:
+              data = _context3.sent;
+              _context3.next = 34;
+              break;
+            case 30:
+              _context3.prev = 30;
+              _context3.t0 = _context3["catch"](24);
+              console.error();
+              return _context3.abrupt("return");
+            case 34:
+              console.log(data);
+              if (data.success) {
+                _context3.next = 37;
+                break;
+              }
+              throw new Error(data.message);
+            case 37:
+              if (data.success) {
+                window.location.href = "http://localhost/SAM/workorders";
+              }
+              _context3.next = 45;
+              break;
+            case 40:
+              _context3.prev = 40;
+              _context3.t1 = _context3["catch"](17);
+              console.log(_context3.t1);
+              alert(_context3.t1.message);
+              return _context3.abrupt("return");
+            case 45:
+              _context3.next = 48;
+              break;
+            case 47:
+              window.location.href = "http://localhost/SAM/workorders/complete/".concat(row.dataset.id);
+            case 48:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3, null, [[17, 40], [24, 30]]);
+      }));
+      return function (_x4) {
+        return _ref5.apply(this, arguments);
+      };
+    }());
+  }
 
   //event handler for splitting work orders when they are part complete by clicking the 'scissor' SVG
-  //NEEEEEEEED REFACTORING!!!!!!!!!!!!!!!!!!
+  //NEEEEEEEEDs REFACTORING!!!!!!!!!!!!!!!!!!
   var splitBtns = document.querySelectorAll(".split-order");
   var splitPoint;
   var j;
@@ -1054,6 +1111,7 @@ function initWorkOrders() {
   }
   initDelete();
   initPagination();
+  handleSerials();
 }
 
 
