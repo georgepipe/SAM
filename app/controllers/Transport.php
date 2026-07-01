@@ -71,16 +71,20 @@ class Transport extends Controller {
         $this->view('transport/viewtn', $data);
     }
 
-    public function tnote ($transportType, $wkos) {
+    public function tnote ($transportType, $wkos, $weight) {
         $transportType = $transportType === 'd' ? 'Delivery' : 'Collection';
         $wkos = str_getcsv($wkos,",");
         $tData = [
             'transport' => $transportType,
-            'wkos' => $wkos
+            'wkos' => $wkos,
+            'weight' => $weight
         ];
-        print_r($wkos);
-         if($wkos[0]>0) {
-        $lastInsertedId = $this->tnModel->addTransportNote($tData);
+
+        //calculate weight for transport note
+
+
+        if($wkos[0]>0) {
+            $lastInsertedId = $this->tnModel->addTransportNote($tData);
             //reload index
             //update wkos with tnid
             $workorders = [];
@@ -90,6 +94,7 @@ class Transport extends Controller {
                 print_r($workorder);
                 $this->woModel->updateWorkorderTnid($workorder);
             }
+            flash('post_message', 'Transport note added');
             redirect('transport/index');  
         } else {
             die('OH SHIT! ERR No Wko(s) set..');
@@ -98,15 +103,15 @@ class Transport extends Controller {
     }
 
     public function delete($tnid) {
-    //remove tnid from associated wkos duh
-    echo '<pre>';
+        //remove tnid from associated wkos duh
+        echo '<pre>';
         $Wkos = $this->woModel->getWorkOrdersFromTransportNote($tnid);
         print_r($Wkos);
         foreach ($Wkos as $workorder) {
             $this->woModel->removeTnid($workorder);
         }
         
-    //delete TNID duh!
+        //delete TNID duh!
         if($this->tnModel->deleteTnote($tnid)) {
             return true;
         } else {
@@ -117,7 +122,9 @@ class Transport extends Controller {
     public function complete($tnid) {
         //update as complete innit
         if($this->tnModel->completeTnote($tnid)) {
-            return true;
+            // flash('post_message', 'Work Order marked as completed!');
+            // redirect('transport/index');
+            // return true;
         } else {
             return false;
         } 

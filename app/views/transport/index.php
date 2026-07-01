@@ -1,9 +1,10 @@
 <?php require APPROOT . '/views/inc/header.php'; ?>
 
+<?php if(isset($_SESSION['post_message'])) {echo flash('post_message');} ?>
 
 <div class="relative rounded-2xl p-8 fade-in">
 <?php if(!empty($data->avaliableworkorders)) : ?>
-<div class="divTrans m-8 border-4 border-red-600">
+<div class="divTrans dispContainer">
         <h1 class="flex justify-center text-lg"><strong><U>Product Ready for Transport</U></strong></h1>
         <section class="flex flex-col">
             <table class="text-sm justify-evenly w-full border-4">
@@ -14,6 +15,7 @@
                         <th scope="col" class="pr-5">Description</th>
                         <th scope="col" class="pr-5">Quantity</th>
                         <th scope="col" class="pr-5">Weight (kg)</th>
+                        <th scope="col" class="pr-5">Transport</th>
                     </tr>
                 </thead>
                     <?php foreach($data->avaliableworkorders as $workorder) : ?>
@@ -26,6 +28,7 @@
 									<td class=" text-[15px]"><?php echo $workorder->pdesc; ?></td>
 									<td class=""><?php echo $workorder->quantity; ?></td>
                                     <td class="" ><?php echo ($workorder->weight * $workorder->quantity)?></td>
+                                    <td><?= $workorder->wko_delivery ?></td>
                                 </tr>
                             
                         </tbody>
@@ -35,9 +38,9 @@
     </div>
 <!-- create deliver/collection note buttons -->
 <div class="flex flex-row m-auto justify-center btnContainer hidden">
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-6 h-16 text-nowrap colBtn ">Create Collection</button>
-    <button class="btn btn-blue mx-6 h-16 delBtn ">Create Dellivery</button>
-    <div class="weightDiv border-2">Current total Delivery Weight: <br><text class="weightTxt">kg</text></div>
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-6 h-16 text-nowrap collectionBtn ">Create Collection</button>
+    <button class="btn btn-blue mx-6 h-16 deliveryBtn hidden">Create Delivery</button>
+    <div class="weightDiv border-2 hidden">Current total transport weight: <br><text class="weightTxt">kg</text></div>
 </div>
 <?php endif; ?>
 <?php if(!empty($data->activetransportnotes)) : ?>
@@ -86,7 +89,7 @@
 </div>
 <?php endif; ?>
 <?php if(!empty($data->completedtransportnotes)) : ?>
-	<div class="m-8 border-4 border-red-600">
+	<div class="m-8 dispContainer">
         <h1 class="flex justify-center text-lg"><strong><U>Completed Collections & Deliveries</U></strong></h1>
         <section class="flex flex-col">
             <table class="text-sm justify-evenly w-full border-4">

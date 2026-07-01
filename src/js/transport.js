@@ -12,12 +12,8 @@ function initTransport() {
 
             const row = checkbox.closest("tr");
 
-            checkbox.addEventListener('change', function() { //there's a native toggle function avaliable for this .classList.toggle
-                if (checkbox.checked) {
-                    row.classList.add("checked");
-                } else {
-                    row.classList.remove("checked");
-                }
+            checkbox.addEventListener('change', function() { 
+                row.classList.toggle('checked');
             })
 
             row.addEventListener('click', function (e) {
@@ -33,6 +29,9 @@ function initTransport() {
 
     }
 
+    // function deliveryButtonToggle() {
+    //     const deliveryButton = document.querySelector();
+    // }
 
 
     checkboxStyler();

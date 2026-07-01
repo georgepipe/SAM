@@ -413,8 +413,8 @@ function initTransferNotes() {
   var tNoteRows = document.querySelectorAll(".tnoterow");
   var tnoteChecks = document.querySelectorAll(".tCheck");
   var btnCont = document.querySelector(".btnContainer");
-  var colBtn = document.querySelector(".colBtn");
-  var delBtn = document.querySelector(".delBtn");
+  var colBtn = document.querySelector(".collectionBtn");
+  var delBtn = document.querySelector(".deliveryBtn");
   var weightTxt = document.querySelector('.weightTxt');
   var deleteBtn = document.querySelector(".delete");
   var weightDiv = document.querySelector(".weightDiv");
@@ -467,8 +467,16 @@ function initTransferNotes() {
         console.log(totalWeight);
         if (totalWeight > 1100) {
           weightDiv.classList.add("overweight");
+          delBtn.disabled = true;
+          delBtn.classList.add("disabledBtn");
+          delBtn.textContent = "Delivery Overweight!";
         } else {
-          if (weightDiv.classList.contains("overweight")) weightDiv.classList.remove("overweight");
+          if (weightDiv.classList.contains("overweight")) {
+            weightDiv.classList.remove("overweight");
+            delBtn.disabled = false;
+            delBtn.classList.remove("disabledBtn");
+            delBtn.textContent = "Create Delivery";
+          }
         }
       });
     }
@@ -478,8 +486,10 @@ function initTransferNotes() {
         if (tnoteChecks[k].checked) {
           wkos.push(tnoteChecks[k].parentElement.dataset.id);
         }
+        ;
       }
-      window.location.href = "http://localhost/SAM/transport/tnote/c/" + wkos;
+      ;
+      window.location.href = "http://localhost/SAM/transport/tnote/c/" + wkos + "/" + totalWeight;
     });
     delBtn.addEventListener('click', function (e) {
       //do the delivery note stuff innit
@@ -488,11 +498,15 @@ function initTransferNotes() {
         if (tnoteChecks[l].checked) {
           wkos.push(tnoteChecks[l].parentElement.dataset.id);
         }
+        ;
       }
-      window.location.href = "http://localhost/SAM/transport/tnote/d/" + wkos;
+      ;
+      window.location.href = "http://localhost/SAM/transport/tnote/d/" + wkos + "/" + totalWeight;
     });
   }
+  ;
 }
+;
 
 
 /***/ }),
@@ -515,12 +529,7 @@ function initTransport() {
     checkBoxes.forEach(function (checkbox) {
       var row = checkbox.closest("tr");
       checkbox.addEventListener('change', function () {
-        //there's a native toggle function avaliable for this .classList.toggle
-        if (checkbox.checked) {
-          row.classList.add("checked");
-        } else {
-          row.classList.remove("checked");
-        }
+        row.classList.toggle('checked');
       });
       row.addEventListener('click', function (e) {
         if (e.target == checkbox) return;
@@ -529,6 +538,11 @@ function initTransport() {
       });
     });
   }
+
+  // function deliveryButtonToggle() {
+  //     const deliveryButton = document.querySelector();
+  // }
+
   checkboxStyler();
 }
 
@@ -852,7 +866,7 @@ function initWorkOrders() {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return fetch("../apiworkorders/setSerials/", {
+              return fetch("".concat(URLROOT, "apiworkorders/setSerials"), {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'

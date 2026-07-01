@@ -12,12 +12,11 @@
     <div class=" ml-8" >
         <h1 class="text-center text-lg"><strong>To Do:</strong></h1>
         <p><strong class="mb-4 border-b-2">Workorders Page:</strong><BR>
-            - Fix pagination row classes<br>
+            - Fix pagination bug to view page past the max results page<br>
             - Add search bar to filter results<br>
-            - Pop-up function to add serials to AVNs with To Be Confirmed serial range<br>
-            - Fix pagination<br>
-            - Fix grille saving/loading/pdesc for mb212 brushed steel <br>
             - Fix serial retreival from PDF in weird edge cases where product name is specified in given serial ranges <br>
+            - Fix serial issue where single serials are contracted into ranges i.e 500 => 500 - 500 <BR>
+            - Fix pagination buttons on completed WKOs page: ... needs to dynamically change based on current page <br>
         <strong>Suggested Improvements:</strong><br>
         - Batch avn uploads<br>
 
@@ -32,4 +31,7 @@
         <BR>
     </div>
 </div>
+
+<?php dumpAndDie($_REQUEST) ?>
+
 <?php require APPROOT . '/views/inc/footer.php'; ?>

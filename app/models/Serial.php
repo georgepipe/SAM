@@ -84,29 +84,26 @@ class Serial {
             $serial = '';
             $serialsArr = [];
             $tempArr = [];
-            $serialRangeArr = explode('/',$serials);
+            $serialRangeArr = explode(',',$serials);
             foreach($serialRangeArr as $serialRange) {
                 $s = explode('-',$serialRange);
                 // echo '<br> Serial: ';
                 // print_r($s);
                 $first = (int)trim($s[0]);
                 $last = (int)trim($s[1]);
-                $last = (int)empty($last) ? (int)$first : (int)$last;
+                $last = empty($last) ? $first : $last;
                 $i = $first;
-                // echo '<BR>first:'.$first;
-                // echo '<BR>last:'.$last;
-                for ($i===$first; $i < $last + 1; $i++) {
-                    array_push($tempArr,$i);
-                    array_push($serialsArr,$i);
+                for ($i=$first; $i < $last + 1; $i++) {
+                    $serialsArr[] = $i;
+                    // array_push($serialsArr,$i);
                 }
-                // print_r($tempArr);
-                $tempArr = [];
             }
-            //$count = count($serialsArr);
+            // $count = count($serialsArr);
+            // dumpAndDie($serialsArr, $count);
             return $serialsArr;
         }
 
-        public function contractSerials($serialsArr) {
+        public function contractSerials(array $serialsArr) {
             $sLength = count($serialsArr); 
             //$lastSerial = null;
             $i = 0;

@@ -28,6 +28,19 @@
             return $data;
         }
 
+        public function validateEdit(object $data): object {
+            $this->validateModelSelection($data);
+            $this->validateCabinetFinishSelection($data);
+            $this->validateGrilleSelection($data);
+            $this->validateConnectorSelection($data);
+            $this->validateQuantity($data);
+            $this->validateNewSerials($data);
+            $this->validateWaveguideSelection($data);
+            $this->setPID($data);
+
+            return $data;
+        }
+
         public function hasErrors($errors): bool {
             foreach ($errors as $error) {
                 if(!empty($error)) {
@@ -92,8 +105,8 @@
         }
 
         private function validateNewSerials(object $data): void {
-             //validate serial string
-             if(preg_match('/([A-z])/',$data->form->serials) && $data->form->serials != 'To Be Confirmed') {
+             //validate serial string 
+            if(preg_match('/([A-z])/',$data->form->serials) && $data->form->serials != 'To Be Confirmed') {
                 $data->errors->err_serials = "Serials cannot contain characters";
             } else {
                 //check serials for duplicates
@@ -112,7 +125,7 @@
                     if($data->form->quantity != $sCount && !empty($data->form->serials)) {
                         if($sCount > $data->form->quantity) {
                         $data->errors->err_quantity = 'Quantity is '.$data->form->quantity.' but '.$sCount.' serials have been specified.';
-                        } else if ($sCount == 1) {
+                        } else if ($sCount === 1) {
                             $data->errors->err_quantity = 'Quantity is '.$data->form->quantity.' but only '.$sCount.' serial has been specified.'; 
                         } else {
                             $data->errors->err_quantity = 'Quantity is '.$data->form->quantity.' but only '.$sCount.' serials have been specified.';  

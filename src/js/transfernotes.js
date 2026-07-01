@@ -9,8 +9,8 @@ function initTransferNotes () {
     const tNoteRows = document.querySelectorAll(".tnoterow");
     const tnoteChecks = document.querySelectorAll(".tCheck");
     const btnCont = document.querySelector(".btnContainer");
-    const colBtn = document.querySelector(".colBtn");
-    const delBtn = document.querySelector(".delBtn");
+    const colBtn = document.querySelector(".collectionBtn");
+    const delBtn = document.querySelector(".deliveryBtn");
     const weightTxt = document.querySelector('.weightTxt');
     const deleteBtn = document.querySelector(".delete");
     const weightDiv = document.querySelector(".weightDiv");
@@ -63,35 +63,43 @@ function initTransferNotes () {
                 console.log(totalWeight);
                 if(totalWeight > 1100) {
                     weightDiv.classList.add("overweight");
+                    delBtn.disabled = true;
+                    delBtn.classList.add("disabledBtn");
+                    delBtn.textContent = "Delivery Overweight!"
                 } else {
-                    if(weightDiv.classList.contains("overweight")) weightDiv.classList.remove("overweight");
+                    if(weightDiv.classList.contains("overweight")) { 
+                        weightDiv.classList.remove("overweight");
+                        delBtn.disabled = false;
+                        delBtn.classList.remove("disabledBtn"); 
+                        delBtn.textContent = "Create Delivery"
+                    }
                 }
             })
 
         }
 
         colBtn.addEventListener('click', (e) => {
-            wkos = []
+            wkos = [];
             for (k=0; k < tnoteChecks.length; k++) {
                 if(tnoteChecks[k].checked) {
-                    wkos.push(tnoteChecks[k].parentElement.dataset.id)
-                }
-            }
-            window.location.href = "http://localhost/SAM/transport/tnote/c/"+wkos
-        })
+                    wkos.push(tnoteChecks[k].parentElement.dataset.id);
+                };
+            };
+            window.location.href = "http://localhost/SAM/transport/tnote/c/"+wkos+"/"+totalWeight;
+        });
         
         delBtn.addEventListener('click', (e) => {
             //do the delivery note stuff innit
-            wkos = []
+            wkos = [];
             for (l=0; l < tnoteChecks.length; l++) {
                 if(tnoteChecks[l].checked) {
-                    wkos.push(tnoteChecks[l].parentElement.dataset.id)
-                }
-            }
-            window.location.href = "http://localhost/SAM/transport/tnote/d/"+wkos
-        })
-    }
+                    wkos.push(tnoteChecks[l].parentElement.dataset.id);
+                };
+            };
+            window.location.href = "http://localhost/SAM/transport/tnote/d/"+wkos+"/"+totalWeight;
+        });
+    };
 
-}
+};
 
 export { initTransferNotes }

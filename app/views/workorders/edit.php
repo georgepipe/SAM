@@ -124,7 +124,8 @@
                     </div>
                     <div class="form-group">
                         <label for="quantity">Quantity Required: </label>
-                        <input name="quantity" 
+                        <input 
+                            name="quantity" 
                             id="quantity"
                             class= "<?php echo (!empty($data->errors->err_quantity))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->quantity ?? '';?>"></input>
@@ -132,7 +133,8 @@
                     </div>
                     <div class="form-group">
                         <label for="serials">Serials: </label>
-                        <input name="serials" 
+                        <input 
+                            name="serials" 
                             id="serials"
                             class= "<?php echo (!empty($data->errors->err_serials))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->serials ?? '';?>"></input>
@@ -140,11 +142,12 @@
                     </div>
                     <div class="form-group">
                         <label for="wko_status">Status: </label>
-                        <select name="wko_status" 
+                        <select 
+                            name="wko_status" 
                             id="wko_status"
                             class= "<?php echo (!empty($data->errors->err_wko_status))? 'is-invalid' : '';?>" 
                             value="<?php echo $data->data->wko_status ?? '';?>">
-                            <option value=""><?php if(isset($data->data->wko_status)) {echo $data->data->wko_status;} else { echo '';} ?></option>
+                            <option value="<?php if(isset($data->data->wko_status)) {echo $data->data->wko_status;} else { echo '';} ?>"><?php if(isset($data->data->wko_status)) {echo $data->data->wko_status;} else { echo '';} ?></option>
                             <option value="In Progress">In Progress</option>
                             <option value="On Hold">On Hold</option>
                             <option value="To Be Built">To Be Built</option>

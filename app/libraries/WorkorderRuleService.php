@@ -61,7 +61,7 @@
                 $data->form->serials = 'To Be Confirmed';
             }
             //5 digits per number!
-            $data->form->serials = $this->padSerials($data->form->serials);
+            // $data->form->serials = $this->padSerials($data->form->serials);
         }
 
         private function padSerials(string $input): string {

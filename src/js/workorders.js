@@ -282,7 +282,7 @@ function initWorkOrders () {
 function handleSerials() { 
 
     async function setSerials(payload) {
-        const response = await fetch(`../apiworkorders/setSerials/`, {
+        const response = await fetch(`${URLROOT}apiworkorders/setSerials`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

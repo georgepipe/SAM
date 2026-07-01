@@ -35,13 +35,15 @@
 
         public function addTransportNote($data) {
             $destination = ($data->transport === 'Collection') ? 'Storage' : 'Funktion-One';
-            $this->db->query('INSERT INTO transport_notes (transport, destination, completed) 
-                                                VALUES (:transport, :destination, :completed)');
+            $this->db->query('INSERT INTO transport_notes (transport, destination, weight, completed) 
+                                                VALUES (:transport, :destination, :weight, :completed)');
             $this->db->bind(':transport', $data['transport']);
             $this->db->bind(':destination', $destination);
+            $this->db->bind(':weight', $data['weight']);
             $this->db->bind(':completed', 0);
 
             return $this->db->execute();
+            
         }
 
         public function deleteTnote($tnid) {
@@ -64,7 +66,7 @@
             $this->db->bind(':tnid', $tnid);
             $this->db->bind(':completed_at', $now);
             if($this->db->execute()){
-                flash('post_message','Transport Note Removed');
+                flash('post_message','Transport note completed.');
                 redirect('transport');
             } else { 
                 die('something went wrong');

@@ -103,13 +103,21 @@
                 ✓ duplicate validation - 
                 ✓ serials not already used - 
             **/
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405); //method error code
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Method not allowed'
+                ]);
+                return;
+            }
+            
             header('Content-Type: application/json');
             //GET INPUT
             $input = json_decode(file_get_contents('php://input'), true); 
             $workorderId = $input['workorder_id'] ?? null;
             $serials = $input['numbers'] ?? null;
             $model = $input['model'] ?? null;
-
             //validate input
             if(!$workorderId) {
                 echo json_encode([
@@ -221,7 +229,10 @@
             
             //PASSED VALIDATION
             //SAVE SERIAL TO WORKORDER
-            $serials = implode(',', $serials);
+            //First we have to contract the serials again to short form!
+            // $serials = implode(',', $serials);
+            $serials = $this->seModel->contractSerials($serials);
+            // dumpAndDie($serials,'anything here?');
             if(!$this->woModel->setSerials($workorderId,$serials)){
                 echo json_encode([
                     'success' => false,
@@ -229,6 +240,8 @@
                 ]);
                 return;
             };
+            $workorder->serials = $serials;
+            // dumpAndDie($serials, 'Serials should be updated in workorder now');
             
             //MARK WORKORDER AS COMPLETE 
             //I Will do this on the client side to keep the alert banner working the same as the other completed workorders that already have serials

@@ -192,8 +192,8 @@ class Workorders extends Controller {
         //if post then filter data and validate
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             //sanitise POST array
-               $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-               $form = (object) array (
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $form = (object) array (
                 'work_order_id' => $id,
                 'wko' => trim($_POST['wko']),
                 'avn' => trim($_POST['avn']),
@@ -210,23 +210,22 @@ class Workorders extends Controller {
                 'wko_notes' => trim($_POST['wko_notes']),
                 'pid' => ''
             );
-   
-               $errors = $this->initialiseErrors();
-   
-               $data = (object) array ( 
-                   'form' => $data,
-                   'errors' => $errors
-               );
-                //validate post data//
-                $ruleService= new WorkorderRuleService($this->woModel, $this->moModel);
-                $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
-                $data = $ruleService->apply($data);
-                $data = $validationService->validate($data);
-                $errors = $validationService->hasErrors($data->errors);
-
+            $errors = $this->initialiseErrors();
+            $data = (object) array ( 
+                'form' => $form,
+                'errors' => $errors
+            );
+            //validate post data//
+            $ruleService= new WorkorderRuleService($this->woModel, $this->moModel);
+            $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
+            $data = $ruleService->apply($data);
+            $data = $validationService->validateEdit($data);
+            // dumpAndDie($data);
+            $errors = $validationService->hasErrors($data->errors);
+            ;
                
             if (!$errors) {
-                if ($this->woModel->editOrder($data->data)){
+                if ($this->woModel->editOrder($data->form)){
                     flash('post_message', 'Workorder Updated');
                     redirect('workorders/index');
                 } else {
