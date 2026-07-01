@@ -53,10 +53,10 @@ function initTransferNotes () {
                 weightTxt.textContent = totalWeight + 'kg';
                 if (isChecked && visibleBtns>0) {
                     btnCont.classList.remove('hidden');
-                    btnCont.classList.add('block');
+                    btnCont.classList.add('flex');
                     // return; 
                 } else if(visibleBtns<1) {
-                    btnCont.classList.remove('block');
+                    btnCont.classList.remove('flex');
                     btnCont.classList.add('hidden');
                     // return; 
                 } 

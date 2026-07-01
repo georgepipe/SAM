@@ -457,10 +457,10 @@ function initTransferNotes() {
         weightTxt.textContent = totalWeight + 'kg';
         if (isChecked && visibleBtns > 0) {
           btnCont.classList.remove('hidden');
-          btnCont.classList.add('block');
+          btnCont.classList.add('flex');
           // return; 
         } else if (visibleBtns < 1) {
-          btnCont.classList.remove('block');
+          btnCont.classList.remove('flex');
           btnCont.classList.add('hidden');
           // return; 
         }
@@ -908,7 +908,7 @@ function initWorkOrders() {
               row = e.target.closest('tr'); //check whether workorder has serials or not
               serials = row.querySelector('.wkoSerials').textContent;
               if (!(serials === 'To Be Confirmed')) {
-                _context3.next = 47;
+                _context3.next = 48;
                 break;
               }
               //swap forward slashes for commas
@@ -987,16 +987,14 @@ function initWorkOrders() {
                   throw new Error("Number of serials provided does not match the required quantity of serials. Provided: ".concat(actualQty, " Expected: ").concat(expectedQty));
                 }
               };
-              console.log(serials);
-
               //handle input
               input = window.prompt("Please enter the serials for this work order to mark it as complete", "");
               if (input) {
-                _context3.next = 13;
+                _context3.next = 12;
                 break;
               }
               return _context3.abrupt("return");
-            case 13:
+            case 12:
               //check for blank input
 
               input = input.replace(/\s+/g, ''); //remove any spaces
@@ -1005,7 +1003,7 @@ function initWorkOrders() {
 
               //split input into ranges
               rangeNumbers = [];
-              _context3.prev = 17;
+              _context3.prev = 16;
               if (input.indexOf(',') > -1) {
                 //split ranges and count up all the serials in the range
 
@@ -1043,19 +1041,20 @@ function initWorkOrders() {
                 workorder_id: workorder_id,
                 numbers: numbers
               };
-              _context3.prev = 24;
-              _context3.next = 27;
+              _context3.prev = 23;
+              _context3.next = 26;
               return setSerials(payload);
-            case 27:
+            case 26:
               data = _context3.sent;
-              _context3.next = 34;
+              _context3.next = 33;
               break;
-            case 30:
-              _context3.prev = 30;
-              _context3.t0 = _context3["catch"](24);
+            case 29:
+              _context3.prev = 29;
+              _context3.t0 = _context3["catch"](23);
               console.error();
               return _context3.abrupt("return");
-            case 34:
+            case 33:
+              ;
               console.log(data);
               if (data.success) {
                 _context3.next = 37;
@@ -1063,27 +1062,28 @@ function initWorkOrders() {
               }
               throw new Error(data.message);
             case 37:
+              ;
               if (data.success) {
                 window.location.href = "http://localhost/SAM/workorders";
               }
-              _context3.next = 45;
+              _context3.next = 46;
               break;
-            case 40:
-              _context3.prev = 40;
-              _context3.t1 = _context3["catch"](17);
+            case 41:
+              _context3.prev = 41;
+              _context3.t1 = _context3["catch"](16);
               console.log(_context3.t1);
               alert(_context3.t1.message);
               return _context3.abrupt("return");
-            case 45:
-              _context3.next = 48;
+            case 46:
+              _context3.next = 49;
               break;
-            case 47:
-              window.location.href = "http://localhost/SAM/workorders/complete/".concat(row.dataset.id);
             case 48:
+              window.location.href = "http://localhost/SAM/workorders/complete/".concat(row.dataset.id);
+            case 49:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[17, 40], [24, 30]]);
+        }, _callee3, null, [[16, 41], [23, 29]]);
       }));
       return function (_x4) {
         return _ref5.apply(this, arguments);

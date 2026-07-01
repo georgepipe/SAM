@@ -123,7 +123,11 @@ class Serial {
                     case ($serialsArr[$i] === $serialsArr[$i-1]+1): //sequential number
                         break;
                     case ($serialsArr[$i] != $serialsArr[$i-1]+1): //non-sequential number
-                        $contractedSerials = $contractedSerials.' - '.$serialsArr[$i-1].'/'.$serialsArr[$i];
+                        if($serialsArr[$i-1] === $serialsArr[0]) {
+                            $contractedSerials = $contractedSerials.'/'.$serialsArr[$i];
+                        } else {
+                            $contractedSerials = $contractedSerials.' - '.$serialsArr[$i-1].'/'.$serialsArr[$i];
+                        }
                         break;
                     default:
                         break;

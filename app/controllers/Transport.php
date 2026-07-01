@@ -122,8 +122,8 @@ class Transport extends Controller {
     public function complete($tnid) {
         //update as complete innit
         if($this->tnModel->completeTnote($tnid)) {
-            // flash('post_message', 'Work Order marked as completed!');
-            // redirect('transport/index');
+            flash('post_message', 'Work Order marked as completed!');
+            redirect('transport/index');
             // return true;
         } else {
             return false;

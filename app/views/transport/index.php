@@ -37,7 +37,7 @@
         </section>
     </div>
 <!-- create deliver/collection note buttons -->
-<div class="flex flex-row m-auto justify-center btnContainer hidden">
+<div class="flex-row m-auto justify-center btnContainer hidden">
     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-6 h-16 text-nowrap collectionBtn ">Create Collection</button>
     <button class="btn btn-blue mx-6 h-16 deliveryBtn hidden">Create Delivery</button>
     <div class="weightDiv border-2 hidden">Current total transport weight: <br><text class="weightTxt">kg</text></div>

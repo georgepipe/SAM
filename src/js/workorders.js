@@ -297,9 +297,6 @@ function handleSerials() {
     }
 
     document.addEventListener('click', async function (e) {
-
-        
-
         //PARSE USER INPUT
         //VALIDATE SERIALS
         //SUBMIT
@@ -323,13 +320,10 @@ function handleSerials() {
         const serials = row.querySelector('.wkoSerials').textContent;
         
         if(serials === 'To Be Confirmed'){
-            console.log(serials);
 
             //handle input
             let input = window.prompt("Please enter the serials for this work order to mark it as complete","");
             if(!input) return; //check for blank input
-            
-
 
             input = input.replace(/\s+/g,''); //remove any spaces
             input = input.replace(/\//g, ','); //swap forward slashes for commas
@@ -442,19 +436,19 @@ function handleSerials() {
                 const payload = {
                     workorder_id,
                     numbers
-                }
+                };
+
                 try {
                     data = await setSerials(payload);
                 } catch (error) {
                     console.error();
                     return;
-                }
+                };
+
                 console.log(data);
                 if(!data.success) {
                     throw new Error(data.message);
-                }
-                
-                
+                };
                
                 if(data.success){
                     window.location.href = `http://localhost/SAM/workorders`

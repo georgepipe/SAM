@@ -111,13 +111,14 @@
                 ]);
                 return;
             }
-            
             header('Content-Type: application/json');
-            //GET INPUT
+
+            //GET INPUTS
             $input = json_decode(file_get_contents('php://input'), true); 
             $workorderId = $input['workorder_id'] ?? null;
             $serials = $input['numbers'] ?? null;
             $model = $input['model'] ?? null;
+            
             //validate input
             if(!$workorderId) {
                 echo json_encode([
@@ -200,9 +201,7 @@
                 if($flaggedSerial) {
                     //serial is already in use, create a list of these and return at the end of validation checks
                     $flaggedWorkorder = $this->woModel->getWorkorderById($flaggedSerial->work_order_id);
-                    // array_push($usedSerials, $serial);
                     $usedSerials[] = $serial;
-                    // array_push($flaggedAvns, $flaggedWorkorder->avn);
                     $flaggedAvns[] = $flaggedWorkorder->avn;
                 };
             };
@@ -230,7 +229,6 @@
             //PASSED VALIDATION
             //SAVE SERIAL TO WORKORDER
             //First we have to contract the serials again to short form!
-            // $serials = implode(',', $serials);
             $serials = $this->seModel->contractSerials($serials);
             // dumpAndDie($serials,'anything here?');
             if(!$this->woModel->setSerials($workorderId,$serials)){
@@ -244,14 +242,12 @@
             // dumpAndDie($serials, 'Serials should be updated in workorder now');
             
             //MARK WORKORDER AS COMPLETE 
-            //I Will do this on the client side to keep the alert banner working the same as the other completed workorders that already have serials
             if(!$this->woModel->completeOrder($workorder)) {
                 echo json_encode([
                     'success' => 'false',
                     'message' => 'Error: Failed to mark workorder as completed'
                 ]); 
             }
-
 
             //FINISHED
             flash('post_message', 'Work Order marked as completed!');
