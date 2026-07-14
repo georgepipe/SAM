@@ -9,6 +9,7 @@
     require_once 'helpers/session_helper.php';
     require_once 'helpers/api_helper.php';
     require_once 'helpers/error_handler.php';
+    require_once 'helpers/pagination.php';
     require_once 'DTOs/PdfData.php';
     // require_once 'helpers/pdf_parser.php';
 

@@ -3,9 +3,6 @@
  * Controls the front end php functions required by the work orders to get,
  * add, edit and delete orders as well as directing the browser to the relavent views
  */
-
-
-
 class Workorders extends Controller {
     private $woModel;
     private $moModel;
@@ -81,11 +78,20 @@ class Workorders extends Controller {
         $models = $this->moModel->getModelNames();
         $finishes = $this->woModel->getFinishes();
 
+        //pagination
+        $pagination = new pagination();
+        $activePageData = $pagination::build(1,$acWkoCount);
+        $compPageData = $pagination::build(1,$coWkoCount);
+
+
+
         $data = [
             'activeWorkorders' => $activeWorkorders,
             'completedWorkorders' => $completedWorkorders,
             'acWkoCount' => $acWkoCount,
-            'coWkoCount' => $coWkoCount
+            'coWkoCount' => $coWkoCount,
+            'activePages' => $activePageData,
+            'compPages' => $compPageData
         ];
 
         // flash('post_message', 'Hello!');
@@ -313,6 +319,7 @@ class Workorders extends Controller {
     }
 
     public function split($work_order_id, $sPoint) {
+
         $todaysDate = date('m/d/Y', time());
 
         $originalWorkorder = $this->woModel->getWorkorderById($work_order_id);
@@ -348,4 +355,5 @@ class Workorders extends Controller {
     }
 
    
-} ?>
+} 
+?>

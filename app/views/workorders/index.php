@@ -42,8 +42,8 @@
     <?php if(isset($_SESSION['post_message'])) {echo flash('post_message');} ?>
 
     <div class="activeWkos dispContainer <?php 
-        if (isset($url[3])) { if ($url[3]!="index?p=cw") {echo 'block';} else {echo 'hidden';}}
-        ?>">
+                                            if (isset($url[3])) { if ($url[3]!="index?p=cw") {echo 'block';} else {echo 'hidden';}}
+                                        ?>">
         <div class="border-red-600">
             <h1 class="flex justify-center text-lg"><strong><U>Active Work Orders</U></strong></h1>
             <section class="flex flex-col">
@@ -109,69 +109,75 @@
         </div>
 
         <div class="flex items-center justify-between px-4 py-3 sm:px-6">
-        <div class="flex flex-1 justify-between sm:hidden">
-            <a href="#" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
-            <a href="#" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
-        </div>
+            <div class="flex flex-1 justify-between sm:hidden">
+                <a href="#" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
+                <a href="#" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+            </div>
 
-        <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-            <div>
-                <p class="text-sm text-gray-700 pageInfoA">
-                Showing
-                <span class="font-medium"><?php echo '1'?></span>
-                to
-                <span class="font-medium"><?php  echo ($data['acWkoCount'] < 10) ? $data['acWkoCount']:'10'; ?></span>
-                of
-                <span class="font-medium Acount" data-count="<?php echo $data['acWkoCount']; ?>"><?php echo $data['acWkoCount']; ?></span>
-                results
-                </p>
-            </div>
-            <div>
-            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination" data-wkos="act">
-                
-                <a href="#" class="pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="-1">
-                <span class="sr-only">Previous</span><?php include APPROOT.'/views/components/icons/previousicon.php';?>
-                </a>
-                <!-- Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" -->
-                <?php if($data['acWkoCount']>0) :?>
-                    <?php 
-                        $i = 0;
-                        $pages = ceil($data['acWkoCount'] / 10); //calculate no of pages from results
-                        switch (TRUE) {
-                            case ($pages > 5):
-                                //page btn 1
-                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="0">1</a>'; 
-                                //page btn 2
-                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
-                                echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
-                                //page btn $pages -1
-                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-2).'"">'.($pages-1).'</a>'; 
-                                //page btn $pages
-                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
-                                break;
-                            default: 
-                                //for i
-                                for ($i = 1; $i <= $pages; $i++) {
-                                    if ($i === 1) {
-                                        echo '<a class="aPgBtn pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
-                                    } else {
-                                        echo '<a class="aPgBtn pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
-                                    }
-                                    // echo '<a class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.($i===1 ? '' : '').'" data-page="'.($i-1).'">'.$i.'</a>'; 
-                                }
-                                break;
-                        }
+            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700 pageInfoA">
+                    Showing
+                    <span class="font-medium"><?php echo '1'?></span>
+                    to
+                    <span class="font-medium"><?php  echo ($data['acWkoCount'] < 10) ? $data['acWkoCount']:'10'; ?></span>
+                    of
+                    <span class="font-medium Acount" data-count="<?php echo $data['acWkoCount']; ?>"><?php echo $data['acWkoCount']; ?></span>
+                    results
+                    </p>
+                </div>
+                <div>
+                <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm aPgBtns" aria-label="Pagination" data-wkos="act">
+                    
+                    <a href="#" class="pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="-1">
+                    <span class="sr-only">Previous</span><?php include APPROOT.'/views/components/icons/previousicon.php';?>
+                    </a>
+                    <!-- Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" -->
+                    <?php if($data['acWkoCount']>0) :?>
+                        <?php foreach($data['activePages'] as $page) {
+                            $current = $page->current ? 'selPgBtn' : '';
+                            echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.$current.'" data-page="'.$page->page-1 .'">'.$page->page.'</a>'; 
+                        };
                         
-                    ?>
-                <?php endif ?>
-                <a href="#" class="pgBtn pgBtnArrow rounded-r-md  hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="1">
-                <span class="sr-only">Next</span><?php include APPROOT.'/views/components/icons/nexticon.php';?>
-                </a>
-            </nav>
-            </div>
-        </div>
-        </div>
-    </div>
+                        ?>
+                        <!-- <?php 
+                            $i = 0;
+                            $pages = ceil($data['acWkoCount'] / 10); //calculate no of pages from results
+                            switch (TRUE) {
+                                case ($pages > 5):
+                                    //page btn 1
+                                    echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="0">1</a>'; 
+                                    //page btn 2
+                                    echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
+                                    echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
+                                    //page btn $pages -1
+                                    echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-2).'"">'.($pages-1).'</a>'; 
+                                    //page btn $pages
+                                    echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
+                                    break;
+                                default: 
+                                    //for i
+                                    for ($i = 1; $i <= $pages; $i++) {
+                                        if ($i === 1) {
+                                            echo '<a class="aPgBtn pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
+                                        } else {
+                                            echo '<a class="aPgBtn pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
+                                        }
+                                        // echo '<a class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.($i===1 ? '' : '').'" data-page="'.($i-1).'">'.$i.'</a>'; 
+                                    }
+                                    break;
+                            }
+                            
+                        ?> -->
+                    <?php endif ?>
+                    <a href="#" class="pgBtn pgBtnArrow rounded-r-md  hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="1">
+                    <span class="sr-only">Next</span><?php include APPROOT.'/views/components/icons/nexticon.php';?>
+                    </a>
+                </nav>
+                </div> <!-- -->
+            </div> <!-- -->
+        </div> <!-- -->
+    </div> <!-- active wko display container-->
     <div class="compWkos dispContainer <?php
                             //  if($url[3] != 'index?p=cw') { echo 'hidden'; } else {echo 'block';} 
                             if (isset($url[3])) { if ($url[3]==="index?p=cw") {echo 'block';} else {echo 'hidden';}}
@@ -212,76 +218,79 @@
             </section>
         </div>
 
-        <div class="flex items-center justify-between px-4 py-3 sm:px-6">
-        <div class="flex flex-1 justify-between sm:hidden">
-            <a href="#" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
-            <a href="#" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
-        </div>
+        <div class="flex items-center justify-between px-4 py-3 sm:px-6"> <!-- completed wkos pagination -->
+            <div class="flex flex-1 justify-between sm:hidden">
+                <a href="#" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
+                <a href="#" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+            </div>
 
-        <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-            <div>
-                <p class="text-sm text-gray-700 pageInfoB">
-                Showing
-                <span class="font-medium"><?php echo '1'?></span>
-                to
-                <span class="font-medium"><?php  echo ($data['coWkoCount'] < 10) ? $data['coWkoCount']:'10'; ?></span>
-                of
-                <span class="font-medium Ccount" data-count="<?php echo $data['coWkoCount']; ?>"><?php echo $data['coWkoCount']; ?></span>
-                results
-                </p>
-            </div>
-            <div>
-            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination" data-wkos="com">
-                
-                <a href="#" class="pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="-1">
-                <span class="sr-only">Previous</span><?php include APPROOT.'/views/components/icons/previousicon.php';?>
-                </a>
-                <!-- Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" -->
-                <?php if($data['coWkoCount']>0) :?>
-                    <?php 
-                        $i = 0;
-                        $pages = ceil($data['coWkoCount'] / 10); //calculate num of pages from results
-                        switch (TRUE) {
-                            case ($pages > 5):
-                                //page btn 1
-                                echo '<a href="#" class="pgBtn cPgBtn pgBtnNum selPgBtn">1</a>'; 
-                                //page btn 2
-                                echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
-                                echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
-                                //page btn $pages -1
-                                echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" id="'.($pages-2).'"">'.($pages-1).'</a>'; 
-                                //page btn $pages
-                                echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
-                                break;
-                            default: 
-                                for ($i = 1; $i <= $pages; $i++) {
-                                    if ($i === 1) {
-                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
-                                    } else {
-                                        echo '<a class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
-                                    }
-                                }
-                                break;
-                        }
+            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700 pageInfoB">
+                        Showing
+                        <span class="font-medium"><?php echo '1'?></span>
+                        to
+                        <span class="font-medium"><?php  echo ($data['coWkoCount'] < 10) ? $data['coWkoCount']:'10'; ?></span>
+                        of
+                        <span class="font-medium Ccount" data-count="<?php echo $data['coWkoCount']; ?>"><?php echo $data['coWkoCount']; ?></span>
+                        results
+                    </p>
+                </div>
+                <div>
+                    <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm cPgBtns" aria-label="Pagination" data-wkos="com">
                         
-                    ?>
-                    <!-- <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">2</a> -->
-                    <!-- <a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">3</a> -->
-                    <!-- <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span> -->
-                    <!-- <a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">8</a> -->
-                    <!-- <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">9</a> -->
-                    <!-- <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">10</a> -->
-                <?php endif ?>
-                <a href="#" class="pgBtn pgBtnArrow forwardArrow rounded-r-md  hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="1">
-                <span class="sr-only">Next</span><?php include APPROOT.'/views/components/icons/nexticon.php';?>
-                </a>
-            </nav>
+                        <a href="#" class="pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="-1">
+                        <span class="sr-only">Previous</span><?php include APPROOT.'/views/components/icons/previousicon.php';?>
+                        </a>
+                        <!-- Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" -->
+                        <?php if($data['coWkoCount']>0) :?>
+                            <?php foreach($data['compPages'] as $page) {
+                            $current = $page->current ? 'selPgBtn' : '';
+                            if($page->type === 'page') {
+                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.$current.'" data-page="'.$page->page-1 .'">'.$page->page.'</a>'; 
+                            } else {
+                                echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>'; 
+                            }
+                        };
+                        ?>
+                            <!-- <?php 
+                                $i = 0;
+                                $pages = ceil($data['coWkoCount'] / 10); //calculate num of pages from results
+                                switch (TRUE) {
+                                    case ($pages > 5):
+                                        //page btn 1
+                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>'; 
+                                        //page btn 2
+                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
+                                        echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
+                                        //page btn $pages -1
+                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-2).'"">'.($pages-1).'</a>'; 
+                                        //page btn $pages
+                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
+                                        break;
+                                    default: 
+                                        for ($i = 1; $i <= $pages; $i++) {
+                                            if ($i === 1) {
+                                                echo '<a href="#" class="pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
+                                            } else {
+                                                echo '<a class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
+                                            }
+                                        }
+                                        break;
+                                }
+                                
+                            ?> -->
+                        <?php endif ?>
+                        <a href="#" class="pgBtn pgBtnArrow forwardArrow rounded-r-md  hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="1">
+                        <span class="sr-only">Next</span><?php include APPROOT.'/views/components/icons/nexticon.php';?>
+                        </a>
+                    </nav>
+                </div>
             </div>
-        </div>
         </div>
     </div>
 </div>
-<!-- <?php 
-echo '<pre>'; print_r($data);
-?> -->
+<?php 
+echo '<pre>'; print_r($data['compPages']);
+?>
 <?php require APPROOT . '/views/inc/footer.php'; ?>

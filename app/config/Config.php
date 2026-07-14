@@ -10,3 +10,5 @@
     define('TEMPDIR' , dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/temp/' );
     //advice notes folder
     define('AVNDIR', dirname(dirname(dirname(__FILE__))).'/public/advice_notes/');
+    //items per page in pagination
+    define('ITEMSPERPAGE', 10);

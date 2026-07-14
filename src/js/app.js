@@ -4,6 +4,7 @@ import { initTransferNotes } from "./transfernotes";
 import { initAddOrder } from "./addOrder";
 import { initUpdateStatus } from "./statusUpdate";
 import { initTransport } from "./transport.js";
+import { pagination } from "./pagination.js";
 
 const URLROOT = 'http://localhost/SAM/';
 // const APPROOT = __dirname
@@ -16,6 +17,8 @@ const URLROOT = 'http://localhost/SAM/';
     initAddOrder();
     initUpdateStatus();
     initTransport();
+    pagination();
+    console.log('javascript is running');
   })();
 
 
