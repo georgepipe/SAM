@@ -65,10 +65,13 @@ class Pagination {
 
             foreach($pages as $page) {
 
-                if($previous->page !== null && $previous->page+1 !== $page->page) {
-                    $results[] = (object) [
-                        'type' => 'ellipsis'
-                    ];
+                
+                if($previous){
+                    if($previous->page+1 !== $page->page) {
+                        $results[] = (object) [
+                            'type' => 'ellipsis'
+                        ];
+                    }
                 }
 
                 $results[] = $page;
