@@ -302,22 +302,6 @@ class Workorders extends Controller {
         $this->view('workorders/viewwo', $data);
     }
 
-    public function complete($work_order_id, $serialRanges = '') {
-        // if(!empty($serialRanges)) {
-        //     //add serials to the work order first!
-        //     $this->woModel->setSerials($work_order_id, $serialRanges);
-        // }
-        // $workorder = $this->woModel->getWorkorderById($work_order_id);
-        // $product = $this->poModel->getProductFromPid($workorder->pid);
-        // $this->seModel->addSerials($work_order_id, $product->cab_model_id, $workorder->serials);
-        // if ($this->woModel->completeOrder($workorder)) {
-        //     flash('post_message', 'Work Order marked as completed!');
-        // } else { die('Something went horribly horribly wrong, please contact the web admin'); }
-        // redirect('workorders/index');
-        
-    
-    }
-
     public function split($work_order_id, $sPoint) {
 
         $todaysDate = date('m/d/Y', time());
