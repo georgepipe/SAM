@@ -197,36 +197,17 @@ class Workorders extends Controller {
     public function edit($id = 0) {
         //if post then filter data and validate
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
-            //sanitise POST array
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-            $form = (object) array (
-                'work_order_id' => $id,
-                'wko' => trim($_POST['wko']),
-                'avn' => trim($_POST['avn']),
-                'cab_model_id' => trim($_POST['cab_model_id']),
-                'cab_finish_id' => trim($_POST['cab_finish_id']),
-                'waveguide_finish_id' => trim($_POST['waveguide_finish_id']),
-                'grille_finish_id' => trim($_POST['grille_finish_id']),
-                'connectors' => trim($_POST['connectors']),
-                'wheels' => $_POST['wheels'],
-                'quantity' => (int)$_POST['quantity'],
-                'serials' => trim($_POST['serials']),
-                'wko_status' => trim($_POST['wko_status']),
-                'wko_delivery' => trim($_POST['wko_delivery']),
-                'wko_notes' => trim($_POST['wko_notes']),
-                'pid' => ''
-            );
-            $errors = $this->initialiseErrors();
-            $data = (object) array ( 
-                'form' => $form,
-                'errors' => $errors
-            );
+
+            $data = (object) [
+                'form' => $this->getPostedWorkorderData(),
+                'errors' => $this->initialiseErrors()
+            ];
+
             //validate post data//
             $ruleService= new WorkorderRuleService($this->woModel, $this->moModel);
             $validationService = new WorkorderValidationService($this->woModel, $this->seModel, $ruleService);
             $data = $ruleService->apply($data);
             $data = $validationService->validateEdit($data);
-            // dumpAndDie($data);
             $errors = $validationService->hasErrors($data->errors);
             ;
                
@@ -242,7 +223,7 @@ class Workorders extends Controller {
                 $data = (object) [
                     'models' => $this->moModel->getModelNames(),
                     'finishes' => $this->woModel->getFinishes(),
-                    'data' => $this->woModel->getWorkorderById($id),
+                    'data' => $data->form,
                     'errors' => $data->errors
                 ];
                 if (!empty($data->data)) {

@@ -75,16 +75,11 @@ class Serial {
             
         }
 
-        // public function validateSerials(object $workorder, int $mid){
-
-        // }
-
-
         public function expandSerials($serials) {
             $serial = '';
             $serialsArr = [];
             $tempArr = [];
-            $serialRangeArr = explode(',',$serials);
+            $serialRangeArr = explode('/',$serials);
             foreach($serialRangeArr as $serialRange) {
                 $s = explode('-',$serialRange);
                 // echo '<br> Serial: ';

@@ -24,7 +24,6 @@
             $this->validateNewSerials($data);
             $this->validateWaveguideSelection($data);
             $this->setPID($data);
-
             return $data;
         }
 
