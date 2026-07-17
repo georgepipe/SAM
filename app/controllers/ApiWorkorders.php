@@ -94,8 +94,8 @@
 
         }
         
-        public function setSerials() {
-            /*  
+        public function completeWorkorder() {
+            /*  first validate the save
             ✓ numeric validation - 
             ✓ quantity validation
             ✓ work order still open - 
@@ -212,7 +212,7 @@
 
                 echo json_encode([
                     'success' => false,
-                    'message' => 'The serial(s) '.$usedSerials.' are/is used in AVN '.$flaggedAvns
+                    'message' => 'The serial(s) '.$usedSerials.' are/is already used in AVN '.$flaggedAvns
                 ]); 
                 return;
             }

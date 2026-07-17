@@ -2,10 +2,10 @@ function pagination() {
 
     // function initPagination() {
 
-        console.log('this is working!');
+        // console.log('this is working!');
         //pagination code
         //setup
-        let page = 1;
+        let page = 0;
         let localPage = page;
         let tag;
         let localTag = tag;
@@ -23,7 +23,6 @@ function pagination() {
         if(tableA || tableB) {
             // let pgBtns = document.querySelectorAll(".pgBtn");
             const paginationContainers = document.querySelectorAll('.aPgBtns, .cPgBtns');
-            console.log(paginationContainers);
             const pageNumberInfoA = document.querySelector(".pageInfoA");
             const pageNumberInfoB = document.querySelector(".pageInfoB");
             const totalAResults = +document.querySelector(".Acount").dataset.count;
@@ -45,15 +44,13 @@ function pagination() {
                 if(!clickedButton) return;
                 
                 e.preventDefault(); //stop default link behaviour
-                console.log(clickedButton);
-                if(clickedButton.classList.contains(".pgBtnArrow")){ //was the button click an arrow?
-                    delta = Number(clickedButton.dataset.delta);
+                if(clickedButton.classList.contains("pgBtnArrow")){ //was the button click an arrow?
+                    let delta = Number(clickedButton.dataset.delta);
                     localPage = calculateNextPage(localPage, delta, localTag);
                 } else {
                     localPage = Number(clickedButton.dataset.page);
                     localTag = clickedButton.closest('[data-wkos]').dataset.wkos;
                 };
-
 
 
                 const endpoint = localTag === "com" 
@@ -75,6 +72,7 @@ function pagination() {
             }
 
             function calculateNextPage(localPage, delta, tag){
+                localPage = localPage;
                 let newPage = localPage + delta;
                 return validatePageBounds(newPage, tag) 
                     ? newPage 
@@ -82,7 +80,7 @@ function pagination() {
             }
 
             function validatePageBounds(localPage, tag) {
-                const max = tag == 'com' ? cPageMax : aPageMax;
+                const max = tag == 'com' ? cPageMax-1 : aPageMax-1;
                 return localPage >= 0 && localPage <= max;
             }
 
@@ -254,7 +252,7 @@ function pagination() {
                 let qSelector = tag === "com" ? ".cPgBtns" : ".aPgBtns";
                 const pageBtns = document.querySelector(qSelector);
                 let totalPages = tag === 'com' ? Math.ceil(totalCResults/PAGE_SIZE) : Math.ceil(totalAResults/PAGE_SIZE);
-                pageBtns.innerHTML = Pagination.render(Pagination.build(localPage, totalPages));
+                pageBtns.innerHTML = Pagination.render(Pagination.build(localPage, totalPages), tag);
             }
 
             const Pagination = {
@@ -344,14 +342,16 @@ function pagination() {
                     return finalPages;
                 },
 
-                render(paginationArray) {
+                render(paginationArray, tag) {
                     //iterate through array and render buttons
                     let html = '';
+                    let pgClass = tag === 'com' ? 'cPgBtn' : 'aPgBtn';
                     html = `<a href="#" class="pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="-1">${ICONS.backArrow}<span class="sr-only">Previous</span></a>`;
                     for (const item of paginationArray) {
                         let current = (item.current) ? 'selPgBtn' : '';
                         if (item.type === 'page') {
-                            html += `<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${current}" data-page="${item.page-1}">${item.page}</a>`
+                            //need to add either aPgBtns or cPgBtns depending on workorder table
+                            html += `<a href="#" class="pgBtn ${pgClass} pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${current}" data-page="${item.page-1}">${item.page}</a>`
                         }
                         if(item.type === 'ellipsis') {
                             html += `<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>`

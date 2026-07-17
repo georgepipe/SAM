@@ -138,37 +138,7 @@
                             $current = $page->current ? 'selPgBtn' : '';
                             echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.$current.'" data-page="'.$page->page-1 .'">'.$page->page.'</a>'; 
                         };
-                        
                         ?>
-                        <!-- <?php 
-                            $i = 0;
-                            $pages = ceil($data['acWkoCount'] / 10); //calculate no of pages from results
-                            switch (TRUE) {
-                                case ($pages > 5):
-                                    //page btn 1
-                                    echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="0">1</a>'; 
-                                    //page btn 2
-                                    echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
-                                    echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
-                                    //page btn $pages -1
-                                    echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-2).'"">'.($pages-1).'</a>'; 
-                                    //page btn $pages
-                                    echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
-                                    break;
-                                default: 
-                                    //for i
-                                    for ($i = 1; $i <= $pages; $i++) {
-                                        if ($i === 1) {
-                                            echo '<a class="aPgBtn pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
-                                        } else {
-                                            echo '<a class="aPgBtn pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
-                                        }
-                                        // echo '<a class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.($i===1 ? '' : '').'" data-page="'.($i-1).'">'.$i.'</a>'; 
-                                    }
-                                    break;
-                            }
-                            
-                        ?> -->
                     <?php endif ?>
                     <a href="#" class="pgBtn pgBtnArrow rounded-r-md  hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="1">
                     <span class="sr-only">Next</span><?php include APPROOT.'/views/components/icons/nexticon.php';?>
@@ -247,39 +217,11 @@
                             <?php foreach($data['compPages'] as $page) {
                             $current = $page->current ? 'selPgBtn' : '';
                             if($page->type === 'page') {
-                                echo '<a href="#" class="aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.$current.'" data-page="'.$page->page-1 .'">'.$page->page.'</a>'; 
+                                echo '<a href="#" class="cPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.$current.'" data-page="'.$page->page-1 .'">'.$page->page.'</a>'; 
                             } else {
                                 echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>'; 
                             }
-                        };
-                        ?>
-                            <!-- <?php 
-                                $i = 0;
-                                $pages = ceil($data['coWkoCount'] / 10); //calculate num of pages from results
-                                switch (TRUE) {
-                                    case ($pages > 5):
-                                        //page btn 1
-                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>'; 
-                                        //page btn 2
-                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="1">2</a>'; 
-                                        echo '<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>';
-                                        //page btn $pages -1
-                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-2).'"">'.($pages-1).'</a>'; 
-                                        //page btn $pages
-                                        echo '<a href="#" class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-page="'.($pages-1).'">'.$pages.'</a>'; 
-                                        break;
-                                    default: 
-                                        for ($i = 1; $i <= $pages; $i++) {
-                                            if ($i === 1) {
-                                                echo '<a href="#" class="pgBtn cPgBtn pgBtnNum selPgBtn" data-page="0">1</a>';  
-                                            } else {
-                                                echo '<a class="pgBtn cPgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 '.('').'" data-page="'.($i-1).'">'.$i.'</a>'; 
-                                            }
-                                        }
-                                        break;
-                                }
-                                
-                            ?> -->
+                        };?>
                         <?php endif ?>
                         <a href="#" class="pgBtn pgBtnArrow forwardArrow rounded-r-md  hover:bg-gray-50 focus:z-20 focus:outline-offset-0" data-delta="1">
                         <span class="sr-only">Next</span><?php include APPROOT.'/views/components/icons/nexticon.php';?>

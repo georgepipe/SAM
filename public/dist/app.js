@@ -256,10 +256,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 function pagination() {
   // function initPagination() {
 
-  console.log('this is working!');
+  // console.log('this is working!');
   //pagination code
   //setup
-  var page = 1;
+  var page = 0;
   var localPage = page;
   var tag;
   var localTag = tag;
@@ -277,7 +277,7 @@ function pagination() {
     //click handler
     var handlePaginationClick = /*#__PURE__*/function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(e) {
-        var clickedButton, endpoint, data;
+        var clickedButton, delta, endpoint, data;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -289,8 +289,7 @@ function pagination() {
               return _context.abrupt("return");
             case 3:
               e.preventDefault(); //stop default link behaviour
-              console.log(clickedButton);
-              if (clickedButton.classList.contains(".pgBtnArrow")) {
+              if (clickedButton.classList.contains("pgBtnArrow")) {
                 //was the button click an arrow?
                 delta = Number(clickedButton.dataset.delta);
                 localPage = calculateNextPage(localPage, delta, localTag);
@@ -300,39 +299,40 @@ function pagination() {
               }
               ;
               endpoint = localTag === "com" ? "../apiworkorders/paginate/completed/".concat(localPage) : "../apiworkorders/paginate/active/".concat(localPage);
-              _context.prev = 8;
-              _context.next = 11;
+              _context.prev = 7;
+              _context.next = 10;
               return fetchWorkorders(endpoint);
-            case 11:
+            case 10:
               data = _context.sent;
-              _context.next = 18;
+              _context.next = 17;
               break;
-            case 14:
-              _context.prev = 14;
-              _context.t0 = _context["catch"](8);
+            case 13:
+              _context.prev = 13;
+              _context.t0 = _context["catch"](7);
               console.error("Pagination fetch failed: ", _context.t0);
               return _context.abrupt("return");
-            case 18:
+            case 17:
               ;
               renderTable(data, localTag);
               updatePaginationInfo(localPage, data.length, localTag);
               updatePaginationUX(localPage, localTag);
-            case 22:
+            case 21:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[8, 14]]);
+        }, _callee, null, [[7, 13]]);
       }));
       return function handlePaginationClick(_x) {
         return _ref.apply(this, arguments);
       };
     }();
     var calculateNextPage = function calculateNextPage(localPage, delta, tag) {
+      localPage = localPage;
       var newPage = localPage + delta;
       return validatePageBounds(newPage, tag) ? newPage : localPage;
     };
     var validatePageBounds = function validatePageBounds(localPage, tag) {
-      var max = tag == 'com' ? cPageMax : aPageMax;
+      var max = tag == 'com' ? cPageMax - 1 : aPageMax - 1;
       return localPage >= 0 && localPage <= max;
     }; //fetch data logic
     var fetchWorkorders = /*#__PURE__*/function () {
@@ -498,7 +498,7 @@ function pagination() {
       var qSelector = tag === "com" ? ".cPgBtns" : ".aPgBtns";
       var pageBtns = document.querySelector(qSelector);
       var totalPages = tag === 'com' ? Math.ceil(totalCResults / PAGE_SIZE) : Math.ceil(totalAResults / PAGE_SIZE);
-      pageBtns.innerHTML = Pagination.render(Pagination.build(localPage, totalPages));
+      pageBtns.innerHTML = Pagination.render(Pagination.build(localPage, totalPages), tag);
     };
     var createActionLink = function createActionLink(href, svg) {
       var extraAttrs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -515,7 +515,6 @@ function pagination() {
     };
     // let pgBtns = document.querySelectorAll(".pgBtn");
     var paginationContainers = document.querySelectorAll('.aPgBtns, .cPgBtns');
-    console.log(paginationContainers);
     var pageNumberInfoA = document.querySelector(".pageInfoA");
     var pageNumberInfoB = document.querySelector(".pageInfoB");
     var totalAResults = +document.querySelector(".Acount").dataset.count;
@@ -610,9 +609,10 @@ function pagination() {
         });
         return finalPages;
       },
-      render: function render(paginationArray) {
+      render: function render(paginationArray, tag) {
         //iterate through array and render buttons
         var html = '';
+        var pgClass = tag === 'com' ? 'cPgBtn' : 'aPgBtn';
         html = "<a href=\"#\" class=\"pgBtn pgBtnArrow rounded-l-md hover:bg-gray-50 focus:z-20 focus:outline-offset-0\" data-delta=\"-1\">".concat(ICONS.backArrow, "<span class=\"sr-only\">Previous</span></a>");
         var _iterator = _createForOfIteratorHelper(paginationArray),
           _step;
@@ -621,7 +621,8 @@ function pagination() {
             var item = _step.value;
             var current = item.current ? 'selPgBtn' : '';
             if (item.type === 'page') {
-              html += "<a href=\"#\" class=\"aPgBtn pgBtn pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ".concat(current, "\" data-page=\"").concat(item.page - 1, "\">").concat(item.page, "</a>");
+              //need to add either aPgBtns or cPgBtns depending on workorder table
+              html += "<a href=\"#\" class=\"pgBtn ".concat(pgClass, " pgBtnNum hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ").concat(current, "\" data-page=\"").concat(item.page - 1, "\">").concat(item.page, "</a>");
             }
             if (item.type === 'ellipsis') {
               html += "<span class=\"relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0\">...</span>";
@@ -1010,18 +1011,18 @@ function initWorkOrders() {
   });
 
   //event handler for marking workorders as complete when clicking the 'tick' SVG
-  function handleSerials() {
-    function setSerials(_x) {
-      return _setSerials.apply(this, arguments);
+  function completeWorkorder() {
+    function completeWorkorder(_x) {
+      return _completeWorkorder.apply(this, arguments);
     }
-    function _setSerials() {
-      _setSerials = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(payload) {
+    function _completeWorkorder() {
+      _completeWorkorder = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(payload) {
         var response;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return fetch("".concat(URLROOT, "apiworkorders/setSerials"), {
+              return fetch("".concat(URLROOT, "apiworkorders/completeWorkorder"), {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -1046,45 +1047,34 @@ function initWorkOrders() {
           }
         }, _callee2);
       }));
-      return _setSerials.apply(this, arguments);
+      return _completeWorkorder.apply(this, arguments);
     }
     document.addEventListener('click', /*#__PURE__*/function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(e) {
-        var row, serials, getNumbersFromRange, validateRange, checkForDuplicates, validateQty, input, inputRanges, rangeNumbers, numbers, _iterator, _step, range, spreadNumbers, workorder_id, data, payload;
+        var row, serials, workorder_id, input, getNumbersFromRange, validateRange, checkForDuplicates, validateQty, inputRanges, rangeNumbers, numbers, _iterator, _step, range, spreadNumbers, data, payload;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              if (e.target.closest('.compBtn')) {
-                _context.next = 2;
-                break;
-              }
-              return _context.abrupt("return");
-            case 2:
-              row = e.target.closest('tr'); //check whether workorder has serials or not
-              serials = row.querySelector('.wkoSerials').textContent;
-              if (!(serials === 'To Be Confirmed')) {
-                _context.next = 48;
-                break;
-              }
-              //swap forward slashes for commas
-              getNumbersFromRange = function getNumbersFromRange(range) {
-                //validate range inputs:
-                validateRange(range);
-                if (range.indexOf('-') === -1) return [Number(range)];
-                //get start and end of the range
-                var splitRange = range.split('-');
-                var first = Number(splitRange[0]);
-                var second = Number(splitRange[1]);
-
-                //create array of sequential numbers
-                var rangeNumbers = [];
-                for (var n = first; n <= second; n++) {
-                  rangeNumbers.push(n);
+              validateQty = function _validateQty(numbers) {
+                var _numbers$length;
+                var expectedQty = Number(row.querySelector('#qty').dataset.qty);
+                console.log(expectedQty);
+                var actualQty = (_numbers$length = numbers.length) !== null && _numbers$length !== void 0 ? _numbers$length : 1;
+                if (expectedQty === actualQty) {
+                  //VALIDATION PASSED
+                  return;
+                } else {
+                  throw new Error("Number of serials provided does not match the required quantity of serials. Provided: ".concat(actualQty, " Expected: ").concat(expectedQty));
                 }
-                ;
-                return rangeNumbers;
               };
-              validateRange = function validateRange(range) {
+              checkForDuplicates = function _checkForDuplicates(serials) {
+                var duplicates = serials.filter(function (item, index) {
+                  return serials.indexOf(item) !== index;
+                });
+                console.log("duplicates: ".concat(duplicates));
+                if (duplicates.length > 0) throw new Error("Duplicate serials detected!");
+              };
+              validateRange = function _validateRange(range) {
                 //detect invalid inputs
                 /**
                  * check for:
@@ -1123,42 +1113,57 @@ function initWorkOrders() {
                 //VALIDATION PASS
                 return;
               };
-              checkForDuplicates = function checkForDuplicates(serials) {
-                var duplicates = serials.filter(function (item, index) {
-                  return serials.indexOf(item) !== index;
-                });
-                console.log("duplicates: ".concat(duplicates));
-                if (duplicates.length > 0) throw new Error("Duplicate serials detected!");
-              };
-              validateQty = function validateQty(numbers) {
-                var _numbers$length;
-                var expectedQty = Number(row.querySelector('#qty').dataset.qty);
-                console.log(expectedQty);
-                var actualQty = (_numbers$length = numbers.length) !== null && _numbers$length !== void 0 ? _numbers$length : 1;
-                if (expectedQty === actualQty) {
-                  //VALIDATION PASSED
-                  return;
-                } else {
-                  throw new Error("Number of serials provided does not match the required quantity of serials. Provided: ".concat(actualQty, " Expected: ").concat(expectedQty));
+              getNumbersFromRange = function _getNumbersFromRange(range) {
+                //validate range inputs:
+                validateRange(range);
+                if (range.indexOf('-') === -1) return [Number(range)];
+                //get start and end of the range
+                var splitRange = range.split('-');
+                var first = Number(splitRange[0]);
+                var second = Number(splitRange[1]);
+
+                //create array of sequential numbers
+                var rangeNumbers = [];
+                for (var n = first; n <= second; n++) {
+                  rangeNumbers.push(n);
                 }
+                ;
+                return rangeNumbers;
               };
-              //handle input
-              input = window.prompt("Please enter the serials for this work order to mark it as complete", "");
-              if (input) {
-                _context.next = 12;
+              if (e.target.closest('.compBtn')) {
+                _context.next = 6;
                 break;
               }
               return _context.abrupt("return");
-            case 12:
-              //check for blank input
-
+            case 6:
+              row = e.target.closest('tr'); //check whether workorder has serials or not
+              serials = row.querySelector('.wkoSerials').textContent;
+              workorder_id = row.dataset.id;
+              if (!(serials === 'To Be Confirmed')) {
+                _context.next = 15;
+                break;
+              }
+              //handle input
+              input = window.prompt("Please enter the serials for this work order to mark it as complete", "");
+              if (input) {
+                _context.next = 13;
+                break;
+              }
+              return _context.abrupt("return");
+            case 13:
+              _context.next = 16;
+              break;
+            case 15:
+              input = serials;
+            case 16:
               input = input.replace(/\s+/g, ''); //remove any spaces
-              input = input.replace(/\//g, ',');
+              input = input.replace(/\//g, ','); //swap forward slashes for commas
+
               ;
 
               //split input into ranges
               rangeNumbers = [];
-              _context.prev = 16;
+              _context.prev = 20;
               if (input.indexOf(',') > -1) {
                 //split ranges and count up all the serials in the range
 
@@ -1190,55 +1195,50 @@ function initWorkOrders() {
               //check quantity of serials against expected quantity
               validateQty(numbers);
               //send to the backend API!
-              workorder_id = row.dataset.id;
-              console.log('fetching!');
+
+              console.log('fetching ');
               payload = {
                 workorder_id: workorder_id,
                 numbers: numbers
               };
-              _context.prev = 23;
-              _context.next = 26;
-              return setSerials(payload);
-            case 26:
-              data = _context.sent;
-              _context.next = 33;
-              break;
+              _context.prev = 26;
+              _context.next = 29;
+              return completeWorkorder(payload);
             case 29:
-              _context.prev = 29;
-              _context.t0 = _context["catch"](23);
+              data = _context.sent;
+              _context.next = 36;
+              break;
+            case 32:
+              _context.prev = 32;
+              _context.t0 = _context["catch"](26);
               console.error();
               return _context.abrupt("return");
-            case 33:
+            case 36:
               ;
               console.log(data);
               if (data.success) {
-                _context.next = 37;
+                _context.next = 40;
                 break;
               }
               throw new Error(data.message);
-            case 37:
+            case 40:
               ;
               if (data.success) {
                 window.location.href = "http://localhost/SAM/workorders";
               }
-              _context.next = 46;
+              _context.next = 49;
               break;
-            case 41:
-              _context.prev = 41;
-              _context.t1 = _context["catch"](16);
+            case 44:
+              _context.prev = 44;
+              _context.t1 = _context["catch"](20);
               console.log(_context.t1);
               alert(_context.t1.message);
               return _context.abrupt("return");
-            case 46:
-              _context.next = 49;
-              break;
-            case 48:
-              window.location.href = "http://localhost/SAM/workorders/complete/".concat(row.dataset.id);
             case 49:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[16, 41], [23, 29]]);
+        }, _callee, null, [[20, 44], [26, 32]]);
       }));
       return function (_x2) {
         return _ref.apply(this, arguments);
@@ -1284,7 +1284,7 @@ function initWorkOrders() {
     }
   }
   initDelete();
-  handleSerials();
+  completeWorkorder();
 }
 
 
@@ -1376,7 +1376,7 @@ var URLROOT = 'http://localhost/SAM/';
   (0,_statusUpdate__WEBPACK_IMPORTED_MODULE_4__.initUpdateStatus)();
   (0,_transport_js__WEBPACK_IMPORTED_MODULE_5__.initTransport)();
   (0,_pagination_js__WEBPACK_IMPORTED_MODULE_6__.pagination)();
-  console.log('javascript is running');
+  // console.log('javascript is running');
 })();
 /******/ })()
 ;

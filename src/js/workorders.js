@@ -26,10 +26,10 @@ function initWorkOrders () {
 
 
 //event handler for marking workorders as complete when clicking the 'tick' SVG
-function handleSerials() { 
+function completeWorkorder() { 
 
-    async function setSerials(payload) {
-        const response = await fetch(`${URLROOT}apiworkorders/setSerials`, {
+    async function completeWorkorder(payload) {
+        const response = await fetch(`${URLROOT}apiworkorders/completeWorkorder`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ function handleSerials() {
         //VALIDATE SERIALS
         //SUBMIT
         /**
-         * input
+         * input or take serials from wko
          * split ranges
          * validate syntax
          * expand ranged
@@ -65,13 +65,16 @@ function handleSerials() {
 
         //check whether workorder has serials or not
         const serials = row.querySelector('.wkoSerials').textContent;
-        
+        const workorder_id = row.dataset.id;
+        let input;
         if(serials === 'To Be Confirmed'){
 
             //handle input
-            let input = window.prompt("Please enter the serials for this work order to mark it as complete","");
+            input = window.prompt("Please enter the serials for this work order to mark it as complete","");
             if(!input) return; //check for blank input
-
+        } else {
+            input = serials;
+        }
             input = input.replace(/\s+/g,''); //remove any spaces
             input = input.replace(/\//g, ','); //swap forward slashes for commas
             
@@ -176,9 +179,8 @@ function handleSerials() {
                 //check quantity of serials against expected quantity
                 validateQty(numbers);
                 //send to the backend API!
-                const workorder_id = row.dataset.id;
 
-                console.log('fetching!');
+                console.log('fetching ');
                 let data;
                 const payload = {
                     workorder_id,
@@ -186,7 +188,7 @@ function handleSerials() {
                 };
 
                 try {
-                    data = await setSerials(payload);
+                    data = await completeWorkorder(payload);
                 } catch (error) {
                     console.error();
                     return;
@@ -206,9 +208,6 @@ function handleSerials() {
                 alert(error.message);
                 return;
             }  
-        } else {
-            window.location.href = `http://localhost/SAM/workorders/complete/${row.dataset.id}`
-        }
     });
 }
 
@@ -254,7 +253,7 @@ function handleSerials() {
     }
 
     initDelete();
-    handleSerials();
+    completeWorkorder();
 }   
 
 

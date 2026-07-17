@@ -18,7 +18,7 @@ const URLROOT = 'http://localhost/SAM/';
     initUpdateStatus();
     initTransport();
     pagination();
-    console.log('javascript is running');
+    // console.log('javascript is running');
   })();
 
 
